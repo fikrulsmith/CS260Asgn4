@@ -1,0 +1,3 @@
+1) Added in a Restart Mechanic to the game for the player to play again if they win or lose.
+2) Added Bullet Hell. Whenever the player kills 5 asteroids without dying, he is able to shoot 5 bullets in one shot.
+3) Added Bullet Explosion. Whenever player dies, it creates a circular bullet explosion that kills asteroids around the player.
