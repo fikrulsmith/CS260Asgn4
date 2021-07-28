@@ -36,3 +36,8 @@
 *.db-wal
 *.opendb
 *.ipch
+Bin/CS260_AsteroidsD.pdb
+A4LANGame/x64/Debug/vc142.pdb
+A4LANGame/x64/Debug/vc142.idb
+A4LANGame/x64/Debug/CS260_AsteroidsD.ilk
+A4LANGame/x64/Debug/CS260_Asteroids.tlog/CS260_Asteroids.write.1u.tlog
