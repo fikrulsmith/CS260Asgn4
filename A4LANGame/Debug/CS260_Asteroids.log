@@ -1,0 +1,9 @@
+﻿  Collision.cpp
+C:\Users\ferna\Desktop\CS260Asgn4\A4LANGame\Include\main.h(29,10): fatal error C1083: Cannot open include file: 'AEEngine.h': No such file or directory
+  GameStateMgr.cpp
+C:\Users\ferna\Desktop\CS260Asgn4\A4LANGame\Include\main.h(29,10): fatal error C1083: Cannot open include file: 'AEEngine.h': No such file or directory
+  GameState_Asteroids.cpp
+C:\Users\ferna\Desktop\CS260Asgn4\A4LANGame\Include\main.h(29,10): fatal error C1083: Cannot open include file: 'AEEngine.h': No such file or directory
+  Main.cpp
+C:\Users\ferna\Desktop\CS260Asgn4\A4LANGame\Include\main.h(29,10): fatal error C1083: Cannot open include file: 'AEEngine.h': No such file or directory
+  Generating Code...
