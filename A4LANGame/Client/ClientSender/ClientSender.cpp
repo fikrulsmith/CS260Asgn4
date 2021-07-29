@@ -16,3 +16,30 @@ int ClientSender::SendClient(ClientInfo info, std::string message)
 
 	return bytesSend;
 }
+
+int ClientSender::RecvClient(ClientInfo info, std::string& message)
+{
+	const size_t BUFFER_SIZE = 10000;
+	char buffer[BUFFER_SIZE];
+
+	int serverAddressSize = sizeof(*info.addr->ai_addr);
+	const int bytesReceived = recvfrom(info.socket, buffer, BUFFER_SIZE - 1, 0, info.addr->ai_addr, &serverAddressSize);
+
+	if (bytesReceived == SOCKET_ERROR)
+	{
+		std::cerr << "Failed to receive!" << std::endl;
+		return SOCKET_ERROR;
+	}
+
+	if (bytesReceived == 0)
+	{
+		std::cerr << "Server has disconnected!" << std::endl;
+		return 0;
+	}
+
+	buffer[bytesReceived] = '\0';
+	message.clear();
+	message.append(buffer, bytesReceived);
+
+	return bytesReceived;
+}
