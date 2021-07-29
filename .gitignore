@@ -24,7 +24,6 @@
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
@@ -39,3 +38,7 @@
 *.tlog
 *.pdb
 *.idb
+*.exp
+*.ilk
+*.tmp
+*.log

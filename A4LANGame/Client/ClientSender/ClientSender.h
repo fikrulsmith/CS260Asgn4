@@ -15,5 +15,5 @@
 class ClientSender
 {
 public:
-	int SendClient(ClientInfo info, std::string message);
+	/*int SendClient(ClientInfo info, std::string message);*/
 };
