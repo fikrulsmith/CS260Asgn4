@@ -51,8 +51,6 @@ struct GameObjInst
 	// object transformation matrix: Each frame, 
 	// calculate the object instance's transformation matrix and save it here
 	AEMtx33 transform;
-	//void				(*pfUpdate)(void);
-	//void				(*pfDraw)(void);
 };
 
 enum class GameSystemType
