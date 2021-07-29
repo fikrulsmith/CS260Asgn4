@@ -8,12 +8,8 @@
 // #include "winsock2.h"	// ...or Winsock alone
 #include "ws2tcpip.h"		// getaddrinfo()
 
-#include <string>
-#include <iostream>
-#include "../ClientInfo.h"
-
-class ClientSender
+struct ClientInfo
 {
-public:
-	int SendClient(ClientInfo info, std::string message);
+	SOCKET socket;
+	addrinfo* addr;
 };

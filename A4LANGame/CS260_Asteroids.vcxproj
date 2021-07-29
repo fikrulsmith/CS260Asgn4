@@ -166,6 +166,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Client\Client.h" />
+    <ClInclude Include="Client\ClientInfo.h" />
+    <ClInclude Include="Client\ClientSender\ClientSender.h" />
     <ClInclude Include="Include\Collision.h" />
     <ClInclude Include="Include\GameStateList.h" />
     <ClInclude Include="Include\GameStateMgr.h" />
@@ -173,6 +176,8 @@
     <ClInclude Include="Include\Main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Client\Client.cpp" />
+    <ClCompile Include="Client\ClientSender\ClientSender.cpp" />
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\GameStateMgr.cpp" />
     <ClCompile Include="Src\GameState_Asteroids.cpp" />
