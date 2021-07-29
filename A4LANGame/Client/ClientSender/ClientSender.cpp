@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ClientSender.h"
 
-int ClientSender::SendClient(ClientInfo info, std::string message)
+int ClientSender::SendClient(ClientInfo& info, std::string message)
 {
 	int bytesSend = sendto(info.socket, message.c_str(),
 		static_cast<int>(message.length()), 0, info.addr->ai_addr, sizeof(*info.addr->ai_addr));
@@ -17,7 +17,7 @@ int ClientSender::SendClient(ClientInfo info, std::string message)
 	return bytesSend;
 }
 
-int ClientSender::RecvClient(ClientInfo info, std::string& message)
+int ClientSender::RecvClient(ClientInfo& info, std::string& message)
 {
 	const size_t BUFFER_SIZE = 10000;
 	char buffer[BUFFER_SIZE];
@@ -42,4 +42,14 @@ int ClientSender::RecvClient(ClientInfo info, std::string& message)
 	message.append(buffer, bytesReceived);
 
 	return bytesReceived;
+}
+
+int ClientSender::SendCommand(ClientInfo& info, std::string command)
+{
+	return SendClient(info, command);
+}
+
+int ClientSender::SendPacket(ClientInfo& info, std::string packet)
+{
+	return SendClient(info, packet);
 }
