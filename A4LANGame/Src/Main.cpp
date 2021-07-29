@@ -1,19 +1,3 @@
-/* Start Header **************************************************************/
-/*!
-\file Main.cpp
-\author Fikrul Islami Bin Abdullah, f.abdullah, 440005019
-\par f.abdullah\@digipen.edu
-\date February 09, 2020
-\brief This *.cpp file contains the variables and definition that controls
-	   the main game loop.
-
-Copyright (C) 2020 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header ****************************************************************/
-
 #include "pch.h"
 #include "main.h"
 
@@ -48,7 +32,8 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
-
+	/*std::unordered_map<std::string, std::string> map; 
+	Parser::GetHostnameToIPMap(std::string{ command_line }, map);*/
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_ASTEROIDS);
 

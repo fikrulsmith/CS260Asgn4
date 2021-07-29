@@ -1,19 +1,3 @@
-/* Start Header **************************************************************/
-/*!
-\file GameStateMgr.cpp
-\author Fikrul Islami Bin Abdullah, f.abdullah, 440005019
-\par f.abdullah\@digipen.edu
-\date February 09, 2020
-\brief This *.cpp file contains the variables and definition that handles
-	   the transition of game states within the game.
-
-Copyright (C) 2020 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header ****************************************************************/
-
 #include "pch.h"
 #include "main.h"
 

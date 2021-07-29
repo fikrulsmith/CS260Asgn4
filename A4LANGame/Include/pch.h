@@ -17,3 +17,7 @@
 
 #include <unordered_map>
 #include <functional>
+#include <string>
+#include <ctype.h>
+
+#include "Parser.h"

@@ -1,5 +1,4 @@
-#ifndef CS230_GAME_STATE_MGR_H_
-#define CS230_GAME_STATE_MGR_H_
+#pragma once
 
 #include "AEEngine.h"
 #include "GameStateList.h"
@@ -37,5 +36,3 @@ private:
 	AsteroidsGameState Asteroids_;
 	std::unordered_map<GameSystemType, std::function<void()>> GS_FunctionMap_;
 };
-
-#endif // CS230_GAME_STATE_MGR_H_

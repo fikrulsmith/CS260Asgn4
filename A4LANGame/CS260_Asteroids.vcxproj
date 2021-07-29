@@ -176,6 +176,7 @@
     <ClInclude Include="Include\GameState_Asteroids.h" />
     <ClInclude Include="Include\Global.h" />
     <ClInclude Include="Include\Main.h" />
+    <ClInclude Include="Include\Parser.h" />
     <ClInclude Include="Include\pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     <ClCompile Include="Src\GameStateMgr.cpp" />
     <ClCompile Include="Src\GameState_Asteroids.cpp" />
     <ClCompile Include="Src\Main.cpp" />
+    <ClCompile Include="Src\Parser.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
