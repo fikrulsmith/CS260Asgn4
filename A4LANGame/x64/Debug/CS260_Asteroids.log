@@ -1,7 +1,0 @@
-﻿  Collision.cpp
-  GameStateMgr.cpp
-  GameState_Asteroids.cpp
-  Main.cpp
-  Generating Code...
-     Creating library C:\Users\ferna\Desktop\CS260Asgn4\\Bin\CS260_AsteroidsD.lib and object C:\Users\ferna\Desktop\CS260Asgn4\\Bin\CS260_AsteroidsD.exp
-  CS260_Asteroids.vcxproj -> C:\Users\ferna\Desktop\CS260Asgn4\Bin\CS260_AsteroidsD.exe
