@@ -105,13 +105,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Dep\AlphaEngine_V3.07\MSVS_19\Include;Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Dep\AlphaEngine_V3.07\MSVS_19\Include;Include</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,10 +174,15 @@
     <ClInclude Include="Include\GameStateMgr.h" />
     <ClInclude Include="Include\GameState_Asteroids.h" />
     <ClInclude Include="Include\Main.h" />
+    <ClInclude Include="Include\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client\Client.cpp" />
     <ClCompile Include="Client\ClientSender\ClientSender.cpp" />
+    <ClCompile Include="Include\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Src\Collision.cpp" />
     <ClCompile Include="Src\GameStateMgr.cpp" />
     <ClCompile Include="Src\GameState_Asteroids.cpp" />

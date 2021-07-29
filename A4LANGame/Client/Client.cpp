@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Client.h"
 
 ClientInfo Client::GetClient(size_t index)

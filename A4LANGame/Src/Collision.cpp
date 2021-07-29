@@ -14,8 +14,8 @@ Technology is prohibited.
 */
 /* End Header ****************************************************************/
 
+#include "pch.h"
 #include "main.h"
-
 /**************************************************************************/
 /*!
 	Handles the collision between 2 rectangular bounding boxes based on 
