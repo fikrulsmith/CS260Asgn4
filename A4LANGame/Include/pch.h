@@ -15,3 +15,5 @@
 //#include "ClientSender/ClientSender.h"
 #include "../Client/ClientInfo.h"
 
+#include <unordered_map>
+#include <functional>

@@ -20,17 +20,14 @@ Technology is prohibited.
 /* End Header ****************************************************************/
 
 #include "pch.h"
-#include "main.h"
+#include "Main.h"
+#include "Global.h"
 
 /******************************************************************************/
 /*!
 	Defines
 */
 /******************************************************************************/
-const unsigned int	GAME_OBJ_NUM_MAX		= 32;			//The total number of different objects (Shapes)
-const unsigned int	GAME_OBJ_INST_NUM_MAX	= 2048;			//The total number of different game object instances
-
-
 const unsigned int	SHIP_INITIAL_NUM		= 3;			// initial number of ship lives
 const float			SHIP_SIZE				= 16.0f;		// ship size
 const float			SHIP_ACCEL_FORWARD		= 40.0f;		// ship forward acceleration (in m/s^2)
@@ -44,56 +41,9 @@ static bool			SPECIAL_CHECK           = false;			// check if player can use spec
 const float			ASTEROID_SIZE			= 50.0f;		// asteroid size
 unsigned int		ASTEROID_COUNT			= 0;			// no of asteroids that spawned
 
-static bool			onValueChange		    = true;			// The idea is to display any of these variables/strings whenever a change in their value happens changes
-
-// -----------------------------------------------------------------------------
-enum TYPE
-{
-	// list of game object types
-	TYPE_SHIP = 0, 
-	TYPE_BULLET,
-	TYPE_ASTEROID,
-	TYPE_HEALTH,
-
-	TYPE_NUM
-};
-
-// -----------------------------------------------------------------------------
-// object flag definition
-
-const unsigned long FLAG_ACTIVE				= 0x00000001;
-
-/******************************************************************************/
-/*!
-	Struct/Class Definitions
-*/
-/******************************************************************************/
-
-//Game object structure
-struct GameObj
-{
-	unsigned long		type;		// object type
-	AEGfxVertexList *	pMesh;		// This will hold the triangles which will form the shape of the object
-};
 
 // ---------------------------------------------------------------------------
 
-//Game object instance structure
-struct GameObjInst
-{
-	GameObj *			pObject;	// pointer to the 'original' shape
-	unsigned long		flag;		// bit flag or-ed together
-	float				scale;		// scaling value of the object instance
-	AEVec2				posCurr;	// object current position
-	AEVec2				velCurr;	// object current velocity
-	float				dirCurr;	// object current direction
-	AABB				boundingBox;// object bouding box that encapsulates the object
-	AEMtx33				transform;	// object transformation matrix: Each frame, 
-									// calculate the object instance's transformation matrix and save it here
-
-	//void				(*pfUpdate)(void);
-	//void				(*pfDraw)(void);
-};
 
 /******************************************************************************/
 /*!
@@ -124,91 +74,6 @@ static unsigned long		sScore;										// Current score
 GameObjInst *		gameObjInstCreate (unsigned long type, float scale, 
 											   AEVec2 * pPos, AEVec2 * pVel, float dir);
 void					gameObjInstDestroy(GameObjInst * pInst);
-
-
-/******************************************************************************/
-/*!
-	"Load" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsLoad(void)
-{
-	// zero the game object array
-	memset(sGameObjList, 0, sizeof(GameObj) * GAME_OBJ_NUM_MAX);
-	// No game objects (shapes) at this point
-	sGameObjNum = 0;
-
-	// zero the game object instance array
-	memset(sGameObjInstList, 0, sizeof(GameObjInst) * GAME_OBJ_INST_NUM_MAX);
-	// No game object instances (sprites) at this point
-	sGameObjInstNum = 0;
-
-	// The ship object instance hasn't been created yet, so this "spShip" pointer is initialized to 0
-	spShip = nullptr;
-
-	// load/create the mesh data (game objects / Shapes)
-	GameObj * pObj;
-
-	// =====================
-	// create the ship shape
-	// =====================
-
-	pObj		= sGameObjList + sGameObjNum++;
-	pObj->type	= TYPE_SHIP;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f,  0.5f, 0xFFFF0000, 0.0f, 0.0f, 
-		-0.5f, -0.5f, 0xFFFF0000, 0.0f, 1.0f,
-		 0.5f,  0.0f, 0xFFFFFFFF, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-
-
-	// =======================
-	// create the bullet shape
-	// =======================
-
-	pObj = sGameObjList + sGameObjNum++;
-	pObj->type = TYPE_BULLET;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
-		0.25f, 0.125f, 0xFFFFFF00, 0.0f, 1.0f,
-		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
-		-0.25f, -0.125f, 0xFFFFFF00, 0.0f, 1.0f,
-		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-
-
-	// =========================
-	// create the asteroid shape
-	// =========================
-
-	pObj = sGameObjList + sGameObjNum++;
-	pObj->type = TYPE_ASTEROID;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xBEC1BE, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0xBEC1BE, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xCDD2CD, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0xCDD2CD, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-}
 
 // Creates bullet explosion when ship dies
 void bulletExplosion(void)
@@ -288,14 +153,145 @@ void spawnBulletHell(int i)
 
 /******************************************************************************/
 /*!
-	"Initialize" function of this state
+	A function that creates the game objects for this assignment.
 */
 /******************************************************************************/
-void GameStateAsteroidsInit(void)
+GameObjInst * gameObjInstCreate(unsigned long type, 
+							   float scale, 
+							   AEVec2 * pPos, 
+							   AEVec2 * pVel, 
+							   float dir)
+{
+	AEVec2 zero;
+	AEVec2Zero(&zero);
+
+	AE_ASSERT_PARM(type < sGameObjNum);
+	
+	// loop through the object instance list to find a non-used object instance
+	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
+	{
+		GameObjInst * pInst = sGameObjInstList + i;
+
+		// check if current instance is not used
+		if (pInst->flag == 0)
+		{
+			// it is not used => use it to create the new instance
+			pInst->pObject	= sGameObjList + type;
+			pInst->flag		= FLAG_ACTIVE;
+			pInst->scale	= scale;
+			pInst->posCurr	= pPos ? *pPos : zero;
+			pInst->velCurr	= pVel ? *pVel : zero;
+			pInst->dirCurr	= dir;
+			
+			// return the newly created instance
+			return pInst;
+		}
+	}
+
+	// cannot find empty slot => return 0
+	return 0;
+}
+
+/******************************************************************************/
+/*!
+	This function ensures that the game deallocates memory of all game objects.
+*/
+/******************************************************************************/
+void gameObjInstDestroy(GameObjInst * pInst)
+{
+	// if instance is destroyed before, just return
+	if (pInst->flag == 0)
+		return;
+
+	// zero out the flag
+	pInst->flag = 0;
+}
+
+void AsteroidsGameState::GameStateAsteroidsLoad(void)
+{
+	// zero the game object array
+	memset(sGameObjList, 0, sizeof(GameObj) * GAME_OBJ_NUM_MAX);
+	// No game objects (shapes) at this point
+	sGameObjNum = 0;
+
+	// zero the game object instance array
+	memset(sGameObjInstList, 0, sizeof(GameObjInst) * GAME_OBJ_INST_NUM_MAX);
+	// No game object instances (sprites) at this point
+	sGameObjInstNum = 0;
+
+	// The ship object instance hasn't been created yet, so this "spShip" pointer is initialized to 0
+	spShip = nullptr;
+
+	// load/create the mesh data (game objects / Shapes)
+	GameObj* pObj;
+
+	// =====================
+	// create the ship shape
+	// =====================
+
+	pObj = sGameObjList + sGameObjNum++;
+	pObj->type = TYPE_SHIP;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, 0.5f, 0xFFFF0000, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0xFFFF0000, 0.0f, 1.0f,
+		0.5f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+
+
+	// =======================
+	// create the bullet shape
+	// =======================
+
+	pObj = sGameObjList + sGameObjNum++;
+	pObj->type = TYPE_BULLET;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
+		0.25f, 0.125f, 0xFFFFFF00, 0.0f, 1.0f,
+		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
+
+	AEGfxTriAdd(
+		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
+		-0.25f, -0.125f, 0xFFFFFF00, 0.0f, 1.0f,
+		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+
+
+	// =========================
+	// create the asteroid shape
+	// =========================
+
+	pObj = sGameObjList + sGameObjNum++;
+	pObj->type = TYPE_ASTEROID;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xBEC1BE, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0xBEC1BE, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xCDD2CD, 1.0f, 1.0f);
+
+	AEGfxTriAdd(
+		0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f,
+		0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
+		-0.5f, 0.5f, 0xCDD2CD, 1.0f, 1.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+}
+
+void AsteroidsGameState::GameStateAsteroidsInit(void)
 {
 	// create the main ship
 	spShip = gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, nullptr, nullptr, 0.0f);
-	AE_ASSERT(spShip);	
+
+	AE_ASSERT(spShip);
 
 	// CREATE THE INITIAL ASTEROIDS INSTANCES USING THE "gameObjInstCreate" FUNCTION
 	for (int i = 0; i < 4; i++)
@@ -304,16 +300,11 @@ void GameStateAsteroidsInit(void)
 	}
 
 	// reset the score and the number of ships
-	sScore      = 0;
-	sShipLives  = SHIP_INITIAL_NUM;
+	sScore = 0;
+	sShipLives = SHIP_INITIAL_NUM;
 }
 
-/******************************************************************************/
-/*!
-	"Update" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsUpdate(void)
+void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 {
 	// =========================
 	// update according to input
@@ -338,7 +329,8 @@ void GameStateAsteroidsUpdate(void)
 		// Reset Key Values
 		if (AEInputCheckCurr(AEVK_R))
 		{
-			gGameStateCurr = GS_RESTART;
+			GSManager->SetGameStateCurrIndex(GS_RESTART);
+			/*gGameStateCurr = GS_RESTART;*/
 			sScore = 0;
 			sShipLives = SHIP_INITIAL_NUM;
 			ASTEROID_COUNT = 0;
@@ -448,20 +440,20 @@ void GameStateAsteroidsUpdate(void)
 	// ===================================
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst * pInst = sGameObjInstList + i;
+		GameObjInst* pInst = sGameObjInstList + i;
 
 		// skip non-active object
 		if ((pInst->flag & FLAG_ACTIVE) == 0)
 			continue;
-		
+
 		// check if the object is a ship
 		if (pInst->pObject->type == TYPE_SHIP)
 		{
 			// warp the ship from one end of the screen to the other
 			pInst->posCurr.x = AEWrap(pInst->posCurr.x, AEGfxGetWinMinX() - SHIP_SIZE,
-														AEGfxGetWinMaxX() + SHIP_SIZE);
+				AEGfxGetWinMaxX() + SHIP_SIZE);
 			pInst->posCurr.y = AEWrap(pInst->posCurr.y, AEGfxGetWinMinY() - SHIP_SIZE,
-														AEGfxGetWinMaxY() + SHIP_SIZE);
+				AEGfxGetWinMaxY() + SHIP_SIZE);
 		}
 
 		// Wrap asteroids here
@@ -469,9 +461,9 @@ void GameStateAsteroidsUpdate(void)
 		{
 			// warp the ship from one end of the screen to the other
 			pInst->posCurr.x = AEWrap(pInst->posCurr.x, AEGfxGetWinMinX() - ASTEROID_SIZE,
-														AEGfxGetWinMaxX() + ASTEROID_SIZE);
+				AEGfxGetWinMaxX() + ASTEROID_SIZE);
 			pInst->posCurr.y = AEWrap(pInst->posCurr.y, AEGfxGetWinMinY() - ASTEROID_SIZE,
-														AEGfxGetWinMaxY() + ASTEROID_SIZE);
+				AEGfxGetWinMaxY() + ASTEROID_SIZE);
 		}
 
 		// Remove bullets that go out of bounds
@@ -491,7 +483,7 @@ void GameStateAsteroidsUpdate(void)
 	// ====================
 	// check for collision
 	// ====================
-	
+
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
 		GameObjInst* pInst = sGameObjInstList + i;
@@ -525,7 +517,7 @@ void GameStateAsteroidsUpdate(void)
 					{
 						// Creates bullet explosion after each death.
 						if (sShipLives > 1)
-						{ 
+						{
 							bulletExplosion();
 						}
 
@@ -583,7 +575,7 @@ void GameStateAsteroidsUpdate(void)
 						sScore += 100;
 
 						// Increment Special Trigger by 1
-						SPECIAL_TRIGGER+= 1;
+						SPECIAL_TRIGGER += 1;
 
 						if (SPECIAL_TRIGGER >= 5)
 						{
@@ -654,7 +646,7 @@ void GameStateAsteroidsUpdate(void)
 
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst * pInst = sGameObjInstList + i;
+		GameObjInst* pInst = sGameObjInstList + i;
 		AEMtx33		 trans, rot, scale;
 
 		// skip non-active object
@@ -674,12 +666,7 @@ void GameStateAsteroidsUpdate(void)
 	}
 }
 
-/******************************************************************************/
-/*!
-	"Render" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsDraw(void)
+void AsteroidsGameState::GameStateAsteroidsDraw(void)
 {
 	char strBuffer[1024] = { '\0' };
 	char InGameBuffer[1024] = { '\0' };
@@ -748,13 +735,7 @@ void GameStateAsteroidsDraw(void)
 	sprintf_s(InGameBuffer, "Ship Left: %d Score: %d", sShipLives >= 0 ? sShipLives : 0, sScore <= 5000 ? sScore : 5000);
 }
 
-
-/******************************************************************************/
-/*!
-	"Free" function of this state that deallocates memory of game objects.
-*/
-/******************************************************************************/
-void GameStateAsteroidsFree(void)
+void AsteroidsGameState::GameStateAsteroidsFree(void)
 {
 	// kill all object instances in the array using "gameObjInstDestroy"
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
@@ -764,12 +745,7 @@ void GameStateAsteroidsFree(void)
 	}
 }
 
-/******************************************************************************/
-/*!
-	"Unload" function of this state that frees all the meshes.
-*/
-/******************************************************************************/
-void GameStateAsteroidsUnload(void)
+void AsteroidsGameState::GameStateAsteroidsUnload(void)
 {
 	// free all mesh data (shapes) of each object using "AEGfxTriFree"
 	for (unsigned long i = 0; i < GAME_OBJ_NUM_MAX; i++)
@@ -779,60 +755,4 @@ void GameStateAsteroidsUnload(void)
 			continue;
 		AEGfxMeshFree(pInst->pMesh);
 	}
-}
-
-/******************************************************************************/
-/*!
-	A function that creates the game objects for this assignment.
-*/
-/******************************************************************************/
-GameObjInst * gameObjInstCreate(unsigned long type, 
-							   float scale, 
-							   AEVec2 * pPos, 
-							   AEVec2 * pVel, 
-							   float dir)
-{
-	AEVec2 zero;
-	AEVec2Zero(&zero);
-
-	AE_ASSERT_PARM(type < sGameObjNum);
-	
-	// loop through the object instance list to find a non-used object instance
-	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
-	{
-		GameObjInst * pInst = sGameObjInstList + i;
-
-		// check if current instance is not used
-		if (pInst->flag == 0)
-		{
-			// it is not used => use it to create the new instance
-			pInst->pObject	= sGameObjList + type;
-			pInst->flag		= FLAG_ACTIVE;
-			pInst->scale	= scale;
-			pInst->posCurr	= pPos ? *pPos : zero;
-			pInst->velCurr	= pVel ? *pVel : zero;
-			pInst->dirCurr	= dir;
-			
-			// return the newly created instance
-			return pInst;
-		}
-	}
-
-	// cannot find empty slot => return 0
-	return 0;
-}
-
-/******************************************************************************/
-/*!
-	This function ensures that the game deallocates memory of all game objects.
-*/
-/******************************************************************************/
-void gameObjInstDestroy(GameObjInst * pInst)
-{
-	// if instance is destroyed before, just return
-	if (pInst->flag == 0)
-		return;
-
-	// zero out the flag
-	pInst->flag = 0;
 }

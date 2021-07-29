@@ -17,12 +17,6 @@ Technology is prohibited.
 #ifndef CS230_MAIN_H_
 #define CS230_MAIN_H_
 
-//------------------------------------
-// Globals
-
-extern float	g_dt;
-extern double	g_appTime;
-
 // ---------------------------------------------------------------------------
 // includes
 
@@ -32,6 +26,13 @@ extern double	g_appTime;
 #include "GameStateMgr.h"
 #include "GameState_Asteroids.h"
 #include "Collision.h"
+
+//------------------------------------
+// Globals
+
+extern float	g_dt;
+extern double	g_appTime;
+extern std::unique_ptr<GameStateManager> GSManager;
 
 
 #endif // CS230_MAIN_H_

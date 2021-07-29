@@ -24,12 +24,16 @@ Technology is prohibited.
 
 // ---------------------------------------------------------------------------
 
-void GameStateAsteroidsLoad(void);
-void GameStateAsteroidsInit(void);
-void GameStateAsteroidsUpdate(void);
-void GameStateAsteroidsDraw(void);
-void GameStateAsteroidsFree(void);
-void GameStateAsteroidsUnload(void);
+class AsteroidsGameState
+{
+public:
+	void GameStateAsteroidsLoad(void);
+	void GameStateAsteroidsInit(void);
+	void GameStateAsteroidsUpdate(void);
+	void GameStateAsteroidsDraw(void);
+	void GameStateAsteroidsFree(void);
+	void GameStateAsteroidsUnload(void);
+};
 
 // ---------------------------------------------------------------------------
 

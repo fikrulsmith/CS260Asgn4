@@ -173,6 +173,7 @@
     <ClInclude Include="Include\GameStateList.h" />
     <ClInclude Include="Include\GameStateMgr.h" />
     <ClInclude Include="Include\GameState_Asteroids.h" />
+    <ClInclude Include="Include\Global.h" />
     <ClInclude Include="Include\Main.h" />
     <ClInclude Include="Include\pch.h" />
   </ItemGroup>

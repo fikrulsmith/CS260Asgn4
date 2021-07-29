@@ -17,7 +17,7 @@ Technology is prohibited.
 #ifndef CS230_COLLISION_H_
 #define CS230_COLLISION_H_
 
-#include "AEEngine.h"
+//#include "AEEngine.h"
 
 /**************************************************************************/
 /*!
