@@ -170,6 +170,7 @@
     <ClInclude Include="Client\ClientInfo.h" />
     <ClInclude Include="Client\ClientSender\ClientSender.h" />
     <ClInclude Include="Include\Collision.h" />
+    <ClInclude Include="Include\GameObjectFactory.h" />
     <ClInclude Include="Include\GameStateList.h" />
     <ClInclude Include="Include\GameStateMgr.h" />
     <ClInclude Include="Include\GameState_Asteroids.h" />
@@ -185,6 +186,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Src\Collision.cpp" />
+    <ClCompile Include="Src\GameObjectFactory.cpp" />
     <ClCompile Include="Src\GameStateMgr.cpp" />
     <ClCompile Include="Src\GameState_Asteroids.cpp" />
     <ClCompile Include="Src\Main.cpp" />

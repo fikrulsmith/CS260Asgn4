@@ -17,7 +17,7 @@ Technology is prohibited.
 #ifndef CS230_COLLISION_H_
 #define CS230_COLLISION_H_
 
-//#include "AEEngine.h"
+#include "AEEngine.h"
 
 /**************************************************************************/
 /*!
@@ -26,9 +26,6 @@ Technology is prohibited.
 /**************************************************************************/
 struct AABB
 {
-	//AEVec2	c; // center
-	//float  r[2]; // holds half width and half height
-	
 	AEVec2	min;
 	AEVec2	max;
 };
