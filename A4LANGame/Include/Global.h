@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #include "Collision.h"
 
@@ -62,4 +63,12 @@ enum class GameSystemType
 	DRAW,
 	FREE,
 	UNLOAD
+};
+
+struct ClientInfo
+{
+	SOCKET socket = INVALID_SOCKET;
+	addrinfo* addr = nullptr;
+	std::string name;
+	std::string port;
 };

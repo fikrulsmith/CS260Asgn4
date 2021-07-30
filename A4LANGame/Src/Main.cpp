@@ -2,6 +2,7 @@
 #include "main.h"
 
 #include <memory>
+#include "../Client/Client.h"
 
 // ---------------------------------------------------------------------------
 // Globals
@@ -17,6 +18,8 @@ std::unique_ptr<GameStateManager> GSManager;
 /******************************************************************************/
 int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _In_ LPSTR command_line, _In_ int show)
 {
+	Client client;
+
 	UNREFERENCED_PARAMETER(prevInstanceH);
 	UNREFERENCED_PARAMETER(command_line);
 

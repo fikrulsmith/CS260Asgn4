@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Global.h"
 #include "ClientSender.h"
 
 int ClientSender::SendClient(ClientInfo& info, std::string message)
