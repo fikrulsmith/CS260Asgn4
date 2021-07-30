@@ -1,6 +1,18 @@
 #include "pch.h"
 #include "Client.h"
 
+Client::Client(std::string name, std::string port)
+{
+	// not sure yet
+	// probably dont even need honestly
+	// or directly try to connect with all clients here
+}
+
+Client::~Client()
+{
+	WSACleanup();
+}
+
 ClientInfo Client::GetClient(size_t index)
 {
 	return clients[index];
@@ -14,6 +26,8 @@ bool Client::RegisterClient(ClientInfo client)
 
 bool Client::DisconnectClient(SOCKET clientSocket)
 {
+	// maybe donnid to erase the client
+	// jus add a boolean to say it's not active can already
 	for (auto it = clients.begin(); it != clients.end(); it++)
 	{
 		if (it->socket == clientSocket)
