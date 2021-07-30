@@ -25,6 +25,29 @@ public:
 	// run this first
 	// check against DOES_NOT_EXIST before trying to get client
 	size_t CheckClientExist(SOCKET clientSocket); 
+
+	int SendClient()
+	{
+		while (true)
+		{
+			sender.SendClient(clients[0], "stupid");
+		}
+	}
+
+	int ReceiveClient()
+	{
+		while (true)
+		{
+			std::string message;
+			sender.RecvClient(clients[0], message);
+			std::cout << message << std::endl;
+		}
+	}
+
+	std::string GetOwnPort()
+	{
+		return MyInfo.port;
+	}
 	
 	int ConnectToClient(ClientInfo& client);
 	// gets the client info

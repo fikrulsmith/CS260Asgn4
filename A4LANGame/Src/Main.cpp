@@ -41,6 +41,11 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	Client client;
 	client.InitialiseClient(vec);
 
+	/*if (client.GetOwnPort() == "2048")
+		client.SendClient();
+	else
+		client.ReceiveClient();*/
+
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
 
