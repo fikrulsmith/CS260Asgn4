@@ -34,6 +34,9 @@ int Client::InitMyInfo(std::string name, std::string port)
 	MyInfo.name = name;
 	MyInfo.port = port;
 
+	std::cout << "Own Address: " << name << std::endl;
+	std::cout << "Own Port: " << port << std::endl;
+
 	addrinfo hints{};
 	SecureZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;			// IPv4
@@ -48,6 +51,7 @@ int Client::InitMyInfo(std::string name, std::string port)
 		std::cerr << "getaddrinfo() failed." << std::endl;
 		return errorCode;
 	}
+
 	std::cout << "Successful.\n" << std::endl;
 	return OK;
 }
@@ -69,10 +73,14 @@ Client::~Client()
 int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> allClients)
 {
 	if (InitWSA() != OK) return -1;
+	if (InitMyInfo(allClients[0].first, allClients[0].second) != OK) return -1;
+
+	allClients.erase(allClients.begin());
 
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
-		
+		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
+		ConnectToClient(clients[index]);
 	}
 
 	return 1;
@@ -83,10 +91,14 @@ ClientInfo Client::GetClient(size_t index)
 	return clients[index];
 }
 
-bool Client::RegisterClient(ClientInfo client)
+size_t Client::RegisterClient(std::string name, std::string port)
 {
+	ClientInfo client;
+	client.name = name;
+	client.port = port;
+
 	clients.push_back(client);
-	return true;
+	return clients.size() - 1;
 }
 
 bool Client::DisconnectClient(SOCKET clientSocket)
@@ -191,8 +203,12 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	client.addr = serverInfo;
 	client.socket = serverSocket;
+	
+	std::cout << "CLIENT: " << std::endl;
+	std::cout << client.name << std::endl;
+	std::cout << client.port << std::endl;
 
-	std::cout << "Successfully connected to Client." << std::endl;
+	std::cout << "Successfully stored client address." << std::endl;
 
 	return 200;
 }
