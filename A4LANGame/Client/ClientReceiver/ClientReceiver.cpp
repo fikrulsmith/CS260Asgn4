@@ -27,8 +27,19 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 
 	if (bytesReceived == SOCKET_ERROR)
 	{
-		std::cerr << "Failed to receive!" << std::endl;
-		return SOCKET_ERROR;
+		size_t errorCode = WSAGetLastError();
+		if (errorCode == WSAEWOULDBLOCK)
+		{
+			// A non-blocking call returned no data; sleep and try again.
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(200ms);
+			//std::cerr << "trying again..." << std::endl;
+			return;
+		}
+		else
+		{
+			std::cerr << "recv()from failed." << std::endl;
+		}
 	}
 
 	if (bytesReceived == 0)
