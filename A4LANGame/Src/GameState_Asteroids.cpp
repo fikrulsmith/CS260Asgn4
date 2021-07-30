@@ -1,319 +1,16 @@
-/* Start Header **************************************************************/
-/*!
-\file GameState_Asteroids.cpp
-\author Fikrul Islami Bin Abdullah, f.abdullah, 440005019
-\par f.abdullah\@digipen.edu
-\date February 09, 2020
-\brief This *.cpp file contains the variables and definition of 6 functions;
-	   1) Load
-	   2) Initialization
-	   3) Update
-	   4) Draw
-	   5) Free
-	   6) Unload
-
-Copyright (C) 2020 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header ****************************************************************/
-
 #include "pch.h"
-#include "main.h"
-
-/******************************************************************************/
-/*!
-	Defines
-*/
-/******************************************************************************/
-const unsigned int	GAME_OBJ_NUM_MAX		= 32;			//The total number of different objects (Shapes)
-const unsigned int	GAME_OBJ_INST_NUM_MAX	= 2048;			//The total number of different game object instances
-
-
-const unsigned int	SHIP_INITIAL_NUM		= 3;			// initial number of ship lives
-const float			SHIP_SIZE				= 16.0f;		// ship size
-const float			SHIP_ACCEL_FORWARD		= 40.0f;		// ship forward acceleration (in m/s^2)
-const float			SHIP_ACCEL_BACKWARD		= 40.0f;		// ship backward acceleration (in m/s^2)
-const float			SHIP_ROT_SPEED			= (2.0f * PI);	// ship rotation speed (degree/second)
-
-const float			BULLET_SPEED			= 150.0f;		// bullet speed (m/s)
-static int			SPECIAL_TRIGGER			= 0;			// charges up special
-static bool			SPECIAL_CHECK           = false;			// check if player can use special power
-
-const float			ASTEROID_SIZE			= 50.0f;		// asteroid size
-unsigned int		ASTEROID_COUNT			= 0;			// no of asteroids that spawned
-
-static bool			onValueChange		    = true;			// The idea is to display any of these variables/strings whenever a change in their value happens changes
-
-// -----------------------------------------------------------------------------
-enum TYPE
-{
-	// list of game object types
-	TYPE_SHIP = 0, 
-	TYPE_BULLET,
-	TYPE_ASTEROID,
-	TYPE_HEALTH,
-
-	TYPE_NUM
-};
-
-// -----------------------------------------------------------------------------
-// object flag definition
-
-const unsigned long FLAG_ACTIVE				= 0x00000001;
-
-/******************************************************************************/
-/*!
-	Struct/Class Definitions
-*/
-/******************************************************************************/
-
-//Game object structure
-struct GameObj
-{
-	unsigned long		type;		// object type
-	AEGfxVertexList *	pMesh;		// This will hold the triangles which will form the shape of the object
-};
-
-// ---------------------------------------------------------------------------
-
-//Game object instance structure
-struct GameObjInst
-{
-	GameObj *			pObject;	// pointer to the 'original' shape
-	unsigned long		flag;		// bit flag or-ed together
-	float				scale;		// scaling value of the object instance
-	AEVec2				posCurr;	// object current position
-	AEVec2				velCurr;	// object current velocity
-	float				dirCurr;	// object current direction
-	AABB				boundingBox;// object bouding box that encapsulates the object
-	AEMtx33				transform;	// object transformation matrix: Each frame, 
-									// calculate the object instance's transformation matrix and save it here
-
-	//void				(*pfUpdate)(void);
-	//void				(*pfDraw)(void);
-};
+#include "Main.h"
 
 /******************************************************************************/
 /*!
 	Static Variables
 */
 /******************************************************************************/
+GameObjInst* AsteroidsGameState::spShip = nullptr;
+long AsteroidsGameState::sShipLives = 0;
+unsigned long AsteroidsGameState::sScore = 0;
 
-// list of original object
-static GameObj				sGameObjList[GAME_OBJ_NUM_MAX];				// Each element in this array represents a unique game object (shape)
-static unsigned long		sGameObjNum;								// The number of defined game objects
-
-// list of object instances
-static GameObjInst			sGameObjInstList[GAME_OBJ_INST_NUM_MAX];	// Each element in this array represents a unique game object instance (sprite)
-static unsigned long		sGameObjInstNum;							// The number of used game object instances
-
-// pointer to the ship object
-static GameObjInst *		spShip;										// Pointer to the "Ship" game object instance
-
-// number of ship available (lives 0 = game over)
-static long					sShipLives;									// The number of lives left
-
-// the score = number of asteroid destroyed
-static unsigned long		sScore;										// Current score
-
-// ---------------------------------------------------------------------------
-
-// functions to create/destroy a game object instance
-GameObjInst *		gameObjInstCreate (unsigned long type, float scale, 
-											   AEVec2 * pPos, AEVec2 * pVel, float dir);
-void					gameObjInstDestroy(GameObjInst * pInst);
-
-
-/******************************************************************************/
-/*!
-	"Load" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsLoad(void)
-{
-	// zero the game object array
-	memset(sGameObjList, 0, sizeof(GameObj) * GAME_OBJ_NUM_MAX);
-	// No game objects (shapes) at this point
-	sGameObjNum = 0;
-
-	// zero the game object instance array
-	memset(sGameObjInstList, 0, sizeof(GameObjInst) * GAME_OBJ_INST_NUM_MAX);
-	// No game object instances (sprites) at this point
-	sGameObjInstNum = 0;
-
-	// The ship object instance hasn't been created yet, so this "spShip" pointer is initialized to 0
-	spShip = nullptr;
-
-	// load/create the mesh data (game objects / Shapes)
-	GameObj * pObj;
-
-	// =====================
-	// create the ship shape
-	// =====================
-
-	pObj		= sGameObjList + sGameObjNum++;
-	pObj->type	= TYPE_SHIP;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f,  0.5f, 0xFFFF0000, 0.0f, 0.0f, 
-		-0.5f, -0.5f, 0xFFFF0000, 0.0f, 1.0f,
-		 0.5f,  0.0f, 0xFFFFFFFF, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-
-
-	// =======================
-	// create the bullet shape
-	// =======================
-
-	pObj = sGameObjList + sGameObjNum++;
-	pObj->type = TYPE_BULLET;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
-		0.25f, 0.125f, 0xFFFFFF00, 0.0f, 1.0f,
-		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
-		-0.25f, -0.125f, 0xFFFFFF00, 0.0f, 1.0f,
-		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-
-
-	// =========================
-	// create the asteroid shape
-	// =========================
-
-	pObj = sGameObjList + sGameObjNum++;
-	pObj->type = TYPE_ASTEROID;
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xBEC1BE, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0xBEC1BE, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xCDD2CD, 1.0f, 1.0f);
-
-	AEGfxTriAdd(
-		0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0xCDD2CD, 1.0f, 1.0f);
-
-	pObj->pMesh = AEGfxMeshEnd();
-	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
-}
-
-// Creates bullet explosion when ship dies
-void bulletExplosion(void)
-{
-	float BEDir = 0.0f;
-	float BERot = 0.2f;
-	AEVec2 BulletExp;
-
-	for (int i = 0; i < 10; ++i)
-	{
-		BEDir = BERot * PI;
-
-		// Get the bullet's direction according to the ship's direction
-		AEVec2Set(&BulletExp, cosf(BEDir), sinf(BEDir));
-
-		// Set the velocity
-		BulletExp.x += BULLET_SPEED * BulletExp.x;
-		BulletExp.y += BULLET_SPEED * BulletExp.y;
-
-		// Create an instance
-		gameObjInstCreate(TYPE_BULLET, 20.0f, &spShip->posCurr, &BulletExp, BEDir);
-
-		BERot += 0.2f;
-	}
-}
-
-// Spawns an asteroid
-void spawnAsteroid(void)
-{
-	// Create an array of vectors for the asteroids
-	AEVec2 AsteroidPos[4];
-	// Velocity Vector
-	AEVec2 added;
-
-	// Randomize size from 0 - 99
-	int size = rand() % 100;
-	// Randomize position in array from 0-3
-	int index = rand() % 4;
-	// Randomize Velocity 75-100
-	int velocity = rand() % (150 + 1 - 75) + 75;
-	// Radomize direction
-	float dir = (float)(rand() % (int)(2 * PI)) + 0.01f;
-
-	// Set each spawn location in the array
-	AsteroidPos[0] = { AEGfxGetWinMinX() / 2, AEGfxGetWinMinY() / 2 };
-	AsteroidPos[1] = { AEGfxGetWinMinX() / 2, AEGfxGetWinMinY() };
-	AsteroidPos[2] = { AEGfxGetWinMinX(), AEGfxGetWinMinY() / 2 };
-	AsteroidPos[3] = { AEGfxGetWinMinX(), AEGfxGetWinMinY() };
-
-	// Sets the direction of the asteroids
-	AEVec2Set(&added, cosf(dir), sinf(dir));
-	// Adds the velocity to the asteroids position
-	AEVec2Add(&AsteroidPos[index], &AsteroidPos[index], &added);
-
-	// Sets velocity of asteroids
-	added.x += static_cast<float>(velocity) * added.x;
-	added.y += static_cast<float>(velocity)* added.y;
-
-	// Creates the game object
-	gameObjInstCreate(TYPE_ASTEROID, static_cast<float>(size), &AsteroidPos[index], &added, dir);
-
-	// Keeps track of the spawned asteroids on screen
-	ASTEROID_COUNT++;
-}
-
-// Creates Bullet Hell Mechanic
-void spawnBulletHell(int i)
-{
-	AEVec2 BulletHell;
-	AEVec2Set(&BulletHell, cosf(spShip->dirCurr) + 0.3f * i, sinf(spShip->dirCurr) + 0.3f * i);
-	// Set the velocity
-	BulletHell.x += BULLET_SPEED * BulletHell.x;
-	BulletHell.y += BULLET_SPEED * BulletHell.y;
-	// Get the bullet's direction according to the ship's direction
-	gameObjInstCreate(TYPE_BULLET, 10.0f, &spShip->posCurr, &BulletHell, spShip->dirCurr);
-}
-
-/******************************************************************************/
-/*!
-	"Initialize" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsInit(void)
-{
-	// create the main ship
-	spShip = gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, nullptr, nullptr, 0.0f);
-	AE_ASSERT(spShip);	
-
-	// CREATE THE INITIAL ASTEROIDS INSTANCES USING THE "gameObjInstCreate" FUNCTION
-	for (int i = 0; i < 4; i++)
-	{
-		spawnAsteroid();
-	}
-
-	// reset the score and the number of ships
-	sScore      = 0;
-	sShipLives  = SHIP_INITIAL_NUM;
-}
-
-/******************************************************************************/
-/*!
-	"Update" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsUpdate(void)
+void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 {
 	// =========================
 	// update according to input
@@ -338,7 +35,7 @@ void GameStateAsteroidsUpdate(void)
 		// Reset Key Values
 		if (AEInputCheckCurr(AEVK_R))
 		{
-			gGameStateCurr = GS_RESTART;
+			GSManager->SetGameStateCurrIndex(GS_RESTART);
 			sScore = 0;
 			sShipLives = SHIP_INITIAL_NUM;
 			ASTEROID_COUNT = 0;
@@ -407,7 +104,7 @@ void GameStateAsteroidsUpdate(void)
 				Bullet.x += BULLET_SPEED * Bullet.x;
 				Bullet.y += BULLET_SPEED * Bullet.y;
 				// Create an instance
-				gameObjInstCreate(TYPE_BULLET, 10.0f, &spShip->posCurr, &Bullet, spShip->dirCurr);
+				GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 10.0f, &spShip->posCurr, &Bullet, spShip->dirCurr);
 			}
 		}
 
@@ -420,7 +117,7 @@ void GameStateAsteroidsUpdate(void)
 		// ======================================================
 		for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 		{
-			GameObjInst* pInst = sGameObjInstList + i;
+			GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
 
 			// If the object is not active, don't do anything
 			if ((pInst->flag & FLAG_ACTIVE) == 0)
@@ -448,20 +145,20 @@ void GameStateAsteroidsUpdate(void)
 	// ===================================
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst * pInst = sGameObjInstList + i;
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
 
 		// skip non-active object
 		if ((pInst->flag & FLAG_ACTIVE) == 0)
 			continue;
-		
+
 		// check if the object is a ship
 		if (pInst->pObject->type == TYPE_SHIP)
 		{
 			// warp the ship from one end of the screen to the other
 			pInst->posCurr.x = AEWrap(pInst->posCurr.x, AEGfxGetWinMinX() - SHIP_SIZE,
-														AEGfxGetWinMaxX() + SHIP_SIZE);
+				AEGfxGetWinMaxX() + SHIP_SIZE);
 			pInst->posCurr.y = AEWrap(pInst->posCurr.y, AEGfxGetWinMinY() - SHIP_SIZE,
-														AEGfxGetWinMaxY() + SHIP_SIZE);
+				AEGfxGetWinMaxY() + SHIP_SIZE);
 		}
 
 		// Wrap asteroids here
@@ -469,9 +166,9 @@ void GameStateAsteroidsUpdate(void)
 		{
 			// warp the ship from one end of the screen to the other
 			pInst->posCurr.x = AEWrap(pInst->posCurr.x, AEGfxGetWinMinX() - ASTEROID_SIZE,
-														AEGfxGetWinMaxX() + ASTEROID_SIZE);
+				AEGfxGetWinMaxX() + ASTEROID_SIZE);
 			pInst->posCurr.y = AEWrap(pInst->posCurr.y, AEGfxGetWinMinY() - ASTEROID_SIZE,
-														AEGfxGetWinMaxY() + ASTEROID_SIZE);
+				AEGfxGetWinMaxY() + ASTEROID_SIZE);
 		}
 
 		// Remove bullets that go out of bounds
@@ -479,11 +176,11 @@ void GameStateAsteroidsUpdate(void)
 		{
 			// if the bullet goes out of x-axis, remove
 			if (pInst->posCurr.x > AEGfxGetWinMaxX() || pInst->posCurr.x < AEGfxGetWinMinX())
-				gameObjInstDestroy(pInst);
+				GameObjFactory_->gameObjInstDestroy(pInst);
 
 			// if the bullet goes out of y-axis, remove
 			if (pInst->posCurr.y > AEGfxGetWinMaxY() || pInst->posCurr.y < AEGfxGetWinMinY())
-				gameObjInstDestroy(pInst);
+				GameObjFactory_->gameObjInstDestroy(pInst);
 		}
 	}
 
@@ -491,10 +188,10 @@ void GameStateAsteroidsUpdate(void)
 	// ====================
 	// check for collision
 	// ====================
-	
+
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst* pInst = sGameObjInstList + i;
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
 
 		// If object is inactive, do nothing and skip
 		if ((pInst->flag & FLAG_ACTIVE) == 0)
@@ -507,7 +204,7 @@ void GameStateAsteroidsUpdate(void)
 		{
 			for (unsigned long j = 0; j < GAME_OBJ_INST_NUM_MAX; j++)
 			{
-				GameObjInst* _pInst = sGameObjInstList + j;
+				GameObjInst* _pInst = GameObjFactory_->GetGameObjInstData() + j;
 
 				// If asteroid object is inactive, do nothing and skip
 				if ((_pInst->flag & FLAG_ACTIVE) == 0 ||
@@ -525,7 +222,7 @@ void GameStateAsteroidsUpdate(void)
 					{
 						// Creates bullet explosion after each death.
 						if (sShipLives > 1)
-						{ 
+						{
 							bulletExplosion();
 						}
 
@@ -545,7 +242,7 @@ void GameStateAsteroidsUpdate(void)
 						SPECIAL_TRIGGER = 0;
 
 						// Destroy Asteroid
-						gameObjInstDestroy(pInst);
+						GameObjFactory_->gameObjInstDestroy(pInst);
 
 						// Set flag to true
 						if (sScore <= 5000)
@@ -574,16 +271,16 @@ void GameStateAsteroidsUpdate(void)
 						_pInst->boundingBox, _pInst->velCurr))
 					{
 						// Destroy Asteroid
-						gameObjInstDestroy(pInst);
+						GameObjFactory_->gameObjInstDestroy(pInst);
 
 						// Remove Bullet
-						gameObjInstDestroy(_pInst);
+						GameObjFactory_->gameObjInstDestroy(_pInst);
 
 						// Update Score
 						sScore += 100;
 
 						// Increment Special Trigger by 1
-						SPECIAL_TRIGGER+= 1;
+						SPECIAL_TRIGGER += 1;
 
 						if (SPECIAL_TRIGGER >= 5)
 						{
@@ -654,7 +351,7 @@ void GameStateAsteroidsUpdate(void)
 
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst * pInst = sGameObjInstList + i;
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
 		AEMtx33		 trans, rot, scale;
 
 		// skip non-active object
@@ -674,12 +371,108 @@ void GameStateAsteroidsUpdate(void)
 	}
 }
 
-/******************************************************************************/
-/*!
-	"Render" function of this state
-*/
-/******************************************************************************/
-void GameStateAsteroidsDraw(void)
+AsteroidsGameState::AsteroidsGameState() :
+	GameObjFactory_{ std::make_shared<GameObjectFactory>() }
+{}
+
+void AsteroidsGameState::GameStateAsteroidsLoad(void)
+{
+	// zero the game object array
+	memset(GameObjFactory_->GetGameObjData(), 0, sizeof(GameObj) * GAME_OBJ_NUM_MAX);
+	// No game objects (shapes) at this point
+	GameObjFactory_->SetGameObjSize(0);
+
+	// zero the game object instance array
+	memset(GameObjFactory_->GetGameObjInstData(), 0, sizeof(GameObjInst) * GAME_OBJ_INST_NUM_MAX);
+	// No game object instances (sprites) at this point
+	GameObjFactory_->SetGameObjInstSize(0);
+
+	// The ship object instance hasn't been created yet, so this "spShip" pointer is initialized to 0
+	spShip = nullptr;
+
+	// load/create the mesh data (game objects / Shapes)
+	GameObj* pObj;
+
+	// =====================
+	// create the ship shape
+	// =====================
+
+	pObj = GameObjFactory_->GetNextGameObjectPointer();
+	pObj->type = TYPE_SHIP;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, 0.5f, 0xFFFF0000, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0xFFFF0000, 0.0f, 1.0f,
+		0.5f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+
+
+	// =======================
+	// create the bullet shape
+	// =======================
+
+	pObj = GameObjFactory_->GetNextGameObjectPointer();
+	pObj->type = TYPE_BULLET;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
+		0.25f, 0.125f, 0xFFFFFF00, 0.0f, 1.0f,
+		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
+
+	AEGfxTriAdd(
+		-0.25f, 0.125f, 0xFFFFFF00, 0.0f, 0.0f,
+		-0.25f, -0.125f, 0xFFFFFF00, 0.0f, 1.0f,
+		0.25f, -0.125f, 0xFFFFFF00, 1.0f, 1.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+
+
+	// =========================
+	// create the asteroid shape
+	// =========================
+
+	pObj = GameObjFactory_->GetNextGameObjectPointer();
+	pObj->type = TYPE_ASTEROID;
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFF808080, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFF808080, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFF808080, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f);
+
+	pObj->pMesh = AEGfxMeshEnd();
+	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");
+}
+
+void AsteroidsGameState::GameStateAsteroidsInit(void)
+{
+	// Player 1
+	spShip = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, nullptr, nullptr, 0.0f);
+
+	AE_ASSERT(spShip);
+
+	// CREATE THE INITIAL ASTEROIDS INSTANCES USING THE "gameObjInstCreate" FUNCTION
+	for (int i = 0; i < 4; i++)
+	{
+		spawnAsteroid();
+	}
+
+	// reset the score and the number of ships
+	sScore = 0;
+	sShipLives = SHIP_INITIAL_NUM;
+}
+
+void AsteroidsGameState::GameStateAsteroidsDraw(void)
 {
 	char strBuffer[1024] = { '\0' };
 	char InGameBuffer[1024] = { '\0' };
@@ -690,7 +483,7 @@ void GameStateAsteroidsDraw(void)
 	// draw all object instances in the list
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst* pInst = sGameObjInstList + i;
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
 
 		// skip non-active object
 		if ((pInst->flag & FLAG_ACTIVE) == 0)
@@ -748,91 +541,100 @@ void GameStateAsteroidsDraw(void)
 	sprintf_s(InGameBuffer, "Ship Left: %d Score: %d", sShipLives >= 0 ? sShipLives : 0, sScore <= 5000 ? sScore : 5000);
 }
 
-
-/******************************************************************************/
-/*!
-	"Free" function of this state that deallocates memory of game objects.
-*/
-/******************************************************************************/
-void GameStateAsteroidsFree(void)
+void AsteroidsGameState::GameStateAsteroidsFree(void)
 {
 	// kill all object instances in the array using "gameObjInstDestroy"
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
-		GameObjInst* pInst = sGameObjInstList + i;
-		gameObjInstDestroy(pInst);
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
+		GameObjFactory_->gameObjInstDestroy(pInst);
 	}
 }
 
-/******************************************************************************/
-/*!
-	"Unload" function of this state that frees all the meshes.
-*/
-/******************************************************************************/
-void GameStateAsteroidsUnload(void)
+void AsteroidsGameState::GameStateAsteroidsUnload(void)
 {
 	// free all mesh data (shapes) of each object using "AEGfxTriFree"
 	for (unsigned long i = 0; i < GAME_OBJ_NUM_MAX; i++)
 	{
-		GameObj* pInst = sGameObjList + i;
+		GameObj* pInst = GameObjFactory_->GetGameObjData() + i;
 		if ((pInst->pMesh == nullptr))
 			continue;
 		AEGfxMeshFree(pInst->pMesh);
 	}
 }
 
-/******************************************************************************/
-/*!
-	A function that creates the game objects for this assignment.
-*/
-/******************************************************************************/
-GameObjInst * gameObjInstCreate(unsigned long type, 
-							   float scale, 
-							   AEVec2 * pPos, 
-							   AEVec2 * pVel, 
-							   float dir)
+// Creates bullet explosion when ship dies
+void AsteroidsGameState::bulletExplosion(void)
 {
-	AEVec2 zero;
-	AEVec2Zero(&zero);
+	float BEDir = 0.0f;
+	float BERot = 0.2f;
+	AEVec2 BulletExp;
 
-	AE_ASSERT_PARM(type < sGameObjNum);
-	
-	// loop through the object instance list to find a non-used object instance
-	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
+	for (int i = 0; i < 10; ++i)
 	{
-		GameObjInst * pInst = sGameObjInstList + i;
+		BEDir = BERot * PI;
 
-		// check if current instance is not used
-		if (pInst->flag == 0)
-		{
-			// it is not used => use it to create the new instance
-			pInst->pObject	= sGameObjList + type;
-			pInst->flag		= FLAG_ACTIVE;
-			pInst->scale	= scale;
-			pInst->posCurr	= pPos ? *pPos : zero;
-			pInst->velCurr	= pVel ? *pVel : zero;
-			pInst->dirCurr	= dir;
-			
-			// return the newly created instance
-			return pInst;
-		}
+		// Get the bullet's direction according to the ship's direction
+		AEVec2Set(&BulletExp, cosf(BEDir), sinf(BEDir));
+
+		// Set the velocity
+		BulletExp.x += BULLET_SPEED * BulletExp.x;
+		BulletExp.y += BULLET_SPEED * BulletExp.y;
+
+		// Create an instance
+		GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 20.0f, &spShip->posCurr, &BulletExp, BEDir);
+
+		BERot += 0.2f;
 	}
-
-	// cannot find empty slot => return 0
-	return 0;
 }
 
-/******************************************************************************/
-/*!
-	This function ensures that the game deallocates memory of all game objects.
-*/
-/******************************************************************************/
-void gameObjInstDestroy(GameObjInst * pInst)
+// Spawns an asteroid
+void AsteroidsGameState::spawnAsteroid(void)
 {
-	// if instance is destroyed before, just return
-	if (pInst->flag == 0)
-		return;
+	// Create an array of vectors for the asteroids
+	AEVec2 AsteroidPos[4];
+	// Velocity Vector
+	AEVec2 added;
 
-	// zero out the flag
-	pInst->flag = 0;
+	// Randomize size from 0 - 99
+	int size = rand() % 100;
+	// Randomize position in array from 0-3
+	int index = rand() % 4;
+	// Randomize Velocity 75-100
+	int velocity = rand() % (150 + 1 - 75) + 75;
+	// Radomize direction
+	float dir = (float)(rand() % (int)(2 * PI)) + 0.01f;
+
+	// Set each spawn location in the array
+	AsteroidPos[0] = { AEGfxGetWinMinX() / 2, AEGfxGetWinMinY() / 2 };
+	AsteroidPos[1] = { AEGfxGetWinMinX() / 2, AEGfxGetWinMinY() };
+	AsteroidPos[2] = { AEGfxGetWinMinX(), AEGfxGetWinMinY() / 2 };
+	AsteroidPos[3] = { AEGfxGetWinMinX(), AEGfxGetWinMinY() };
+
+	// Sets the direction of the asteroids
+	AEVec2Set(&added, cosf(dir), sinf(dir));
+	// Adds the velocity to the asteroids position
+	AEVec2Add(&AsteroidPos[index], &AsteroidPos[index], &added);
+
+	// Sets velocity of asteroids
+	added.x += static_cast<float>(velocity) * added.x;
+	added.y += static_cast<float>(velocity) * added.y;
+
+	// Creates the game object
+	GameObjFactory_->gameObjInstCreate(TYPE_ASTEROID, static_cast<float>(size), &AsteroidPos[index], &added, dir);
+
+	// Keeps track of the spawned asteroids on screen
+	ASTEROID_COUNT++;
+}
+
+// Creates Bullet Hell Mechanic
+void AsteroidsGameState::spawnBulletHell(int i)
+{
+	AEVec2 BulletHell;
+	AEVec2Set(&BulletHell, cosf(spShip->dirCurr) + 0.3f * i, sinf(spShip->dirCurr) + 0.3f * i);
+	// Set the velocity
+	BulletHell.x += BULLET_SPEED * BulletHell.x;
+	BulletHell.y += BULLET_SPEED * BulletHell.y;
+	// Get the bullet's direction according to the ship's direction
+	GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 10.0f, &spShip->posCurr, &BulletHell, spShip->dirCurr);
 }

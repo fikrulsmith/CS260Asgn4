@@ -1,57 +1,40 @@
-/* Start Header **************************************************************/
-/*!
-\file GameStateMgr.h
-\author Fikrul Islami Bin Abdullah, f.abdullah, 440005019
-\par f.abdullah\@digipen.edu
-\date February 09, 2020
-\brief This *.h file contains the declarations that handles the transition
-	   of game states.
-
-Copyright (C) 2020 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents
-without the prior written consent of DigiPen Institute of
-Technology is prohibited.
-*/
-/* End Header ****************************************************************/
-
-#ifndef CS230_GAME_STATE_MGR_H_
-#define CS230_GAME_STATE_MGR_H_
-
-// ---------------------------------------------------------------------------
+#pragma once
 
 #include "AEEngine.h"
-
-// ---------------------------------------------------------------------------
-// include the list of game states
-
 #include "GameStateList.h"
+#include "GameState_Asteroids.h"
+#include "GameState_MainMenu.h"
+#include "Global.h"
 
-// ---------------------------------------------------------------------------
-// externs
+class GameStateManager
+{
+public:
+	void GameSystemUpdate();
+	void Init(unsigned int gameStateInit);
 
-extern unsigned int gGameStateInit;
-extern unsigned int gGameStateCurr;
-extern unsigned int gGameStatePrev;
-extern unsigned int gGameStateNext;
+	void GameStateLoad();
+	void GameStateInit();
+	void GameStateUpdate();
+	void GameStateDraw();
+	void GameStateFree();
+	void GameStateUnload();
 
-// ---------------------------------------------------------------------------
+	unsigned int GetGameStateInitIndex() const;
+	unsigned int GetGameStateCurrIndex() const;
+	unsigned int GetGameStatePrevIndex() const;
+	unsigned int GetGameStateNextIndex() const;
 
-extern void (*GameStateLoad)();
-extern void (*GameStateInit)();
-extern void (*GameStateUpdate)();
-extern void (*GameStateDraw)();
-extern void (*GameStateFree)();
-extern void (*GameStateUnload)();
+	void SetGameStateInitIndex(unsigned int index);
+	void SetGameStateCurrIndex(unsigned int index);
+	void SetGameStatePrevIndex(unsigned int index);
+	void SetGameStateNextIndex(unsigned int index);
+private:
+	unsigned int gGameStateInit{ 0 };
+	unsigned int gGameStateCurr{ 0 };
+	unsigned int gGameStatePrev{ 0 };
+	unsigned int gGameStateNext{ 0 };
 
-// ---------------------------------------------------------------------------
-// Function prototypes
-
-// call this at the beginning and AFTER all game states are added to the manager
-void GameStateMgrInit(unsigned int gameStateInit);
-
-// update is used to set the function pointers
-void GameStateMgrUpdate();
-
-// ---------------------------------------------------------------------------
-
-#endif // CS230_GAME_STATE_MGR_H_
+	MainMenuGameState MainMenu_;
+	AsteroidsGameState Asteroids_;
+	std::unordered_map<GameSystemType, std::function<void()>> GS_FunctionMap_;
+};
