@@ -13,7 +13,8 @@ bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port
 	return true;
 }
 
-bool Parser::GetHostnameToIPMap(std::string input, std::unordered_map<std::string, std::string>& map)
+bool Parser::GetAllPairsOfHostnameAndPorts(std::string input, 
+	std::vector<std::pair<std::string, std::string>>& vec)
 {
 	RemoveExtraDelim(input, ' ');
 	std::vector<std::string> tokens = Tokenize(input, ' ');
@@ -25,7 +26,7 @@ bool Parser::GetHostnameToIPMap(std::string input, std::unordered_map<std::strin
 		if (!ParseInput(str, hostname, port))
 			return false;
 
-		map[hostname] = str;
+		vec.push_back(std::make_pair(hostname, port));
 	}
 
 	return true;
