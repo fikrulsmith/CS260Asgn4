@@ -3,10 +3,12 @@
 
 bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port)
 {
-	if (!IsValidIP(ip))
-		return false;
-
 	std::vector<std::string> tokens = Tokenize(ip, ':');
+
+	if (tokens[0] != "localhost")
+		if (!IsValidIP(ip))
+			return false;
+
 	hostname = tokens[0];
 	port = tokens[1];
 
