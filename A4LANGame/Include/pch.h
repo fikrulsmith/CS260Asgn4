@@ -1,9 +1,6 @@
 #pragma once
 #pragma comment(lib, "ws2_32.lib")
 
-#include <vector>
-#include <iostream>
-
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -14,6 +11,9 @@
 
 //#include "ClientSender/ClientSender.h"
 #include "../Client/ClientInfo.h"
+
+#include <vector>
+#include <iostream>
 
 #include <unordered_map>
 #include <functional>

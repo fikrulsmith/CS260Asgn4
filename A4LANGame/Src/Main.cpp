@@ -2,6 +2,7 @@
 #include "main.h"
 
 #include <memory>
+#include "../Client/Client.h"
 
 // ---------------------------------------------------------------------------
 // Globals
@@ -17,6 +18,7 @@ std::unique_ptr<GameStateManager> GSManager;
 /******************************************************************************/
 int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _In_ LPSTR command_line, _In_ int show)
 {
+
 	UNREFERENCED_PARAMETER(prevInstanceH);
 	UNREFERENCED_PARAMETER(command_line);
 
@@ -33,8 +35,11 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
-	/*std::vector<std::pair<std::string, std::string>> vec; 
-	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);*/
+	std::vector<std::pair<std::string, std::string>> vec; 
+	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
+
+	Client client;
+	client.InitialiseClient(vec);
 
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);

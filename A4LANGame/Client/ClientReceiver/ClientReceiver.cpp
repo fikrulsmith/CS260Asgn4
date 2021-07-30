@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Global.h"
 #include "ClientReceiver.h"
 
 int ClientReceiver::SendClient(ClientInfo info, std::string message)
@@ -34,7 +35,7 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(200ms);
 			//std::cerr << "trying again..." << std::endl;
-			return;
+			return -1;
 		}
 		else
 		{

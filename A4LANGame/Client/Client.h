@@ -1,23 +1,32 @@
 #pragma once
-#include "../Client/ClientInfo.h"
 #include "ClientSender/ClientSender.h"
 #include "ClientReceiver/ClientReceiver.h"
+
 class Client
 {
 	std::vector<ClientInfo> clients;
 	ClientSender sender;
 	ClientReceiver receiver;
-	SOCKET MySocket;
+	ClientInfo MyInfo;
+
+	int InitWSA();
 public:
 	const size_t DOES_NOT_EXIST = -1; 
+	const int OK = 200;
 
-	bool RegisterClient(ClientInfo client);
+	~Client();
+
+	int InitMyInfo(std::string name, std::string port);
+	int InitialiseClient(std::vector<std::pair<std::string, std::string>> allClients);
+
+	size_t RegisterClient(std::string name, std::string port);
 	bool DisconnectClient(SOCKET clientSocket);
 
 	// run this first
 	// check against DOES_NOT_EXIST before trying to get client
 	size_t CheckClientExist(SOCKET clientSocket); 
-	void SetupSocket(SOCKET& setupSocket, std::string port);
+	
+	int ConnectToClient(ClientInfo& client);
 	// gets the client info
 	ClientInfo GetClient(size_t index);
 };
