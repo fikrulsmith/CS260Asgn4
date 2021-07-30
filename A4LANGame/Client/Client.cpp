@@ -37,7 +37,7 @@ size_t Client::CheckClientExist(SOCKET clientSocket)
 	return DOES_NOT_EXIST;
 }
 
-void SetupSocket(SOCKET& setupSocket,std::string port)
+void Client::SetupSocket(SOCKET& setupSocket,std::string port)
 {
 	// Object hints indicates which protocols to use to fill in the info.
 	addrinfo hints{};

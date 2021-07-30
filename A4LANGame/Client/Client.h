@@ -7,6 +7,7 @@ class Client
 	std::vector<ClientInfo> clients;
 	ClientSender sender;
 	ClientReceiver receiver;
+	SOCKET MySocket;
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 
@@ -16,7 +17,7 @@ public:
 	// run this first
 	// check against DOES_NOT_EXIST before trying to get client
 	size_t CheckClientExist(SOCKET clientSocket); 
-	void SetupSocket(SOCKET& setupSocket, sockaddr Address);
+	void SetupSocket(SOCKET& setupSocket, std::string port);
 	// gets the client info
 	ClientInfo GetClient(size_t index);
 };
