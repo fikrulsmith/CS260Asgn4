@@ -35,7 +35,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	/*std::unordered_map<std::string, std::string> map; 
 	Parser::GetHostnameToIPMap(std::string{ command_line }, map);*/
 	GSManager = std::make_unique<GameStateManager>();
-	GSManager->Init(GS_ASTEROIDS);
+	GSManager->Init(GS_MAINMENU);
 
 	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{

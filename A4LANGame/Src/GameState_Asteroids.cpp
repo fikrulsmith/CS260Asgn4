@@ -441,14 +441,14 @@ void AsteroidsGameState::GameStateAsteroidsLoad(void)
 
 	AEGfxMeshStart();
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xBEC1BE, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0xBEC1BE, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xCDD2CD, 1.0f, 1.0f);
+		-0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFF808080, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f);
 
 	AEGfxTriAdd(
-		0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFF808080, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0xCDD2CD, 1.0f, 1.0f);
+		0.5f, -0.5f, 0xFF808080, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFF808080, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFF808080, 0.0f, 0.0f);
 
 	pObj->pMesh = AEGfxMeshEnd();
 	AE_ASSERT_MESG(pObj->pMesh, "fail to create object!!");

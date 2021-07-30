@@ -3,6 +3,7 @@
 #include "AEEngine.h"
 #include "GameStateList.h"
 #include "GameState_Asteroids.h"
+#include "GameState_MainMenu.h"
 #include "Global.h"
 
 class GameStateManager
@@ -33,6 +34,7 @@ private:
 	unsigned int gGameStatePrev{ 0 };
 	unsigned int gGameStateNext{ 0 };
 
+	MainMenuGameState MainMenu_;
 	AsteroidsGameState Asteroids_;
 	std::unordered_map<GameSystemType, std::function<void()>> GS_FunctionMap_;
 };

@@ -22,6 +22,20 @@ void GameStateManager::GameSystemUpdate()
 		GS_FunctionMap_[GameSystemType::UNLOAD]
 			= std::bind(&AsteroidsGameState::GameStateAsteroidsUnload, Asteroids_);
 		break;
+	case GS_MAINMENU:
+		GS_FunctionMap_[GameSystemType::LOAD]
+			= std::bind(&MainMenuGameState::GameStateMainMenuLoad, MainMenu_);
+		GS_FunctionMap_[GameSystemType::INIT]		  
+			= std::bind(&MainMenuGameState::GameStateMainMenuInit, MainMenu_);
+		GS_FunctionMap_[GameSystemType::UPDATE]		  
+			= std::bind(&MainMenuGameState::GameStateMainMenuUpdate, MainMenu_);
+		GS_FunctionMap_[GameSystemType::DRAW]		  
+			= std::bind(&MainMenuGameState::GameStateMainMenuDraw, MainMenu_);
+		GS_FunctionMap_[GameSystemType::FREE]		  
+			= std::bind(&MainMenuGameState::GameStateMainMenuFree, MainMenu_);
+		GS_FunctionMap_[GameSystemType::UNLOAD]		  
+			= std::bind(&MainMenuGameState::GameStateMainMenuUnload, MainMenu_);
+		break;
 	default:
 		AE_FATAL_ERROR("invalid state!!");
 	}
