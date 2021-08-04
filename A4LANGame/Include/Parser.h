@@ -5,6 +5,13 @@ class Parser
 public:
 	static bool GetAllPairsOfHostnameAndPorts(std::string input, 
 		std::vector<std::pair<std::string, std::string>>& vec);
+
+// PACKETS
+	static std::string CreatePacket(std::string header, std::string payload);
+	static std::string CreateHeader(std::string headerCommand, std::vector<std::string> params);
+
+	static std::vector<std::string> GetHeader(std::string input, std::string& headerCommand);
+
 private:
 	static bool ParseInput(std::string ip, std::string& hostname, std::string& port);
 	static void RemoveExtraDelim(std::string& str, const char delim);

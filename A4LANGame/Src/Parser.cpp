@@ -1,6 +1,62 @@
 #include "pch.h"
 #include "Parser.h"
 
+/*
+HEADER (includes the \n\n)
+
+PAYLOAD
+*/
+std::string Parser::CreatePacket(std::string header, std::string payload)
+{
+	std::string packet = header + payload;
+	return packet;
+}
+
+/*
+HEADER COMMAND\n
+\n
+PARAM_1\n
+PARAM_2\n
+PARAM_3\n
+\n
+*/
+std::string Parser::CreateHeader(std::string headerCommand, std::vector<std::string> params)
+{
+	std::string header;
+	
+	header = headerCommand;
+	header += "\n\n";
+	for (auto& param : params)
+	{
+		header += param;
+		header += "\n";
+	}
+	header += "\n";
+	return header;
+}
+
+std::vector<std::string> Parser::GetHeader(std::string input, std::string& headerCommand)
+{
+	size_t index = input.find("\n\n");
+	headerCommand = input.substr(0, index);
+	input = input.substr(index + 2);
+
+	std::vector<std::string> params;
+	while (true)
+	{
+		index = input.find("\n");
+		size_t stopper = input.find("\n\n");
+
+		params.push_back(input.substr(0, index));
+		if (index == stopper)
+			break;
+		else
+			input = input.substr(index + 1);
+	}
+
+	return params;
+}
+
 bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port)
 {
 	std::vector<std::string> tokens = Tokenize(ip, ':');
