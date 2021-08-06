@@ -71,4 +71,6 @@ struct ClientInfo
 	addrinfo* addr = nullptr;
 	std::string name;
 	std::string port;
+
+	GameObjInst* playerEntity = nullptr;
 };

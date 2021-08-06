@@ -86,9 +86,44 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	return 1;
 }
 
-ClientInfo Client::GetClient(size_t index)
+ClientInfo* Client::GetClient(size_t index)
 {
-	return clients[index];
+	return &clients[index];
+}
+
+/*****************************************************************
+
+					NEEDS TO BE DONE!!!!
+
+******************************************************************/
+bool Client::CreatePlayer(SOCKET socket)
+{
+	// call fik's function to get pointer
+	// playerEntity 
+}
+
+size_t Client::GetClientByGamePtr(GameObjInst* entity)
+{
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		if (clients[i].playerEntity == entity)
+			return i;
+	}
+
+	return -1;
+}
+
+int Client::SendClient(SOCKET socket, std::string message)
+{
+	size_t index = CheckClientExist(socket);
+	if (index == DOES_NOT_EXIST) return -1;
+	
+	sender.SendClient(*GetClient(index), message);
+}
+
+int Client::SendClient(size_t index, std::string message)
+{
+	sender.SendClient(*GetClient(index), message);
 }
 
 size_t Client::RegisterClient(std::string name, std::string port)

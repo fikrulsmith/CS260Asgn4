@@ -167,7 +167,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Client\Client.h" />
-    <ClInclude Include="Client\ClientInfo.h" />
     <ClInclude Include="Client\ClientReceiver\ClientReceiver.h" />
     <ClInclude Include="Client\ClientSender\ClientSender.h" />
     <ClInclude Include="Client\LockStep\Hasher\Hasher.h" />

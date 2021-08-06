@@ -33,24 +33,18 @@ public:
 	size_t CheckClientExist(SOCKET clientSocket); 
 
 	// gets the client info
-	ClientInfo GetClient(size_t index);
+	ClientInfo* GetClient(size_t index);
 
-	int SendClient()
-	{
-		while (true)
-		{
-			sender.SendClient(clients[0], "stupid");
-		}
-	}
+	bool CreatePlayer(SOCKET socket);
+	size_t GetClientByGamePtr(GameObjInst* entity);
+	
+
+	int SendClient(SOCKET socket, std::string message);
+	int SendClient(size_t index, std::string message);
 
 	int ReceiveClient()
 	{
-		while (true)
-		{
-			std::string message;
-			sender.RecvClient(clients[0], message);
-			std::cout << message << std::endl;
-		}
+		
 	}
 
 	std::string GetOwnPort()

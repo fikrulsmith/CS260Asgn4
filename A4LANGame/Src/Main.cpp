@@ -46,61 +46,56 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	else
 		client.ReceiveClient();*/
 
-	while (true)
-	{
+	GSManager = std::make_unique<GameStateManager>();
+	GSManager->Init(GS_MAINMENU);
 
+	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
+	{
+		// reset the system modules
+		AESysReset();
+
+		// If not restarting, load the gamestate
+		if(GSManager->GetGameStateCurrIndex() != GS_RESTART)
+		{
+			GSManager->GameSystemUpdate();
+			GSManager->GameStateLoad();
+		}
+		else
+		{
+			GSManager->SetGameStateCurrIndex(GSManager->GetGameStatePrevIndex());
+			GSManager->SetGameStateNextIndex(GSManager->GetGameStateCurrIndex());
+		}
+
+		// Initialize the gamestate
+		GSManager->GameStateInit();
+
+		while(GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
+		{
+			AESysFrameStart();
+			AEInputUpdate();
+
+			GSManager->GameStateUpdate();
+			GSManager->GameStateDraw();
+			
+			AESysFrameEnd();
+
+			// check if forcing the application to quit
+			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+				GSManager->SetGameStateNextIndex(GS_QUIT);
+
+			g_dt = (f32)AEFrameRateControllerGetFrameTime();
+			g_appTime += g_dt;
+		}
+		
+		GSManager->GameStateFree();
+
+		if (GSManager->GetGameStateNextIndex() != GS_RESTART)
+			GSManager->GameStateUnload();
+
+		GSManager->SetGameStatePrevIndex(GSManager->GetGameStateCurrIndex());
+		GSManager->SetGameStateCurrIndex(GSManager->GetGameStateNextIndex());
 	}
 
-	//GSManager = std::make_unique<GameStateManager>();
-	//GSManager->Init(GS_MAINMENU);
-
-	//while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
-	//{
-	//	// reset the system modules
-	//	AESysReset();
-
-	//	// If not restarting, load the gamestate
-	//	if(GSManager->GetGameStateCurrIndex() != GS_RESTART)
-	//	{
-	//		GSManager->GameSystemUpdate();
-	//		GSManager->GameStateLoad();
-	//	}
-	//	else
-	//	{
-	//		GSManager->SetGameStateCurrIndex(GSManager->GetGameStatePrevIndex());
-	//		GSManager->SetGameStateNextIndex(GSManager->GetGameStateCurrIndex());
-	//	}
-
-	//	// Initialize the gamestate
-	//	GSManager->GameStateInit();
-
-	//	while(GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
-	//	{
-	//		AESysFrameStart();
-	//		AEInputUpdate();
-
-	//		GSManager->GameStateUpdate();
-	//		GSManager->GameStateDraw();
-	//		
-	//		AESysFrameEnd();
-
-	//		// check if forcing the application to quit
-	//		if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
-	//			GSManager->SetGameStateNextIndex(GS_QUIT);
-
-	//		g_dt = (f32)AEFrameRateControllerGetFrameTime();
-	//		g_appTime += g_dt;
-	//	}
-	//	
-	//	GSManager->GameStateFree();
-
-	//	if (GSManager->GetGameStateNextIndex() != GS_RESTART)
-	//		GSManager->GameStateUnload();
-
-	//	GSManager->SetGameStatePrevIndex(GSManager->GetGameStateCurrIndex());
-	//	GSManager->SetGameStateCurrIndex(GSManager->GetGameStateNextIndex());
-	//}
-
-	//// free the system
-	//AESysExit();
+	// free the system
+	AESysExit();
 }
