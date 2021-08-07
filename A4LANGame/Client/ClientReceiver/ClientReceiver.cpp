@@ -58,12 +58,3 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 	return bytesReceived;
 }
 
-void ClientReceiver::HandleMessage(std::string& message)
-{
-	size_t pos = message.find("[UPDATE]");
-	if (pos != std::string::npos)
-	{
-
-	}
-}
-
