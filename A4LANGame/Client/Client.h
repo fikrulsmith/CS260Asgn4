@@ -52,4 +52,5 @@ public:
 		return MyInfo.port;
 	}
 	
+	void HandleRecvMessage(std::string message);
 };
