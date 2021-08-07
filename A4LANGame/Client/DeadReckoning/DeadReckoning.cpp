@@ -1,12 +1,10 @@
 #include "pch.h"
 #include "DeadReckoning.h"
-void DeadReckoning::predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,AEVec2& UpdateAcceleration)
+void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
 {
-	if (extrapolating)
-		return;
 	UpdatePosition.x = static_cast<float>(OldPosition.x + (OldVelocity.x * g_dt) + (0.5 * OldAcceleration.x * g_dt * g_dt));
 	UpdatePosition.y = static_cast<float>(OldPosition.y + (OldVelocity.y * g_dt) + (0.5 * OldAcceleration.y * g_dt * g_dt));
-	UpdateVelocity = OldVelocity;																				
+	UpdateVelocity = OldVelocity;
 }
 
 void DeadReckoning::UpdateTime()
@@ -27,10 +25,17 @@ void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 
 	extrapolating = true;
 }
 
-void DeadReckoning::correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
+void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity)
 {
-	if (!extrapolating)
-		return;
+	OldPosition = LastKnownPosition;
+	OldVelocity = LastKnownVelocity;
+	OldAcceleration = LastKnownAcceleration;
+	UpdatePosition = OldPosition;
+	UpdateVelocity = OldVelocity;
+}
+
+void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
+{
 	AEVec2 VelocityBlend;
 	AEVec2 Pt;
 	AEVec2 PtPrime;
@@ -55,4 +60,12 @@ void DeadReckoning::correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
 
 	UpdatePosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
+}
+
+void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity)
+{
+	if (!extrapolating)
+		Predict(UpdatePosition, UpdateVelocity);
+	else
+		Correction(UpdatePosition, UpdateVelocity);
 }

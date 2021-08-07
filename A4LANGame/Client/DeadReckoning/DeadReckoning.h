@@ -14,8 +14,10 @@ class DeadReckoning
 	float TimeelapsedsinceUpdate{ 0 };
 	float Ttriangle{ 1 / 60 };
 	float Tarrow{ 0 };
-	void predict(AEVec2& position, AEVec2& velocity, AEVec2& acceleration);
+	void Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
+	void Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
 	void ReceivedPacket(AEVec2 LKPosition,AEVec2 LKVelocity,AEVec2 LKAcceleration);
 	void UpdateTime();
-	void correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
+	void Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
+	void Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
 };
