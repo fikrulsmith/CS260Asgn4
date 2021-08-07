@@ -10,7 +10,6 @@
 #include "ws2tcpip.h"		// getaddrinfo()
 
 //#include "ClientSender/ClientSender.h"
-#include "../Client/ClientInfo.h"
 
 #include <vector>
 #include <iostream>

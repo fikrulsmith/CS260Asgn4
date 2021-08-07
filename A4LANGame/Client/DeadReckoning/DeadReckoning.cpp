@@ -2,9 +2,10 @@
 #include "DeadReckoning.h"
 void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
 {
-	UpdatePosition.x = static_cast<float>(OldPosition.x + (OldVelocity.x * g_dt) + (0.5 * OldAcceleration.x * g_dt * g_dt));
-	UpdatePosition.y = static_cast<float>(OldPosition.y + (OldVelocity.y * g_dt) + (0.5 * OldAcceleration.y * g_dt * g_dt));
+	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * g_dt) + (0.5 * LastKnownAcceleration.x * g_dt * g_dt));
+	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * g_dt) + (0.5 * LastKnownAcceleration.y * g_dt * g_dt));
 	UpdateVelocity = OldVelocity;
+	extrapolating = true;
 }
 
 void DeadReckoning::UpdateTime()
@@ -17,12 +18,11 @@ void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 
 	OldPosition = LastKnownPosition;
 	OldVelocity = LastKnownVelocity;
 	OldAcceleration = LastKnownAcceleration;
-	TimeOfUpdate = g_appTime;
+	TimeOfUpdate = static_cast<float>(g_appTime);
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
 	LastKnownVelocity = LKVelocity;
 	LastKnownAcceleration = LKAcceleration;
-	extrapolating = true;
 }
 
 void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity)
@@ -40,6 +40,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity)
 	AEVec2 Pt;
 	AEVec2 PtPrime;
 	AEVec2 FinalPosition;
+	Tarrow = TimeelapsedsinceUpdate / Ttriangle;
 	VelocityBlend.x = static_cast<float>(OldVelocity.x + (LastKnownVelocity.x - OldVelocity.x) * Tarrow);
 	VelocityBlend.y = static_cast<float>(OldVelocity.y + (LastKnownVelocity.y - OldVelocity.y) * Tarrow);
 	Pt.x = static_cast<float>(OldPosition.x + (VelocityBlend.x * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.x * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));

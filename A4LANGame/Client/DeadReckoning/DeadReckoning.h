@@ -12,7 +12,7 @@ class DeadReckoning
 
 	float TimeOfUpdate{ 0 };
 	float TimeelapsedsinceUpdate{ 0 };
-	float Ttriangle{ 1 / 60 };
+	float Ttriangle{ 1 / 5 };
 	float Tarrow{ 0 };
 	void Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);
 	void Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity);

@@ -248,7 +248,7 @@ int Client::ConnectToClient(ClientInfo& client)
 	return 200;
 }
 
-void HandleRecvMessage(std::string message)
+void Client::HandleRecvMessage(std::string message)
 {
 	std::vector<std::string> params;
 	std::string header;
