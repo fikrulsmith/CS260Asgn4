@@ -247,3 +247,32 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	return 200;
 }
+
+void HandleRecvMessage(std::string message)
+{
+	std::vector<std::string> params;
+	std::string header;
+	params = Parser::GetHeader(message, header);
+	if (header == "[UPDATE]")
+	{
+		//check ID against your container of players
+		int playerID = std::stoi(params[0]);
+		AEVec2 Position;
+		AEVec2 Velocity;
+		AEVec2 Acceleration;
+		Position.x = std::stof(params[1]);
+		Position.y = std::stof(params[2]);
+		Velocity.x = std::stof(params[3]);
+		Velocity.y = std::stof(params[4]);
+		Acceleration.x = std::stof(params[5]);
+		Acceleration.y = std::stof(params[6]);
+		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
+		// add your stuff here nico
+
+
+	}
+	else if (header == "[INITIALIZING]")
+	{
+
+	}
+}
