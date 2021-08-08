@@ -362,8 +362,9 @@ void Client::AllDeadReckoningCorrection()
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Correction(position, velocity, direction);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction);
 		//pass back to fikrul here
+
 	}
 }
 
