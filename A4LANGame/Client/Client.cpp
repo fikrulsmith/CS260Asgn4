@@ -148,6 +148,10 @@ void Client::UpdateState(ShipID id, ShipState state)
 	}
 }
 
+int Client::ReceiveClient(std::string message)
+{
+	return receiver.RecvClient(MyInfo, message);
+}
 size_t Client::RegisterClient(std::string name, std::string port)
 {
 	ClientInfo client;
@@ -282,12 +286,14 @@ void Client::HandleRecvMessage(std::string message)
 		AEVec2 Position;
 		AEVec2 Velocity;
 		AEVec2 Acceleration;
+		float direction;
 		Position.x = std::stof(params[1]);
 		Position.y = std::stof(params[2]);
 		Velocity.x = std::stof(params[3]);
 		Velocity.y = std::stof(params[4]);
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
+		direction = std::stof(params[7]);
 		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
 		// add your stuff here nico
 
