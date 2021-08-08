@@ -83,6 +83,35 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		ConnectToClient(clients[index]);
 	}
 
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		int id = static_cast<int>(ShipID::PLAYER1);
+
+		for (size_t j = 0; j < clients.size(); j++)
+		{
+			if (j == i) continue;
+			if (std::stoi(clients[i].port) > std::stoi(clients[j].port))
+				id++;
+		}
+
+		clients[i].id = static_cast<ShipID>(id);
+	}
+
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		MyInfo.id = static_cast<ShipID>(i);
+		if (std::stoi(MyInfo.port) < std::stoi(clients[i].port))
+		{
+			for (size_t j = i; j < clients.size(); j++)
+			{
+				clients[j].id = static_cast<ShipID>(static_cast<int>(clients[j].id) + 1);
+			}
+			break;
+		}
+	}
+
+	std::cout << static_cast<int>(clients[0].id) << std::endl;
+
 	return 1;
 }
 
@@ -190,6 +219,7 @@ size_t Client::RegisterClient(std::string name, std::string port)
 	client.port = port;
 
 	clients.push_back(client);
+
 	return clients.size() - 1;
 }
 

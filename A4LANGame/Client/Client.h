@@ -14,6 +14,7 @@ class Client
 
 	int InitWSA();
 	int ConnectToClient(ClientInfo& client);
+
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
