@@ -31,8 +31,8 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	// Initialize the system
 	AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
 	// Changing the window title
-	AESysSetWindowTitle("CS260 Asteroids");
-
+	//AESysSetWindowTitle("CS260 Asteroids");
+	AESysSetWindowTitle("1");
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
@@ -49,7 +49,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
-
 	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{
 		// reset the system modules

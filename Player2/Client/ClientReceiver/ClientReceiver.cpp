@@ -53,6 +53,8 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 	message.clear();
 	message.append(buffer, bytesReceived);
 
+	std::cout << message << std::endl;
+
 
 
 	return bytesReceived;

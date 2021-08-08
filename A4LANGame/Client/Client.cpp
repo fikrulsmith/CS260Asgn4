@@ -186,6 +186,8 @@ bool Client::GetClientReadyCheck()
 			return false;
 	}
 
+	if (!MyInfo.readyCheck) return false;
+
 	return true;
 }
 
@@ -537,6 +539,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 
 	std::vector<std::string> params;
 	std::string header;
+	std::cout << header << std::endl;
 	params = Parser::GetHeader(message, header);
 	if (header == "[UPDATE]")
 	{
@@ -565,22 +568,47 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		ClientInfo* info = GetClient(index);
 		info->readyCheck = true;
 
+		std::cout << "Set to Ready" << std::endl;
 	}
 	else if (header == "[LOCK]")
 	{
+		std::string payload = Parser::GetPacket(message, std::string{});
+		size_t index = clientManager->CheckClientExist(client);
+		clientManager->GetClient(index)->hashString = payload;
+
+		std::cout << "Retrieved the hash from client" << std::endl;
+
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
 		std::vector<std::string> params = PackData(MyInfo.id, it->second);
 		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
 
-		std::string hash;
+		std::string input;
 		for (auto string : params)
 		{
-			hash += string + "\n";
+			input += string + "\n";
 		}
 
-		hash = lockStepManager.HashInput(hash);
-		std::string _message = Parser::CreatePacket("[HASHED]", hash);
-		SendClient(client, message);
+		std::cout << "Sending hash input back" << std::endl;
+		// send hash input
+		std::string hash = lockStepManager.HashInput(input);
+		hash = Parser::CreatePacket("[HASHED]", hash);
+		SendClient(client, hash);
+
+		// receive actual input from client
+		std::string _message;
+		std::cout << "Retrieving actual input" << std::endl;
+		ReceiveClient(client, _message);
+		std::cout << "Successfully Received\n" << _message << std::endl;
+
+		std::string temp = Parser::CreatePacket("[UNLOCKED]", input);
+		SendClient(client, temp);
+		std::cout << temp << std::endl;
+
+		std::cout << "Comparing input" << std::endl;
+		if (lockStepManager.CompareInput(_message, payload))
+			std::cout << "NO HAX" << std::endl;
+		else
+			std::cout << "HAX" << std::endl;
 	}
 	else if (header == "[HASHED]")
 	{
