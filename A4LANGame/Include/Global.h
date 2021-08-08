@@ -31,6 +31,37 @@ struct GameObj
 	AEGfxVertexList* pMesh;
 };
 
+enum class ShipState
+{
+	UNASSIGNED,
+	MOVINGFORWARD,
+	MOVINGBACKWARDS,
+	ROTATINGLEFT,
+	ROTATINGRIGHT,
+	SHOOTING
+};
+
+enum class ShipID
+{
+	PLAYER1,
+	PLAYER2,
+	PLAYER3,
+	PLAYER4,
+	UNASSIGNED
+};
+
+struct ShipComponent
+{
+	long sShipLives{ 0 };
+	unsigned long sShipScore{ 0 };
+	ShipState sShipState{ ShipState::UNASSIGNED };
+	ShipID sShipID{ ShipID::UNASSIGNED };
+	int SPECIAL_TRIGGER{ 0 };
+	bool SPECIAL_CHECK{ false };
+	AEVec2 InitialPosition;
+	float InitialDirection{ 0 };
+};
+
 //Game object instance structure
 struct GameObjInst
 {
@@ -51,6 +82,10 @@ struct GameObjInst
 	// object transformation matrix: Each frame, 
 	// calculate the object instance's transformation matrix and save it here
 	AEMtx33 transform;
+	ShipComponent shipComp;
+
+	// For Bullet
+	ShipID BulletSource{ ShipID::UNASSIGNED };
 };
 
 enum class GameSystemType

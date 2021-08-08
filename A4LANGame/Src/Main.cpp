@@ -33,9 +33,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
-	/*std::vector<std::pair<std::string, std::string>> vec; 
-	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);*/
-
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
 
