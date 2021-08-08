@@ -364,22 +364,25 @@ void Client::AllDeadReckoningCorrection()
 		float direction;
 		IdtoDeadReckoning[client.id].Run(position, velocity, direction);
 		//pass back to fikrul here
-
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
+	
 	}
 }
 
-void Client::SendUpdatePacket(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+void Client::SendUpdatePacket(ShipID id)
 {
 	
 	std::vector<std::string> params;
 	params.push_back(std::to_string(static_cast<int>(id)));
-	params.push_back(std::to_string(Position.x));
-	params.push_back(std::to_string(Position.y));
-	params.push_back(std::to_string(Velocity.x));
-	params.push_back(std::to_string(Velocity.y));
-	params.push_back(std::to_string(Acceleration.x));
-	params.push_back(std::to_string(Acceleration.y));
-	params.push_back(std::to_string(direction));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.y));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.y));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
 
 	SendAllClient(Parser::CreateHeader("[UPDATE]", params));
 }
@@ -404,7 +407,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction);
 		// add your stuff here nico
 
 

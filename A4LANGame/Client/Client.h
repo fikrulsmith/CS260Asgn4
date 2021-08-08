@@ -62,5 +62,5 @@ public:
 	}
 	
 	void HandleRecvMessage(SOCKET client,std::string message);
-	void SendUpdatePacket(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
+	void SendUpdatePacket(ShipID id);
 };
