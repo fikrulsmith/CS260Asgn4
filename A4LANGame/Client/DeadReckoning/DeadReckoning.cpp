@@ -1,24 +1,25 @@
 #include "pch.h"
 #include "DeadReckoning.h"
-void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction)
+#include "Global.h"
+void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction,float dt)
 {
-	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * g_dt) + (0.5 * LastKnownAcceleration.x * g_dt * g_dt));
-	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * g_dt) + (0.5 * LastKnownAcceleration.y * g_dt * g_dt));
+	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt) + (0.5 * LastKnownAcceleration.x * dt * dt));
+	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt) + (0.5 * LastKnownAcceleration.y * dt * dt));
 	UpdateVelocity = OldVelocity;
 	direction = Mydirection;
 }
 
-void DeadReckoning::UpdateTime()
+void DeadReckoning::UpdateTime(float dt)
 {
-	TimeelapsedsinceUpdate += g_dt;
+	TimeelapsedsinceUpdate += dt;
 }
 
-void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction)
+void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,double apptime)
 {
 	OldPosition = LastKnownPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
 	OldAcceleration = LastKnownAcceleration;
-	TimeOfUpdate = static_cast<float>(g_appTime);
+	TimeOfUpdate = static_cast<float>(apptime);
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
 	LastKnownVelocity = LKVelocity;
