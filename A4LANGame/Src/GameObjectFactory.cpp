@@ -31,6 +31,12 @@ GameObjInst* GameObjectFactory::gameObjInstCreate(unsigned long type, float scal
 			pInst->velCurr = pVel ? *pVel : zero;
 			pInst->dirCurr = dir;
 
+			if (type == TYPE_SHIP)
+			{
+				pInst->shipComp.InitialDirection = dir;
+				pInst->shipComp.InitialPosition = pPos ? *pPos : zero;
+			}
+
 			// return the newly created instance
 			return pInst;
 		}

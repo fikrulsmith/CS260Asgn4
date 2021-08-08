@@ -27,12 +27,12 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	#endif
 	
-	//// Initialize the system
-    AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
-	//// Changing the window title
+	// Initialize the system
+	AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
+	// Changing the window title
 	AESysSetWindowTitle("CS260 Asteroids");
 
-	////set background color
+	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
 	std::vector<std::pair<std::string, std::string>> vec; 
