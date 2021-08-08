@@ -91,6 +91,17 @@ ClientInfo* Client::GetClient(size_t index)
 	return &clients[index];
 }
 
+bool Client::GetClientReadyCheck()
+{
+	for (auto client : clients)
+	{
+		if (!client.readyCheck)
+			return false;
+	}
+
+	return true;
+}
+
 /*****************************************************************
 
 					NEEDS TO BE DONE!!!!
@@ -107,11 +118,15 @@ size_t Client::GetClientByGamePtr(GameObjInst* entity)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		if (clients[i].playerEntity == entity)
-			return i;
+		
 	}
 
 	return -1;
+}
+
+size_t Client::GetNumberOfClients()
+{
+	return clients.size();
 }
 
 int Client::SendClient(SOCKET socket, std::string message)
@@ -133,6 +148,8 @@ int Client::SendAllClient(std::string message)
 	{
 		SendClient(client.socket, message);
 	}
+
+	return 1;
 }
 
 void Client::UpdateState(ShipID id, ShipState state)

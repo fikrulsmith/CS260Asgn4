@@ -34,10 +34,11 @@ public:
 
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
+	bool GetClientReadyCheck();
 
 	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByGamePtr(GameObjInst* entity);
-	
+	size_t GetNumberOfClients();
 
 	int SendClient(SOCKET socket, std::string message);
 	int SendClient(int index, std::string message);
