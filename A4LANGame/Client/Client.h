@@ -16,6 +16,9 @@ class Client
 	int InitWSA();
 	int ConnectToClient(ClientInfo& client);
 
+	void UpdateHash();
+	bool AllHashUpdated();
+
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;

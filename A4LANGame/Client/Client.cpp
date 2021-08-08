@@ -192,8 +192,23 @@ void Client::UpdateState(ShipID id, ShipState state)
 		if (client.id == id)
 		{
 			client.state = state;
-			std::string message;
+
+			auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
+			std::vector<std::string> params = PackData(MyInfo.id, it->second);
+			params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+
+			std::string hash;
+			for (auto string : params)
+			{
+				hash += string + "\n";
+			}
+
+			hash = lockStepManager.HashInput(hash);
+
+			std::string message = Parser::CreatePacket("[LOCK]", hash);
 			SendAllClient(message);
+
+			UpdateHash();
 		}
 	}
 }
@@ -352,6 +367,23 @@ int Client::ConnectToClient(ClientInfo& client)
 	std::cout << "Successfully stored client address." << std::endl;
 
 	return 200;
+}
+void Client::UpdateHash()
+{
+	while (!AllHashUpdated())
+	{
+		ReceiveAllClient();
+	}
+}
+bool Client::AllHashUpdated()
+{
+	for (auto client : clients)
+	{
+		if (client.hashString.empty())
+			return false;
+	}
+
+	return true;
 }
 void Client::createDeadReckoning(ShipID id)
 {
