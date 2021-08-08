@@ -41,6 +41,11 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 			GameOver_NoShips = true;
 			onValueChange = true;
 		}
+
+		if (AEInputCheckCurr(AEVK_R))
+		{
+			RestartGameInit();
+		}
 	}
 
 
@@ -70,11 +75,12 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		PlayerShoot(myShip->shipComp.sShipID);
 	}
 
-	for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
+	for (size_t i = 0; i < client->GetNumberOfClients(); ++i)
 	{
-		ShipState state = ShipState::UNASSIGNED;
-		auto search = StateToInput_.find(state);
-		StateToInput_[state](ShipID::PLAYER1);
+		auto search = StateToInput_.find(client->GetClient(i)->state);
+
+		if (search != StateToInput_.end())
+			StateToInput_[client->GetClient(i)->state](client->GetClient(i)->id);
 	}
 
 	//if (AEInputCheckCurr(AEVK_W))
