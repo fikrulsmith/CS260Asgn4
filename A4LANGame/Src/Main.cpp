@@ -41,15 +41,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	Client client;
 	client.InitialiseClient(vec);
 
-	GSManager->RandValue = client.InitialiseRand();
-	if (GSManager->RandValue == -1)
-	{
-		while (true)
-		{
-			client.ReceiveClient();
-		}
-	}
-
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else

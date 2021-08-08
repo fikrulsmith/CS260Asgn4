@@ -24,8 +24,6 @@ public:
 	int InitMyInfo(std::string name, std::string port);
 	int InitialiseClient(std::vector<std::pair<std::string, std::string>> allClients);
 
-	time_t InitialiseRand();
-
 	// Register/Disconnect Clients
 	size_t RegisterClient(std::string name, std::string port);
 	bool DisconnectClient(SOCKET clientSocket);
@@ -42,11 +40,13 @@ public:
 	
 
 	int SendClient(SOCKET socket, std::string message);
-	int SendClient(size_t index, std::string message);
+	int SendClient(int index, std::string message);
+
+	size_t GetNumberOfClient();
 
 	int ReceiveClient()
 	{
-		
+		return 0;
 	}
 
 	std::string GetOwnPort()

@@ -86,27 +86,6 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	return 1;
 }
 
-time_t Client::InitialiseRand()
-{
-	for (auto client : clients)
-	{
-		if (client.ReadyStart)
-			return -1;
-	}
-
-	std::vector<std::string> rand;
-	rand.push_back(std::to_string(time(NULL)));
-
-	std::string message = Parser::CreateHeader("[INITIALISE]", rand);
-
-	for (auto client : clients)
-	{
-		SendClient(client.socket, message);
-	}
-
-	return time(NULL);
-}
-
 ClientInfo* Client::GetClient(size_t index)
 {
 	return &clients[index];
@@ -121,6 +100,7 @@ bool Client::CreatePlayer(SOCKET socket)
 {
 	// call fik's function to get pointer
 	// playerEntity 
+	return true;
 }
 
 size_t Client::GetClientByGamePtr(GameObjInst* entity)
@@ -136,15 +116,21 @@ size_t Client::GetClientByGamePtr(GameObjInst* entity)
 
 int Client::SendClient(SOCKET socket, std::string message)
 {
+	std::cout << "SENDING" << std::endl;
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
 	
-	sender.SendClient(*GetClient(index), message);
+	return sender.SendClient(*GetClient(index), message);
 }
 
-int Client::SendClient(size_t index, std::string message)
+int Client::SendClient(int index, std::string message)
 {
-	sender.SendClient(*GetClient(index), message);
+	return sender.SendClient(*GetClient(index), message);
+}
+
+size_t Client::GetNumberOfClient()
+{
+	return clients.size();
 }
 
 size_t Client::RegisterClient(std::string name, std::string port)
