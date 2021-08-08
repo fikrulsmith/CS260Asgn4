@@ -16,15 +16,11 @@ public:
 	void GameStateAsteroidsUnload(void);
 
 	GameObjInst* myShip{ nullptr };
-
-	// number of ship available (lives 0 = game over)
-	long sShipLives = 0;
-	// the score = number of asteroid destroyed
-	// Current score
-	unsigned long sScore = 0;
+	std::unordered_map<ShipID, GameObjInst*> IDToPlayerShip_;
+	std::unordered_map<ShipState, std::function<void(ShipID)>> StateToInput_;
 private:
 	// initial number of ship lives
-	const unsigned int SHIP_INITIAL_NUM{ 1 };
+	const unsigned int SHIP_INITIAL_NUM{ 3 };
 	// ship size
 	const float SHIP_SIZE = 16.0f;
 	// ship forward acceleration (in m/s^2)
@@ -48,7 +44,6 @@ private:
 	bool GameOver_MaxScore{ false };
 
 	std::shared_ptr<GameObjectFactory> GameObjFactory_;
-	std::unordered_map<ShipID, GameObjInst*> IDToPlayerShip_;
 
 	void PlayerMoveForward(ShipID PlayerID);
 	void PlayerMoveBackwards(ShipID PlayerID);

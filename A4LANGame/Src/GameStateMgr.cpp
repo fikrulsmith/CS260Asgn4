@@ -105,6 +105,16 @@ unsigned int GameStateManager::GetGameStateNextIndex() const
 	return gGameStateNext;
 }
 
+MainMenuGameState& GameStateManager::GetMainMenuGameState()
+{
+	return MainMenu_;
+}
+
+AsteroidsGameState& GameStateManager::GetAsteroidGameState()
+{
+	return Asteroids_;
+}
+
 void GameStateManager::SetGameStateInitIndex(unsigned int index)
 {
 	gGameStateInit = index;

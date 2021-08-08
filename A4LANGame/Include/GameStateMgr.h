@@ -26,6 +26,9 @@ public:
 	unsigned int GetGameStatePrevIndex() const;
 	unsigned int GetGameStateNextIndex() const;
 
+	MainMenuGameState& GetMainMenuGameState();
+	AsteroidsGameState& GetAsteroidGameState();
+
 	void SetGameStateInitIndex(unsigned int index);
 	void SetGameStateCurrIndex(unsigned int index);
 	void SetGameStatePrevIndex(unsigned int index);
