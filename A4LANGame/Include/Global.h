@@ -113,6 +113,7 @@ struct ClientInfo
 	std::string port;
 
 	std::string hashString;
+	std::string lockedState;
 
 	bool readyCheck;
 

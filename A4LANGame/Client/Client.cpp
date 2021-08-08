@@ -205,7 +205,14 @@ void Client::UpdateState(ShipState state)
 
 	UpdateHash();
 
-	message = Parser::CreatePacket("[Fuckfikmama]", message);
+	message = Parser::CreatePacket("[UNLOCK]", message);
+
+	if (CheckAllHash())
+		std::cout << "NO CHEATERS" << std::endl;
+	else
+		std::cout << "CHEATERSSSSS!!!" << std::endl;
+
+	ResetHash();
 }
 
 std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
@@ -365,10 +372,22 @@ int Client::ConnectToClient(ClientInfo& client)
 }
 void Client::UpdateHash()
 {
-	while (!AllHashUpdated())
+	while(!AllHashUpdated())
 	{
 		ReceiveAllClient();
 	}
+}
+bool Client::CheckAllHash()
+{
+	while(!AllLocked())
+		ReceiveAllClient();
+
+	for (auto client : clients)
+	{
+		if (lockStepManager.HashInput(client.lockedState) != client.hashString) return false;
+	}
+
+	return true;
 }
 bool Client::AllHashUpdated()
 {
@@ -379,6 +398,26 @@ bool Client::AllHashUpdated()
 	}
 
 	return true;
+}
+
+bool Client::AllLocked()
+{
+	for (auto client : clients)
+	{
+		if (client.lockedState.empty())
+			return false;
+	}
+
+	return true;
+}
+
+void Client::ResetHash()
+{
+	for (auto client : clients)
+	{
+		client.hashString.clear();
+		client.lockedState.clear();
+	}
 }
 
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
@@ -486,6 +525,32 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 			if (_client.socket == client)
 			{
 				_client.hashString = message;
+				return;
+			}
+		}
+	}
+	else if (header == "[UNLOCK]")
+	{
+		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
+		std::vector<std::string> params = PackData(MyInfo.id, it->second);
+		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+
+		std::string _message;
+		for (auto string : params)
+		{
+			_message += string + "\n";
+		}
+
+		_message = Parser::CreatePacket("[UNLOCKED]", _message);
+		SendClient(client, _message);
+	}
+	else if (header == "[UNLOCKED]")
+	{
+		for (auto _client : clients)
+		{
+			if (_client.socket == client)
+			{
+				_client.lockedState = Parser::GetPacket(message, std::string{});
 				return;
 			}
 		}

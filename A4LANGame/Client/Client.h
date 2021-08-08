@@ -17,7 +17,10 @@ class Client
 	int ConnectToClient(ClientInfo& client);
 
 	void UpdateHash();
+	bool CheckAllHash();
 	bool AllHashUpdated();
+	bool AllLocked();
+	void ResetHash();
 
 public:
 	const size_t DOES_NOT_EXIST = -1; 
