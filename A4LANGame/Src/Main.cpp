@@ -40,10 +40,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 	Client client;
 	client.InitialiseClient(vec);
-	while (true)
-	{
-		std::cout << rand() << std::endl;
-	}
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else
@@ -79,7 +75,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 			GSManager->GameStateUpdate();
 			GSManager->GameStateDraw();
-			std::cout << rand() << std::endl;
 			AESysFrameEnd();
 
 			// check if forcing the application to quit
