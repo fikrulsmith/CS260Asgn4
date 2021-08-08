@@ -146,11 +146,12 @@ bool Client::CreatePlayer(SOCKET socket)
 	return true;
 }
 
-size_t Client::GetClientByGamePtr(GameObjInst* entity)
+size_t Client::GetClientByID(ShipID entity)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		
+		if (clients[i].id == entity)
+			return i;
 	}
 
 	return -1;
@@ -195,6 +196,21 @@ void Client::UpdateState(ShipID id, ShipState state)
 			SendAllClient(message);
 		}
 	}
+}
+
+std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
+{
+	std::vector<std::string> params;
+	params.push_back(std::to_string(static_cast<int>(id)));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.y));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.y));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
+	
+	return params;
 }
 
 int Client::ReceiveClient(SOCKET socket,std::string& message)
@@ -420,5 +436,32 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		ClientInfo* info = GetClient(index);
 		info->readyCheck = true;
 
+	}
+	else if (header == "[LOCK]")
+	{
+		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
+		std::vector<std::string> params = PackData(MyInfo.id, it->second);
+		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+
+		std::string hash;
+		for (auto string : params)
+		{
+			hash += string + "\n";
+		}
+
+		hash = lockStepManager.HashInput(hash);
+		std::string _message = Parser::CreatePacket("[HASHED]", hash);
+		SendClient(client, message);
+	}
+	else if (header == "[HASHED]")
+	{
+		for (auto _client : clients)
+		{
+			if (_client.socket == client)
+			{
+				_client.hashString = message;
+				return;
+			}
+		}
 	}
 }

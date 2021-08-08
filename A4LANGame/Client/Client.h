@@ -40,7 +40,7 @@ public:
 	bool GetClientReadyCheck();
 
 	bool CreatePlayer(SOCKET socket);
-	size_t GetClientByGamePtr(GameObjInst* entity);
+	size_t GetClientByID(ShipID entity);
 	size_t GetNumberOfClients();
 
 	int SendClient(SOCKET socket, std::string message);
@@ -50,6 +50,7 @@ public:
 	int ReceiveClient(SOCKET socket,std::string& message);
 	int ReceiveAllClient();
 	void UpdateState(ShipID id, ShipState state);
+	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT();

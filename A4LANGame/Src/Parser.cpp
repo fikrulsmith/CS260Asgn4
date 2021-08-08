@@ -6,9 +6,9 @@ HEADER (includes the \n\n)
 
 PAYLOAD
 */
-std::string Parser::CreatePacket(std::string header, std::string payload)
+std::string Parser::CreatePacket(std::string headerCommand, std::string payload)
 {
-	std::string packet = header + payload;
+	std::string packet = headerCommand + "\n\n" + payload;
 	return packet;
 }
 
@@ -55,6 +55,15 @@ std::vector<std::string> Parser::GetHeader(std::string input, std::string& heade
 	}
 
 	return params;
+}
+
+std::string Parser::GetPacket(std::string input, std::string& headerCommand)
+{
+	size_t index = input.find("\n\n");
+	headerCommand = input.substr(0, index);
+	input = input.substr(index + 2);
+	
+	return input;
 }
 
 bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port)
