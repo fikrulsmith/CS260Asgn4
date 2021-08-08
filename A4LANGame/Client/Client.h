@@ -3,7 +3,6 @@
 #include "ClientReceiver/ClientReceiver.h"
 #include "LockStep/LockStep.h"
 #include "DeadReckoning/DeadReckoning.h"
-
 class Client
 {
 	std::vector<ClientInfo> clients;
@@ -53,9 +52,9 @@ public:
 	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
-	void UpdateAllDeadReckoningDT();
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
-	void AllDeadReckoningCorrection();
+	void UpdateAllDeadReckoningDT(float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime);
+	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{

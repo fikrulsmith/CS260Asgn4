@@ -35,7 +35,7 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 		{
 			std::cout << "waiting for player" << std::endl;
 			client->SendAllClient("[READY]");
-			client->ReceiveAllClient(std::string{});
+			client->ReceiveAllClient();
 		}
 
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
