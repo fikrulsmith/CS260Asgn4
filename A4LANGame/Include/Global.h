@@ -11,6 +11,8 @@ const unsigned int	GAME_OBJ_INST_NUM_MAX = 2048;
 static bool			onValueChange = true;
 // object flag definition
 const unsigned long FLAG_ACTIVE = 0x00000001;
+// MAX SCORE
+const unsigned long MAX_SCORE = 300;
 
 enum TYPE
 {
@@ -30,6 +32,39 @@ struct GameObj
 	unsigned long type;		
 	// This will hold the triangles which will form the shape of the object
 	AEGfxVertexList* pMesh;
+};
+
+enum class ShipState
+{
+	UNASSIGNED,
+	MOVINGFORWARD,
+	MOVINGBACKWARDS,
+	ROTATINGLEFT,
+	ROTATINGRIGHT,
+	SHOOTING
+};
+
+enum class ShipID
+{
+	PLAYER1,
+	PLAYER2,
+	PLAYER3,
+	PLAYER4,
+	UNASSIGNED
+};
+
+static const char* PLAYERID[] = { "PLAYER 1", "PLAYER 2", "PLAYER 3", "PLAYER 4" };
+
+struct ShipComponent
+{
+	long sShipLives{ 0 };
+	unsigned long sShipScore{ 0 };
+	ShipState sShipState{ ShipState::UNASSIGNED };
+	ShipID sShipID{ ShipID::UNASSIGNED };
+	int SPECIAL_TRIGGER{ 0 };
+	bool SPECIAL_CHECK{ false };
+	AEVec2 InitialPosition;
+	float InitialDirection{ 0 };
 };
 
 //Game object instance structure
@@ -52,6 +87,10 @@ struct GameObjInst
 	// object transformation matrix: Each frame, 
 	// calculate the object instance's transformation matrix and save it here
 	AEMtx33 transform;
+	ShipComponent shipComp;
+
+	// For Bullet
+	ShipID BulletSource{ ShipID::UNASSIGNED };
 };
 
 enum class GameSystemType

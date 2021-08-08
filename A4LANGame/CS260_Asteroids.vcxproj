@@ -169,6 +169,7 @@
     <ClInclude Include="Client\Client.h" />
     <ClInclude Include="Client\ClientReceiver\ClientReceiver.h" />
     <ClInclude Include="Client\ClientSender\ClientSender.h" />
+    <ClInclude Include="Client\DeadReckoning\DeadReckoning.h" />
     <ClInclude Include="Client\LockStep\Hasher\Hasher.h" />
     <ClInclude Include="Client\LockStep\LockStep.h" />
     <ClInclude Include="Include\Collision.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="Client\Client.cpp" />
     <ClCompile Include="Client\ClientReceiver\ClientReceiver.cpp" />
     <ClCompile Include="Client\ClientSender\ClientSender.cpp" />
+    <ClCompile Include="Client\DeadReckoning\DeadReckoning.cpp" />
     <ClCompile Include="Client\LockStep\Hasher\Hasher.cpp" />
     <ClCompile Include="Client\LockStep\LockStep.cpp" />
     <ClCompile Include="Include\pch.cpp">

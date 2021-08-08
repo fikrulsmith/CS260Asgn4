@@ -4,7 +4,6 @@
 #include "GameObjectFactory.h"
 
 // ---------------------------------------------------------------------------
-
 class AsteroidsGameState
 {
 public:
@@ -16,17 +15,16 @@ public:
 	void GameStateAsteroidsFree(void);
 	void GameStateAsteroidsUnload(void);
 
-	// pointer to the ship object
-	// Pointer to the "Ship" game object instance
-	static GameObjInst* spShip;
+	GameObjInst* myShip{ nullptr };
+
 	// number of ship available (lives 0 = game over)
-	static long sShipLives;
+	long sShipLives = 0;
 	// the score = number of asteroid destroyed
 	// Current score
-	static unsigned long sScore;
+	unsigned long sScore = 0;
 private:
 	// initial number of ship lives
-	const unsigned int SHIP_INITIAL_NUM{ 3 };
+	const unsigned int SHIP_INITIAL_NUM{ 1 };
 	// ship size
 	const float SHIP_SIZE = 16.0f;
 	// ship forward acceleration (in m/s^2)
@@ -46,11 +44,21 @@ private:
 	// no of asteroids that spawned
 	unsigned int ASTEROID_COUNT = 0;
 
-	std::shared_ptr<GameObjectFactory> GameObjFactory_;
+	bool GameOver_NoShips{ false };
+	bool GameOver_MaxScore{ false };
 
-	void bulletExplosion(void);
+	std::shared_ptr<GameObjectFactory> GameObjFactory_;
+	std::unordered_map<ShipID, GameObjInst*> IDToPlayerShip_;
+
+	void PlayerMoveForward(ShipID PlayerID);
+	void PlayerMoveBackwards(ShipID PlayerID);
+	void PlayerRotateLeft(ShipID PlayerID);
+	void PlayerRotateRight(ShipID PlayerID);
+	void PlayerShoot(ShipID PlayerID);
+	void bulletExplosion(ShipID PlayerID);
 	void spawnAsteroid(void);
-	void spawnBulletHell(int i);
+	void spawnBulletHell(int i, ShipID PlayerID);
+	void RestartGameInit();
 };
 
 
