@@ -51,28 +51,16 @@ public:
 	int ReceiveAllClient();
 	void UpdateState(ShipID id, ShipState state);
 
-<<<<<<< HEAD
-	size_t GetNumberOfClient();
-
-	int ReceiveClient()
-	{
-		return 0;
-	}
-=======
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT();
 	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
 	void AllDeadReckoningCorrection();
->>>>>>> GuanHin2
 
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;
 	}
 	
-<<<<<<< HEAD
-=======
 	void HandleRecvMessage(SOCKET client,std::string message);
-	void SendUpdatePacket(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
->>>>>>> GuanHin2
+	void SendUpdatePacket(ShipID id);
 };
