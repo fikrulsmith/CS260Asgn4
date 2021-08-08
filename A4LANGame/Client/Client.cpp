@@ -126,6 +126,12 @@ int Client::SendClient(size_t index, std::string message)
 	sender.SendClient(*GetClient(index), message);
 }
 
+int Client::ReceiveClient(std::string message)
+{
+	return receiver.RecvClient(MyInfo, message);
+}
+
+
 size_t Client::RegisterClient(std::string name, std::string port)
 {
 	ClientInfo client;
