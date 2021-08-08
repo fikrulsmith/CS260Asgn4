@@ -260,13 +260,15 @@ void Client::HandleRecvMessage(std::string message)
 		AEVec2 Position;
 		AEVec2 Velocity;
 		AEVec2 Acceleration;
+		float direction;
 		Position.x = std::stof(params[1]);
 		Position.y = std::stof(params[2]);
 		Velocity.x = std::stof(params[3]);
 		Velocity.y = std::stof(params[4]);
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
-		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
+		direction = std::stof(params[7]);
+		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration,direction);
 		// add your stuff here nico
 
 
