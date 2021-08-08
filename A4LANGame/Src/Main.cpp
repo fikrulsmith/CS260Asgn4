@@ -73,8 +73,11 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 		while(GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
 		{
 			AESysFrameStart();
-			AEInputUpdate();
+			client->UpdateAllDeadReckoningDT();
+			//checking of recv
+			client->AllDeadReckoningCorrection();
 
+			AEInputUpdate();
 			GSManager->GameStateUpdate();
 			GSManager->GameStateDraw();
 			AESysFrameEnd();
