@@ -51,7 +51,7 @@ public:
 
 	int ReceiveClient(SOCKET socket,std::string& message);
 	int ReceiveAllClient();
-	void UpdateState(ShipID id, ShipState state);
+	void UpdateState(ShipState state);
 	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
