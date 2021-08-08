@@ -41,7 +41,8 @@ enum class ShipState
 	MOVINGBACKWARDS,
 	ROTATINGLEFT,
 	ROTATINGRIGHT,
-	SHOOTING
+	SHOOTING, 
+	NOTHING
 };
 
 enum class ShipID
