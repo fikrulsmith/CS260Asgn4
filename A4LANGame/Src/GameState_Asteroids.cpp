@@ -470,6 +470,8 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 	// reset the score and the number of ships
 	sScore = 0;
 	sShipLives = SHIP_INITIAL_NUM;
+
+	srand(GSManager->RandValue);
 }
 
 void AsteroidsGameState::GameStateAsteroidsDraw(void)

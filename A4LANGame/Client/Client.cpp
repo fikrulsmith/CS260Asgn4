@@ -86,6 +86,27 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	return 1;
 }
 
+time_t Client::InitialiseRand()
+{
+	for (auto client : clients)
+	{
+		if (client.ReadyStart)
+			return -1;
+	}
+
+	std::vector<std::string> rand;
+	rand.push_back(std::to_string(time(NULL)));
+
+	std::string message = Parser::CreateHeader("[INITIALISE]", rand);
+
+	for (auto client : clients)
+	{
+		SendClient(client.socket, message);
+	}
+
+	return time(NULL);
+}
+
 ClientInfo* Client::GetClient(size_t index)
 {
 	return &clients[index];

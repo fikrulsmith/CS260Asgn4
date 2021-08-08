@@ -74,4 +74,5 @@ struct ClientInfo
 
 	GameObjInst* playerEntity = nullptr;
 	std::string hashInput;
+	bool ReadyStart = false;
 };

@@ -9,6 +9,8 @@
 class GameStateManager
 {
 public:
+	time_t RandValue;
+
 	void GameSystemUpdate();
 	void Init(unsigned int gameStateInit);
 

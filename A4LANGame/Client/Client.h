@@ -24,6 +24,8 @@ public:
 	int InitMyInfo(std::string name, std::string port);
 	int InitialiseClient(std::vector<std::pair<std::string, std::string>> allClients);
 
+	time_t InitialiseRand();
+
 	// Register/Disconnect Clients
 	size_t RegisterClient(std::string name, std::string port);
 	bool DisconnectClient(SOCKET clientSocket);
