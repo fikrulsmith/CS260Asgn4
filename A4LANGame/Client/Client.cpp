@@ -110,7 +110,10 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		}
 	}
 
-	std::cout << static_cast<int>(clients[0].id) << std::endl;
+	for (size_t k = 0; k < clients.size(); k++)
+	{
+		createDeadReckoning(clients[k].id);
+	}
 
 	return 1;
 }
@@ -347,6 +350,38 @@ void Client::UpdateAllDeadReckoningDT()
 	}
 }
 
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+{
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction);
+}
+
+void Client::AllDeadReckoningCorrection()
+{
+	for (auto client : clients)
+	{
+		AEVec2 position;
+		AEVec2 velocity;
+		float direction;
+		IdtoDeadReckoning[client.id].Correction(position, velocity, direction);
+		//pass back to fikrul here
+	}
+}
+
+void Client::SendUpdatePacket(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+{
+	
+	std::vector<std::string> params;
+	params.push_back(std::to_string(static_cast<int>(id)));
+	params.push_back(std::to_string(Position.x));
+	params.push_back(std::to_string(Position.y));
+	params.push_back(std::to_string(Velocity.x));
+	params.push_back(std::to_string(Velocity.y));
+	params.push_back(std::to_string(Acceleration.x));
+	params.push_back(std::to_string(Acceleration.y));
+	params.push_back(std::to_string(direction));
+
+	SendAllClient(Parser::CreateHeader("[UPDATE]", params));
+}
 
 void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
