@@ -99,18 +99,73 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		clients[i].id = static_cast<ShipID>(id);
 	}
 
-	for (size_t i = 0; i < clients.size(); i++)
-	{
-		MyInfo.id = static_cast<ShipID>(i);
-		if (std::stoi(MyInfo.port) < std::stoi(clients[i].port))
+	std::vector<ClientInfo> oldClient = clients;
+	std::vector<ClientInfo> newClient = clients;
+	clients.clear();
+
+	newClient.push_back(MyInfo);
+	std::sort(newClient.begin(), newClient.end(),
+		[](const ClientInfo& a, const ClientInfo& b) -> bool
 		{
-			for (size_t j = i; j < clients.size(); j++)
+			return std::stoi(a.port) < std::stoi(b.port);
+		}
+	);
+
+	for (size_t i = 0; i < newClient.size(); i++)
+	{
+		ShipID ID = static_cast<ShipID>(i);
+
+		if (MyInfo.port == newClient[i].port)
+			MyInfo.id = ID;
+
+		newClient[i].id = ID;
+	}
+
+	newClient.erase(std::remove_if(newClient.begin(), newClient.end(),
+		[this](const ClientInfo& a)
+		{
+			return a.port == MyInfo.port;
+		}),
+		newClient.end()
+			);
+
+	for (size_t i = 0; i < oldClient.size(); i++)
+	{
+		for (size_t j = 0; j < newClient.size(); j++)
+		{
+			if (oldClient[i].port == newClient[j].port)
 			{
-				clients[j].id = static_cast<ShipID>(static_cast<int>(clients[j].id) + 1);
+				clients.push_back(newClient[j]);
+				break;
 			}
-			break;
 		}
 	}
+
+	/*clients.push_back(MyInfo);
+	std::sort(clients.begin(), clients.end(), 
+		[](const ClientInfo& a, const ClientInfo& b) -> bool
+		{
+			return std::stoi(a.port) < std::stoi(b.port);
+		}
+	);
+
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		ShipID ID = static_cast<ShipID>(i);
+
+		if (MyInfo.port == clients[i].port)
+			MyInfo.id = ID;
+
+		clients[i].id = ID;
+	}
+
+	clients.erase(std::remove_if(clients.begin(), clients.end(),
+		[this](const ClientInfo& a)
+		{
+			return a.port == MyInfo.port;
+		}),
+		clients.end()
+	);*/
 
 	for (size_t k = 0; k < clients.size(); k++)
 	{

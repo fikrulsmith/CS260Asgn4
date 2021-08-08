@@ -428,49 +428,51 @@ void AsteroidsGameState::GameStateAsteroidsLoad(void)
 
 void AsteroidsGameState::GameStateAsteroidsInit(void)
 {
-	for (size_t i = 0; i < GSManager->PlayerCount_; ++i)
+	for (size_t i = 0; i < clientManager->GetNumberOfClients() + 1; ++i)
 	{
-		if (i == 0)
-		{
-			AEVec2 pos{ -20.f, 20.f };
-			myShip = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(180.f));
-			IDToPlayerShip_[static_cast<ShipID>(i)] = myShip;
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipID = static_cast<ShipID>(i);
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore = 0;
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
-		}
+		AEVec2 pos;
+		float dir = 0.0f;
+		int index = 0;
+
+		if (i == clientManager->GetNumberOfClients())
+			index = static_cast<int>(clientManager->GetOwnInfo()->id);
 		else
+			index = static_cast<int>(clientManager->GetClient(i)->id);
+
+		switch (index)
 		{
-			AEVec2 pos;
-			float dir = 0.0f;
-
-			switch (i)
-			{
-			case 1:
-				pos.x = 20.f;
-				pos.y = 20.f;
-				dir = 0.0f;
-				break;
-			case 2:
-				pos.x = -20.f;
-				pos.y = 0.f;
-				dir = 180.0f;
-				break;
-			case 3:
-				pos.x = 20.f;
-				pos.y = 0.f;
-				dir = 0.0f;
-				break;
-			}
-
-			GameObjInst* temp = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(dir));
-			IDToPlayerShip_[static_cast<ShipID>(i)] = temp;
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipID = static_cast<ShipID>(i);
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore = 0;
-			IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
+		case 0:
+			pos.x = -20.f;
+			pos.y = 20.f;
+			dir = 180.f;
+			break;
+		case 1:
+			pos.x = 20.f;
+			pos.y = 20.f;
+			dir = 0.0f;
+			break;
+		case 2:
+			pos.x = -20.f;
+			pos.y = 0.f;
+			dir = 180.0f;
+			break;
+		case 3:
+			pos.x = 20.f;
+			pos.y = 0.f;
+			dir = 0.0f;
+			break;
 		}
 
-		AE_ASSERT(IDToPlayerShip_[static_cast<ShipID>(i)]);
+		GameObjInst* temp = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(dir));
+		IDToPlayerShip_[static_cast<ShipID>(index)] = temp;
+		IDToPlayerShip_[static_cast<ShipID>(index)]->shipComp.sShipID = static_cast<ShipID>(index);
+		IDToPlayerShip_[static_cast<ShipID>(index)]->shipComp.sShipScore = 0;
+		IDToPlayerShip_[static_cast<ShipID>(index)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
+
+		if (i == clientManager->GetNumberOfClients())
+			myShip = temp;
+
+		AE_ASSERT(IDToPlayerShip_[static_cast<ShipID>(index)]);
 	}
 
 	// CREATE THE INITIAL ASTEROIDS INSTANCES USING THE "gameObjInstCreate" FUNCTION
@@ -626,6 +628,8 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 		// Limit your speed over here
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));
+
+		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::MOVINGFORWARD;
 	}
 }
 
@@ -645,6 +649,8 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 		// Limit your speed over here
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));
+
+		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::MOVINGBACKWARDS;
 	}
 }
 
@@ -655,6 +661,8 @@ void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->dirCurr += SHIP_ROT_SPEED *
 			(float)(AEFrameRateControllerGetFrameTime());
 		IDToPlayerShip_[PlayerID]->dirCurr = AEWrap(IDToPlayerShip_[PlayerID]->dirCurr, -PI, PI);
+
+		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::ROTATINGLEFT;
 	}
 }
 
@@ -665,6 +673,8 @@ void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->dirCurr -=
 			SHIP_ROT_SPEED * (float)(AEFrameRateControllerGetFrameTime());
 		IDToPlayerShip_[PlayerID]->dirCurr = AEWrap(IDToPlayerShip_[PlayerID]->dirCurr, -PI, PI);
+
+		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::ROTATINGRIGHT;
 	}
 }
 
@@ -694,6 +704,8 @@ void AsteroidsGameState::PlayerShoot(ShipID PlayerID)
 				&IDToPlayerShip_[PlayerID]->posCurr, &Bullet, IDToPlayerShip_[PlayerID]->dirCurr);
 			bullet->BulletSource = PlayerID;
 		}
+
+		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::SHOOTING;
 	}
 }
 
