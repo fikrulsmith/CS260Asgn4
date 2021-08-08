@@ -52,27 +52,32 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	if (AEInputCheckCurr(AEVK_UP))
 	{
 		PlayerMoveForward(myShip->shipComp.sShipID);
+		client->UpdateState(myShip->shipComp.sShipID, myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_DOWN))
 	{
 		PlayerMoveBackwards(myShip->shipComp.sShipID);
+		client->UpdateState(myShip->shipComp.sShipID, myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_LEFT))
 	{
 		PlayerRotateLeft(myShip->shipComp.sShipID);
+		client->UpdateState(myShip->shipComp.sShipID, myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_RIGHT))
 	{
 		PlayerRotateRight(myShip->shipComp.sShipID);
+		client->UpdateState(myShip->shipComp.sShipID, myShip->shipComp.sShipState);
 	}
 
 	// Shoot a bullet if space is triggered (Create a new object instance)
 	if (AEInputCheckTriggered(AEVK_SPACE))
 	{
 		PlayerShoot(myShip->shipComp.sShipID);
+		client->UpdateState(myShip->shipComp.sShipID, myShip->shipComp.sShipState);
 	}
 
 	for (size_t i = 0; i < client->GetNumberOfClients(); ++i)

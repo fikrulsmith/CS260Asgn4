@@ -185,32 +185,27 @@ int Client::SendAllClient(std::string message)
 	return 1;
 }
 
-void Client::UpdateState(ShipID id, ShipState state)
+void Client::UpdateState(ShipState state)
 {
-	for (auto client : clients)
+	MyInfo.state = state;
+
+	auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
+	std::vector<std::string> params = PackData(MyInfo.id, it->second);
+	params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+
+	std::string message;
+	for (auto string : params)
 	{
-		if (client.id == id)
-		{
-			client.state = state;
-
-			auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-			std::vector<std::string> params = PackData(MyInfo.id, it->second);
-			params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
-
-			std::string hash;
-			for (auto string : params)
-			{
-				hash += string + "\n";
-			}
-
-			hash = lockStepManager.HashInput(hash);
-
-			std::string message = Parser::CreatePacket("[LOCK]", hash);
-			SendAllClient(message);
-
-			UpdateHash();
-		}
+		message += string + "\n";
 	}
+
+	std::string hash = lockStepManager.HashInput(message);
+
+	SendAllClient(Parser::CreatePacket("[LOCK]", hash));
+
+	UpdateHash();
+
+	message = Parser::CreatePacket("[Fuckfikmama]", message);
 }
 
 std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
@@ -385,32 +380,20 @@ bool Client::AllHashUpdated()
 
 	return true;
 }
-void Client::createDeadReckoning(ShipID id)
-{
-	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
-}
-
-void Client::UpdateAllDeadReckoningDT(float dt)
-{
-	for (auto client : clients)
-	{
-		IdtoDeadReckoning[client.id].UpdateTime(dt);
-	}
-}
 
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
 {
 	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
 }
 
-void Client::AllDeadReckoningCorrection()
+void Client::AllDeadReckoningCorrection(float dt)
 {
 	for (auto client : clients)
 	{
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
@@ -444,27 +427,6 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 	for (auto client : clients)
 	{
 		IdtoDeadReckoning[client.id].UpdateTime(dt);
-	}
-}
-
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
-{
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
-}
-
-void Client::AllDeadReckoningCorrection(float dt)
-{
-	for (auto client : clients)
-	{
-		AEVec2 position;
-		AEVec2 velocity;
-		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction,dt);
-		//pass back to fikrul here
-		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
-		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
-		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-	
 	}
 }
 
