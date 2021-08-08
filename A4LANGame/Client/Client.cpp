@@ -91,6 +91,17 @@ ClientInfo* Client::GetClient(size_t index)
 	return &clients[index];
 }
 
+bool Client::GetClientReadyCheck()
+{
+	for (auto client : clients)
+	{
+		if (!client.readyCheck)
+			return false;
+	}
+
+	return true;
+}
+
 /*****************************************************************
 
 					NEEDS TO BE DONE!!!!
@@ -107,11 +118,15 @@ size_t Client::GetClientByGamePtr(GameObjInst* entity)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		if (clients[i].playerEntity == entity)
-			return i;
+		
 	}
 
 	return -1;
+}
+
+size_t Client::GetNumberOfClients()
+{
+	return clients.size();
 }
 
 int Client::SendClient(SOCKET socket, std::string message)
@@ -127,6 +142,33 @@ int Client::SendClient(int index, std::string message)
 	return sender.SendClient(*GetClient(index), message);
 }
 
+int Client::SendAllClient(std::string message)
+{
+	for (auto client : clients)
+	{
+		SendClient(client.socket, message);
+	}
+
+	return 1;
+}
+
+void Client::UpdateState(ShipID id, ShipState state)
+{
+	for (auto client : clients)
+	{
+		if (client.id == id)
+		{
+			client.state = state;
+			std::string message;
+			SendAllClient(message);
+		}
+	}
+}
+
+int Client::ReceiveClient(std::string message)
+{
+	return receiver.RecvClient(MyInfo, message);
+}
 size_t Client::RegisterClient(std::string name, std::string port)
 {
 	ClientInfo client;
@@ -261,12 +303,14 @@ void Client::HandleRecvMessage(std::string message)
 		AEVec2 Position;
 		AEVec2 Velocity;
 		AEVec2 Acceleration;
+		float direction;
 		Position.x = std::stof(params[1]);
 		Position.y = std::stof(params[2]);
 		Velocity.x = std::stof(params[3]);
 		Velocity.y = std::stof(params[4]);
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
+		direction = std::stof(params[7]);
 		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
 		// add your stuff here nico
 

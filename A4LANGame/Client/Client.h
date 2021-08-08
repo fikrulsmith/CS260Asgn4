@@ -34,15 +34,19 @@ public:
 
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
+	bool GetClientReadyCheck();
 
 	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByGamePtr(GameObjInst* entity);
-	
+	size_t GetNumberOfClients();
 
 	int SendClient(SOCKET socket, std::string message);
 	int SendClient(int index, std::string message);
+	int SendAllClient(std::string message);
 
 	int ReceiveClient(std::string message);
+
+	void UpdateState(ShipID id, ShipState state);
 
 	std::string GetOwnPort()
 	{
