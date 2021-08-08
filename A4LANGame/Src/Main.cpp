@@ -9,6 +9,7 @@
 float	 g_dt;
 double	 g_appTime;
 std::unique_ptr<GameStateManager> GSManager;
+std::unique_ptr<Client> client;
 
 
 /******************************************************************************/
@@ -38,8 +39,9 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	std::vector<std::pair<std::string, std::string>> vec; 
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
-	Client client;
-	client.InitialiseClient(vec);
+	client = std::make_unique<Client>();
+
+	client->InitialiseClient(vec);
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else

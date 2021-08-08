@@ -83,12 +83,55 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		ConnectToClient(clients[index]);
 	}
 
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		int id = static_cast<int>(ShipID::PLAYER1);
+
+		for (size_t j = 0; j < clients.size(); j++)
+		{
+			if (j == i) continue;
+			if (std::stoi(clients[i].port) > std::stoi(clients[j].port))
+				id++;
+		}
+
+		clients[i].id = static_cast<ShipID>(id);
+	}
+
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		MyInfo.id = static_cast<ShipID>(i);
+		if (std::stoi(MyInfo.port) < std::stoi(clients[i].port))
+		{
+			for (size_t j = i; j < clients.size(); j++)
+			{
+				clients[j].id = static_cast<ShipID>(static_cast<int>(clients[j].id) + 1);
+			}
+			break;
+		}
+	}
+
+	for (size_t k = 0; k < clients.size(); k++)
+	{
+		createDeadReckoning(clients[k].id);
+	}
+
 	return 1;
 }
 
 ClientInfo* Client::GetClient(size_t index)
 {
 	return &clients[index];
+}
+
+bool Client::GetClientReadyCheck()
+{
+	for (auto client : clients)
+	{
+		if (!client.readyCheck)
+			return false;
+	}
+
+	return true;
 }
 
 /*****************************************************************
@@ -107,16 +150,19 @@ size_t Client::GetClientByGamePtr(GameObjInst* entity)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		if (clients[i].playerEntity == entity)
-			return i;
+		
 	}
 
 	return -1;
 }
 
+size_t Client::GetNumberOfClients()
+{
+	return clients.size();
+}
+
 int Client::SendClient(SOCKET socket, std::string message)
 {
-	std::cout << "SENDING" << std::endl;
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
 	
@@ -128,11 +174,47 @@ int Client::SendClient(int index, std::string message)
 	return sender.SendClient(*GetClient(index), message);
 }
 
-size_t Client::GetNumberOfClient()
+int Client::SendAllClient(std::string message)
 {
-	return clients.size();
+	for (auto client : clients)
+	{
+		SendClient(client.socket, message);
+	}
+
+	return 1;
 }
 
+void Client::UpdateState(ShipID id, ShipState state)
+{
+	for (auto client : clients)
+	{
+		if (client.id == id)
+		{
+			client.state = state;
+			std::string message;
+			SendAllClient(message);
+		}
+	}
+}
+
+int Client::ReceiveClient(SOCKET socket,std::string& message)
+{
+	size_t index = CheckClientExist(socket);
+	if (index == DOES_NOT_EXIST) return -1;
+
+	return receiver.RecvClient(*GetClient(index), message);
+}
+int Client::ReceiveAllClient()
+{
+	for (auto client : clients)
+	{
+		std::string input;
+		ReceiveClient(client.socket, input);
+		HandleRecvMessage(client.socket, input);
+	}
+
+	return 1;
+}
 size_t Client::RegisterClient(std::string name, std::string port)
 {
 	ClientInfo client;
@@ -140,6 +222,7 @@ size_t Client::RegisterClient(std::string name, std::string port)
 	client.port = port;
 
 	clients.push_back(client);
+
 	return clients.size() - 1;
 }
 
@@ -253,4 +336,85 @@ int Client::ConnectToClient(ClientInfo& client)
 	std::cout << "Successfully stored client address." << std::endl;
 
 	return 200;
+}
+void Client::createDeadReckoning(ShipID id)
+{
+	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
+}
+
+void Client::UpdateAllDeadReckoningDT()
+{
+	for (auto client : clients)
+	{
+		IdtoDeadReckoning[client.id].UpdateTime();
+	}
+}
+
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+{
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction);
+}
+
+void Client::AllDeadReckoningCorrection()
+{
+	for (auto client : clients)
+	{
+		AEVec2 position;
+		AEVec2 velocity;
+		float direction;
+		IdtoDeadReckoning[client.id].Correction(position, velocity, direction);
+		//pass back to fikrul here
+	}
+}
+
+void Client::SendUpdatePacket(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+{
+	
+	std::vector<std::string> params;
+	params.push_back(std::to_string(static_cast<int>(id)));
+	params.push_back(std::to_string(Position.x));
+	params.push_back(std::to_string(Position.y));
+	params.push_back(std::to_string(Velocity.x));
+	params.push_back(std::to_string(Velocity.y));
+	params.push_back(std::to_string(Acceleration.x));
+	params.push_back(std::to_string(Acceleration.y));
+	params.push_back(std::to_string(direction));
+
+	SendAllClient(Parser::CreateHeader("[UPDATE]", params));
+}
+
+void Client::HandleRecvMessage(SOCKET client,std::string message)
+{
+	std::vector<std::string> params;
+	std::string header;
+	params = Parser::GetHeader(message, header);
+	if (header == "[UPDATE]")
+	{
+		//check ID against your container of players
+		int playerID = std::stoi(params[0]);
+		AEVec2 Position;
+		AEVec2 Velocity;
+		AEVec2 Acceleration;
+		float direction;
+		Position.x = std::stof(params[1]);
+		Position.y = std::stof(params[2]);
+		Velocity.x = std::stof(params[3]);
+		Velocity.y = std::stof(params[4]);
+		Acceleration.x = std::stof(params[5]);
+		Acceleration.y = std::stof(params[6]);
+		direction = std::stof(params[7]);
+		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
+		// add your stuff here nico
+
+
+	}
+	else if (header == "[READY]")
+	{
+		size_t index = CheckClientExist(client);
+		if (index == DOES_NOT_EXIST) return;
+
+		ClientInfo* info = GetClient(index);
+		info->readyCheck = true;
+
+	}
 }
