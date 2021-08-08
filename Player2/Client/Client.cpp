@@ -80,6 +80,8 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
+		u_long enable = 1;
+		ioctlsocket(clients[index].socket, FIONBIO, &enable);
 		ConnectToClient(clients[index]);
 	}
 
