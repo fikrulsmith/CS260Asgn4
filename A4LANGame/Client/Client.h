@@ -53,7 +53,7 @@ public:
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
 	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime);
-	void AllDeadReckoningCorrection();
+	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{

@@ -75,7 +75,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			AESysFrameStart();
 			client->UpdateAllDeadReckoningDT(g_dt);
 			//checking of recv
-			client->AllDeadReckoningCorrection();
+			client->AllDeadReckoningCorrection(g_dt);
 
 			AEInputUpdate();
 			GSManager->GameStateUpdate();

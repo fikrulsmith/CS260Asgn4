@@ -44,7 +44,7 @@ void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& d
 	direction = Mydirection;
 }
 
-void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction)
+void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction,float dt)
 {
 	AEVec2 VelocityBlend;
 	AEVec2 Pt;
@@ -69,18 +69,18 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 		FinalPosition.y = static_cast<float>(Pt.y + ((PtPrime.y - Pt.y) * Tarrow));
 	}
 
-	InstantVelocityBetweenDRpositions.x = (FinalPosition.x - UpdatePosition.x) / g_dt;
-	InstantVelocityBetweenDRpositions.y = (FinalPosition.y - UpdatePosition.y) / g_dt;
+	InstantVelocityBetweenDRpositions.x = (FinalPosition.x - UpdatePosition.x) / dt;
+	InstantVelocityBetweenDRpositions.y = (FinalPosition.y - UpdatePosition.y) / dt;
 
 	UpdatePosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
 	direction = Mydirection;
 }
 
-void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction)
+void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction,float dt)
 {
 	if (!extrapolating)
-		Predict(UpdatePosition, UpdateVelocity,direction);
+		Predict(UpdatePosition, UpdateVelocity,direction,dt);
 	else
-		Correction(UpdatePosition, UpdateVelocity,direction);
+		Correction(UpdatePosition, UpdateVelocity,direction,dt);
 }
