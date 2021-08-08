@@ -355,14 +355,14 @@ void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AE
 	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
 }
 
-void Client::AllDeadReckoningCorrection()
+void Client::AllDeadReckoningCorrection(float dt)
 {
 	for (auto client : clients)
 	{
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction,dt);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
