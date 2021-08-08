@@ -17,7 +17,7 @@
 extern float	g_dt;
 extern double	g_appTime;
 extern std::unique_ptr<GameStateManager> GSManager;
-extern std::unique_ptr<Client> client;
+extern std::unique_ptr<Client> clientManager;
 
 
 

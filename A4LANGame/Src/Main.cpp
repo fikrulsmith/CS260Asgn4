@@ -9,7 +9,7 @@
 float	 g_dt;
 double	 g_appTime;
 std::unique_ptr<GameStateManager> GSManager;
-std::unique_ptr<Client> client;
+std::unique_ptr<Client> clientManager;
 
 
 /******************************************************************************/
@@ -39,9 +39,9 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	std::vector<std::pair<std::string, std::string>> vec; 
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
-	client = std::make_unique<Client>();
+	clientManager = std::make_unique<Client>();
 
-	client->InitialiseClient(vec);
+	clientManager->InitialiseClient(vec);
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else
@@ -72,11 +72,11 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 		while(GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
 		{
-			client->ReceiveAllClient();
+			clientManager->ReceiveAllClient();
 			AESysFrameStart();
-			client->UpdateAllDeadReckoningDT(g_dt);
+			clientManager->UpdateAllDeadReckoningDT(g_dt);
 			//checking of recv
-			client->AllDeadReckoningCorrection(g_dt);
+			clientManager->AllDeadReckoningCorrection(g_dt);
 
 			AEInputUpdate();
 			GSManager->GameStateUpdate();

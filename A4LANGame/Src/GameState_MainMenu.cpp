@@ -31,11 +31,11 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 {
 	if (AEInputCheckTriggered(AEVK_RETURN))
 	{
-		while (!client->GetClientReadyCheck())
+		while (!clientManager->GetClientReadyCheck())
 		{
 			std::cout << "waiting for player" << std::endl;
-			client->SendAllClient("[READY]");
-			client->ReceiveAllClient();
+			clientManager->SendAllClient("[READY]");
+			clientManager->ReceiveAllClient();
 		}
 
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
