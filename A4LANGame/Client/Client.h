@@ -34,6 +34,7 @@ public:
 
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
+	bool GetClientReadyCheck();
 
 	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByGamePtr(GameObjInst* entity);

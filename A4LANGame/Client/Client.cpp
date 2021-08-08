@@ -91,6 +91,17 @@ ClientInfo* Client::GetClient(size_t index)
 	return &clients[index];
 }
 
+bool Client::GetClientReadyCheck()
+{
+	for (auto client : clients)
+	{
+		if (!client.readyCheck)
+			return false;
+	}
+
+	return true;
+}
+
 /*****************************************************************
 
 					NEEDS TO BE DONE!!!!

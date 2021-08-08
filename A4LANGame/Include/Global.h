@@ -111,6 +111,8 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
+	bool readyCheck;
+
 	ShipID id;
 	ShipState state;
 };
