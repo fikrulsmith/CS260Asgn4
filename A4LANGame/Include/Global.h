@@ -10,6 +10,8 @@ const unsigned int	GAME_OBJ_INST_NUM_MAX = 2048;
 static bool			onValueChange = true;
 // object flag definition
 const unsigned long FLAG_ACTIVE = 0x00000001;
+// MAX SCORE
+const unsigned long MAX_SCORE = 300;
 
 enum TYPE
 {
@@ -49,6 +51,8 @@ enum class ShipID
 	PLAYER4,
 	UNASSIGNED
 };
+
+static const char* PLAYERID[] = { "PLAYER 1", "PLAYER 2", "PLAYER 3", "PLAYER 4" };
 
 struct ShipComponent
 {

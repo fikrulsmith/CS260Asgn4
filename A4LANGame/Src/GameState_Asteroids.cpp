@@ -9,118 +9,110 @@
 
 void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 {
-	//AllShips_.size();
-	// =========================
-	// update according to input
-	// =========================
+	size_t counter = 0;
 
-	// This input handling moves the ship without any velocity nor acceleration
-	// It should be changed when implementing the Asteroids project
-	//
-	// Updating the velocity and position according to acceleration is 
-	// done by using the following:
-	// Pos1 = 1/2 * a*t*t + v0*t + Pos0
-	//
-	// In our case we need to divide the previous equation into two parts in order 
-	// to have control over the velocity and that is done by:
-	//
-	// v1 = a*t + v0		//This is done when the UP or DOWN key is pressed 
-	// Pos1 = v1*t + Pos0
-
-	// Restart Mechanic
-	if (sScore >= 5000 || sShipLives == 0)
+	if (!GameOver_MaxScore)
 	{
-		// Reset Key Values
+		for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
+		{
+			if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore >= MAX_SCORE)
+			{
+				GameOver_MaxScore = true;
+				onValueChange = true;
+				break;
+			}
+
+			if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives <= 0)
+				counter++;
+		}
+	}
+	else
+	{
 		if (AEInputCheckCurr(AEVK_R))
 		{
-			GSManager->SetGameStateCurrIndex(GS_RESTART);
-			sScore = 0;
-			sShipLives = SHIP_INITIAL_NUM;
-			ASTEROID_COUNT = 0;
-			SPECIAL_TRIGGER = 0;
+			RestartGameInit();
+		}
+	}
+
+	if (counter == IDToPlayerShip_.size())
+	{
+		if (!GameOver_NoShips)
+		{
+			GameOver_NoShips = true;
 			onValueChange = true;
 		}
 	}
 
-	if (sShipLives > 0 && sScore <= 5000)
+
+	if (AEInputCheckCurr(AEVK_UP))
 	{
-		if (AEInputCheckCurr(AEVK_UP))
+		PlayerMoveForward(myShip->shipComp.sShipID);
+	}
+
+	if (AEInputCheckCurr(AEVK_DOWN))
+	{
+		PlayerMoveBackwards(myShip->shipComp.sShipID);
+	}
+
+	if (AEInputCheckCurr(AEVK_LEFT))
+	{
+		PlayerRotateLeft(myShip->shipComp.sShipID);
+	}
+
+	if (AEInputCheckCurr(AEVK_RIGHT))
+	{
+		PlayerRotateRight(myShip->shipComp.sShipID);
+	}
+
+	// Shoot a bullet if space is triggered (Create a new object instance)
+	if (AEInputCheckTriggered(AEVK_SPACE))
+	{
+		PlayerShoot(myShip->shipComp.sShipID);
+	}
+
+	if (AEInputCheckCurr(AEVK_W))
+	{
+		PlayerMoveForward(ShipID::PLAYER2);
+	}
+
+	if (AEInputCheckCurr(AEVK_S))
+	{
+		PlayerMoveBackwards(ShipID::PLAYER2);
+	}
+
+	if (AEInputCheckCurr(AEVK_A))
+	{
+		PlayerRotateLeft(ShipID::PLAYER2);
+	}
+
+	if (AEInputCheckCurr(AEVK_D))
+	{
+		PlayerRotateRight(ShipID::PLAYER2);
+	}
+
+	// Shoot a bullet if space is triggered (Create a new object instance)
+	if (AEInputCheckTriggered(AEVK_E))
+	{
+		PlayerShoot(ShipID::PLAYER2);
+	}
+
+	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
+	{
+		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
+
+		// If the object is not active, don't do anything
+		if ((pInst->flag & FLAG_ACTIVE) == 0)
 		{
-			PlayerMoveForward(myShip->shipComp.sShipID);
+			continue;
 		}
 
-		if (AEInputCheckCurr(AEVK_DOWN))
-		{
-			PlayerMoveBackwards(myShip->shipComp.sShipID);
-		}
+		// Update Positions of the Game Objects
+		pInst->posCurr.x = pInst->posCurr.x + pInst->velCurr.x * g_dt;
+		pInst->posCurr.y = pInst->posCurr.y + pInst->velCurr.y * g_dt;
 
-		if (AEInputCheckCurr(AEVK_LEFT))
-		{
-			PlayerRotateLeft(myShip->shipComp.sShipID);
-		}
-
-		if (AEInputCheckCurr(AEVK_RIGHT))
-		{
-			PlayerRotateRight(myShip->shipComp.sShipID);
-		}
-
-		// Shoot a bullet if space is triggered (Create a new object instance)
-		if (AEInputCheckTriggered(AEVK_SPACE))
-		{
-			PlayerShoot(myShip->shipComp.sShipID);
-		}
-
-		if (AEInputCheckCurr(AEVK_W))
-		{
-			PlayerMoveForward(ShipID::PLAYER2);
-		}
-
-		if (AEInputCheckCurr(AEVK_S))
-		{
-			PlayerMoveBackwards(ShipID::PLAYER2);
-		}
-
-		if (AEInputCheckCurr(AEVK_A))
-		{
-			PlayerRotateLeft(ShipID::PLAYER2);
-		}
-
-		if (AEInputCheckCurr(AEVK_D))
-		{
-			PlayerRotateRight(ShipID::PLAYER2);
-		}
-
-		// Shoot a bullet if space is triggered (Create a new object instance)
-		if (AEInputCheckTriggered(AEVK_E))
-		{
-			PlayerShoot(ShipID::PLAYER2);
-		}
-
-		// ======================================================
-		// update physics of all active game object instances
-		//	-- Positions are updated here with the computed velocity
-		//  -- Get the bounding rectangle of every active instance:
-		//		boundingRect_min = -BOUNDING_RECT_SIZE * instance->scale + instance->pos
-		//		boundingRect_max = BOUNDING_RECT_SIZE * instance->scale + instance->pos
-		// ======================================================
-		for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
-		{
-			GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
-
-			// If the object is not active, don't do anything
-			if ((pInst->flag & FLAG_ACTIVE) == 0)
-			{
-				continue;
-			}
-
-			// Update Positions of the Game Objects
-			pInst->posCurr.x = pInst->posCurr.x + pInst->velCurr.x * g_dt;
-			pInst->posCurr.y = pInst->posCurr.y + pInst->velCurr.y * g_dt;
-
-			// Getting bounding rectangles at every active instance
-			AEVec2Set(&pInst->boundingBox.min, -0.5f * pInst->scale + pInst->posCurr.x, -0.5f * pInst->scale + pInst->posCurr.y);
-			AEVec2Set(&pInst->boundingBox.max, 0.5f * pInst->scale + pInst->posCurr.x, 0.5f * pInst->scale + pInst->posCurr.y);
-		}
+		// Getting bounding rectangles at every active instance
+		AEVec2Set(&pInst->boundingBox.min, -0.5f * pInst->scale + pInst->posCurr.x, -0.5f * pInst->scale + pInst->posCurr.y);
+		AEVec2Set(&pInst->boundingBox.max, 0.5f * pInst->scale + pInst->posCurr.x, 0.5f * pInst->scale + pInst->posCurr.y);
 	}
 
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
@@ -201,10 +193,10 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						_pInst->boundingBox, _pInst->velCurr))
 					{
 						// Creates bullet explosion after each death.
-						if (_pInst->shipComp.sShipLives > 1)
+						/*if (_pInst->shipComp.sShipLives > 1)
 						{
 							bulletExplosion(_pInst->shipComp.sShipID);
-						}
+						}*/
 
 						// Decrease ship lives by 1
 						_pInst->shipComp.sShipLives -= 1;
@@ -216,7 +208,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						AEVec2Set(&_pInst->posCurr,
 							_pInst->shipComp.InitialPosition.x,
 							_pInst->shipComp.InitialPosition.y);
-
 						// Reset Ship Velocity
 						AEVec2Set(&_pInst->velCurr, 0.f, 0.f);
 						// Reset Direction
@@ -228,22 +219,25 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						GameObjFactory_->gameObjInstDestroy(pInst);
 
 						// Set flag to true
-						if (_pInst->shipComp.sShipScore <= 5000)
+						if (_pInst->shipComp.sShipScore <= MAX_SCORE)
 						{
 							onValueChange = true;
 						}
 
-						if (sShipLives < 0)
+						if (_pInst->shipComp.sShipLives <= 0)
 						{
 							// Reset Ship Position
-							AEVec2Set(&myShip->posCurr, 0.f, 0.f);
+							AEVec2Set(&_pInst->posCurr,
+								_pInst->shipComp.InitialPosition.x,
+								_pInst->shipComp.InitialPosition.y);
 							// Reset Ship Velocity
-							AEVec2Set(&myShip->velCurr, 0.f, 0.f);
-							// Reset Ship Direction
-							myShip->dirCurr = 0.f;
-
+							AEVec2Set(&_pInst->velCurr, 0.f, 0.f);
+							// Reset Direction
+							_pInst->dirCurr = _pInst->shipComp.InitialDirection;
+							// Player is out
+							GameObjFactory_->gameObjInstDestroy(_pInst);
 							// Set flag to false
-							onValueChange = false;
+							onValueChange = true;
 						}
 					}
 				}
@@ -288,15 +282,17 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						onValueChange = true;
 
 						// At Max Score
-						if (IDToPlayerShip_[_pInst->BulletSource]->shipComp.sShipScore > 5000)
+						if (IDToPlayerShip_[_pInst->BulletSource]->shipComp.sShipScore > MAX_SCORE)
 						{
-							//// Reset Ship Position
-							//AEVec2Set(&myShip->posCurr, 0.f, 0.f);
-							//// Reset Ship velocity
-							//AEVec2Set(&myShip->velCurr, 0.f, 0.f);
-							//// Reset Ship direction
-							//myShip->dirCurr = 0.f;
-
+							AEVec2Set(&_pInst->posCurr,
+								_pInst->shipComp.InitialPosition.x,
+								_pInst->shipComp.InitialPosition.y);
+							// Reset Ship Velocity
+							AEVec2Set(&_pInst->velCurr, 0.f, 0.f);
+							// Reset Direction
+							_pInst->dirCurr = _pInst->shipComp.InitialDirection;
+							// Player is out
+							GameObjFactory_->gameObjInstDestroy(_pInst);
 							// Set flag to false
 							onValueChange = false;
 						}
@@ -471,7 +467,7 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 void AsteroidsGameState::GameStateAsteroidsDraw(void)
 {
 	char strBuffer[1024] = { '\0' };
-	char InGameBuffer[1024] = { '\0' };
+	//char InGameBuffer[1024] = { '\0' };
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxTextureSet(NULL, 0, 0);
@@ -494,47 +490,72 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 	//You can replace this condition/variable by your own data.
 	if (onValueChange)
 	{
-		sprintf_s(strBuffer, "Score: %d", sScore);
-		//AEGfxPrint(10, 10, (u32)-1, strBuffer);
-		printf("%s \n", strBuffer);
-
-		sprintf_s(strBuffer, "Ship Left: %d", sShipLives >= 0 ? sShipLives : 0);
-		//AEGfxPrint(600, 10, (u32)-1, strBuffer);
-		printf("%s \n", strBuffer);
-
-		if (SPECIAL_TRIGGER >= 5)
+		for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
 		{
-			sprintf_s(strBuffer, "SPECIAL POWER READY");
+			printf("----------------------------------------------------------------- \n");
+			printf("%s \n", PLAYERID[i]);
+			printf("----------------------------------------------------------------- \n");
+
+			if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives <= 0)
+			{
+				printf("%s is dead.\n\n", PLAYERID[i]);
+				continue;
+			}
+
+			sprintf_s(strBuffer, "Score: %d", IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore);
 			printf("%s \n", strBuffer);
-		}
-		else
-		{
-			sprintf_s(strBuffer, "I need to destroy %d more asteroids for my special power!", 5 - SPECIAL_TRIGGER);
+
+			sprintf_s(strBuffer, "Ship Left: %d", IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives > 0 ? 
+				IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives : 0);
 			printf("%s \n", strBuffer);
+
+			if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.SPECIAL_TRIGGER >= 5)
+			{
+				sprintf_s(strBuffer, "SPECIAL POWER READY");
+				printf("%s \n\n", strBuffer);
+			}
+			else
+			{
+				sprintf_s(strBuffer, "I need to destroy %d more asteroids for my special power!", 
+					5 - IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.SPECIAL_TRIGGER);
+				printf("%s \n\n", strBuffer);
+			}
 		}
 
 		// display the game over message
-		if (sShipLives <= 0)
+		if (GameOver_NoShips)
 		{
-			//AEGfxPrint(280, 260, 0xFFFFFFFF, "       GAME OVER       ");
-			printf("GAME OVER\n");
+			printf("GAME OVER, ALL SHIPS ARE DESTROYED\n");
 			printf("Press ESC to quit.\n");
-			printf("Press R to restart.\n");
+			printf("Press R to restart.\n\n");
 		}
 
-		if (sScore >= 5000)
+		if (GameOver_MaxScore)
 		{
-			printf("You Rock\n");
+			size_t WinnerIndex = 0;
+
+			for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
+			{
+				if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore >= MAX_SCORE)
+				{
+					WinnerIndex = i;
+				}
+
+				IDToPlayerShip_[static_cast<ShipID>(i)]->flag = 0;
+			}
+
+			printf("%s wins!!!\n", PLAYERID[WinnerIndex]);
 			printf("Press ESC to quit.\n");
-			printf("Press R to restart.\n");
+			printf("Press R to restart.\n\n");
 		}
+
 		onValueChange = false;
 	}
 
 	//AEGfxPrint(fontID, shipName, 0, 0, 0.1f, 1.0f, 0.1f);
 
 	// Updates the InGameBuffer during the game
-	sprintf_s(InGameBuffer, "Ship Left: %d Score: %d", sShipLives >= 0 ? sShipLives : 0, sScore <= 5000 ? sScore : 5000);
+	//sprintf_s(InGameBuffer, "Ship Left: %d Score: %d", sShipLives >= 0 ? sShipLives : 0, sScore <= 5000 ? sScore : 5000);
 }
 
 void AsteroidsGameState::GameStateAsteroidsFree(void)
@@ -563,9 +584,7 @@ void AsteroidsGameState::GameStateAsteroidsUnload(void)
 
 void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 {
-	auto search = IDToPlayerShip_.find(PlayerID);
-
-	if (search != IDToPlayerShip_.end())
+	if (IDToPlayerShip_[PlayerID]->flag != 0)
 	{
 		AEVec2 added;
 		AEVec2Set(&added, cosf(IDToPlayerShip_[PlayerID]->dirCurr),
@@ -584,9 +603,7 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 
 void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 {
-	auto search = IDToPlayerShip_.find(PlayerID);
-
-	if (search != IDToPlayerShip_.end())
+	if (IDToPlayerShip_[PlayerID]->flag != 0)
 	{
 		AEVec2 added;
 		AEVec2Set(&added, -cosf(IDToPlayerShip_[PlayerID]->dirCurr),
@@ -605,9 +622,7 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 
 void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
 {
-	auto search = IDToPlayerShip_.find(PlayerID);
-
-	if (search != IDToPlayerShip_.end())
+	if (IDToPlayerShip_[PlayerID]->flag != 0)
 	{
 		IDToPlayerShip_[PlayerID]->dirCurr += SHIP_ROT_SPEED *
 			(float)(AEFrameRateControllerGetFrameTime());
@@ -617,9 +632,7 @@ void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
 
 void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
 {
-	auto search = IDToPlayerShip_.find(PlayerID);
-
-	if (search != IDToPlayerShip_.end())
+	if (IDToPlayerShip_[PlayerID]->flag != 0)
 	{
 		IDToPlayerShip_[PlayerID]->dirCurr -=
 			SHIP_ROT_SPEED * (float)(AEFrameRateControllerGetFrameTime());
@@ -629,9 +642,7 @@ void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
 
 void AsteroidsGameState::PlayerShoot(ShipID PlayerID)
 {
-	auto search = IDToPlayerShip_.find(PlayerID);
-
-	if (search != IDToPlayerShip_.end())
+	if (IDToPlayerShip_[PlayerID]->flag != 0)
 	{
 		if (IDToPlayerShip_[PlayerID]->shipComp.SPECIAL_CHECK == TRUE)
 		{
@@ -677,9 +688,10 @@ void AsteroidsGameState::bulletExplosion(ShipID PlayerID)
 		BulletExp.y += BULLET_SPEED * BulletExp.y;
 
 		// Create an instance
-		GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 20.0f, 
+		GameObjInst* bullet = GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 20.0f, 
 			&IDToPlayerShip_[PlayerID]->posCurr, &BulletExp, BEDir);
 
+		bullet->BulletSource = PlayerID;
 		BERot += 0.2f;
 	}
 }
@@ -735,4 +747,22 @@ void AsteroidsGameState::spawnBulletHell(int i, ShipID PlayerID)
 	// Get the bullet's direction according to the ship's direction
 	GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 10.0f, &IDToPlayerShip_[PlayerID]->posCurr,
 		&BulletHell, IDToPlayerShip_[PlayerID]->dirCurr);
+}
+
+void AsteroidsGameState::RestartGameInit()
+{
+	GSManager->SetGameStateCurrIndex(GS_RESTART);
+
+	for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
+	{
+		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore = 0;
+		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
+		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.SPECIAL_TRIGGER = 0;
+		IDToPlayerShip_[static_cast<ShipID>(i)]->flag = FLAG_ACTIVE;
+	}
+
+	ASTEROID_COUNT = 0;
+	GameOver_MaxScore = false;
+	GameOver_NoShips = false;
+	onValueChange = true;
 }

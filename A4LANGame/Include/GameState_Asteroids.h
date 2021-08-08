@@ -24,7 +24,7 @@ public:
 	unsigned long sScore = 0;
 private:
 	// initial number of ship lives
-	const unsigned int SHIP_INITIAL_NUM{ 3 };
+	const unsigned int SHIP_INITIAL_NUM{ 1 };
 	// ship size
 	const float SHIP_SIZE = 16.0f;
 	// ship forward acceleration (in m/s^2)
@@ -44,6 +44,9 @@ private:
 	// no of asteroids that spawned
 	unsigned int ASTEROID_COUNT = 0;
 
+	bool GameOver_NoShips{ false };
+	bool GameOver_MaxScore{ false };
+
 	std::shared_ptr<GameObjectFactory> GameObjFactory_;
 	std::unordered_map<ShipID, GameObjInst*> IDToPlayerShip_;
 
@@ -55,6 +58,7 @@ private:
 	void bulletExplosion(ShipID PlayerID);
 	void spawnAsteroid(void);
 	void spawnBulletHell(int i, ShipID PlayerID);
+	void RestartGameInit();
 };
 
 

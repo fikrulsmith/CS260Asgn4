@@ -29,7 +29,7 @@ public:
 	void SetGameStatePrevIndex(unsigned int index);
 	void SetGameStateNextIndex(unsigned int index);
 
-	size_t PlayerCount_{ 4 };
+	size_t PlayerCount_{ 2 };
 private:
 	unsigned int gGameStateInit{ 0 };
 	unsigned int gGameStateCurr{ 0 };
