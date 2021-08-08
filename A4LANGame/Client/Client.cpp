@@ -100,6 +100,7 @@ bool Client::CreatePlayer(SOCKET socket)
 {
 	// call fik's function to get pointer
 	// playerEntity 
+	return true;
 }
 
 size_t Client::GetClientByGamePtr(GameObjInst* entity)
@@ -118,12 +119,12 @@ int Client::SendClient(SOCKET socket, std::string message)
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
 	
-	sender.SendClient(*GetClient(index), message);
+	return sender.SendClient(*GetClient(index), message);
 }
 
-int Client::SendClient(size_t index, std::string message)
+int Client::SendClient(int index, std::string message)
 {
-	sender.SendClient(*GetClient(index), message);
+	return sender.SendClient(*GetClient(index), message);
 }
 
 int Client::ReceiveClient(std::string message)
