@@ -407,9 +407,8 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
 		// add your stuff here nico
-
 
 	}
 	else if (header == "[READY]")
