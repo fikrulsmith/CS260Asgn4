@@ -18,7 +18,7 @@ class DeadReckoning
 
 	bool extrapolating{ false };
 	bool secondUpdate{ false };
-
+	public:
 	void Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction);
 	void Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction);
 	void ReceivedPacket(AEVec2 LKPosition,AEVec2 LKVelocity,AEVec2 LKAcceleration,float direction);

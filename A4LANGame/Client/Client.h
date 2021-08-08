@@ -2,10 +2,13 @@
 #include "ClientSender/ClientSender.h"
 #include "ClientReceiver/ClientReceiver.h"
 #include "LockStep/LockStep.h"
+#include "DeadReckoning/DeadReckoning.h"
 
 class Client
 {
 	std::vector<ClientInfo> clients;
+	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
+
 	ClientSender sender;
 	ClientReceiver receiver;
 	ClientInfo MyInfo;
@@ -47,6 +50,8 @@ public:
 	int ReceiveAllClient();
 	void UpdateState(ShipID id, ShipState state);
 
+	void createDeadReckoning(ShipID id);
+	void UpdateAllDeadReckoningDT();
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;

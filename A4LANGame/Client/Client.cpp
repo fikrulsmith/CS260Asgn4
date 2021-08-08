@@ -304,6 +304,19 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	return 200;
 }
+void Client::createDeadReckoning(ShipID id)
+{
+	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
+}
+
+void Client::UpdateAllDeadReckoningDT()
+{
+	for (auto client : clients)
+	{
+		IdtoDeadReckoning[client.id].UpdateTime();
+	}
+}
+
 
 void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
