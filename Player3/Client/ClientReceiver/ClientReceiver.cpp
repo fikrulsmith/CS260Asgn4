@@ -33,7 +33,7 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 		{
 			// A non-blocking call returned no data; sleep and try again.
 			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(100ms);
+			std::this_thread::sleep_for(0ms);
 			//std::cerr << "trying again..." << std::endl;
 			return -1;
 		}

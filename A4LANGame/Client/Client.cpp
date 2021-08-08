@@ -239,7 +239,7 @@ int Client::ReceiveClient(SOCKET socket,std::string& message)
 }
 int Client::ReceiveAllClient()
 {
-	for (auto client : clients)
+	for (auto& client : clients)
 	{
 		std::string input;
 		if (ReceiveClient(client.socket, input) == 0) return 0;

@@ -45,3 +45,5 @@
 *.txt
 *.lib
 *.recipe
+*.ipdb
+*.iobj
