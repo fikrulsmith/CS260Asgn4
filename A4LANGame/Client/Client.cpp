@@ -127,6 +127,27 @@ int Client::SendClient(int index, std::string message)
 	return sender.SendClient(*GetClient(index), message);
 }
 
+int Client::SendAllClient(std::string message)
+{
+	for (auto client : clients)
+	{
+		SendClient(client.socket, message);
+	}
+}
+
+void Client::UpdateState(ShipID id, ShipState state)
+{
+	for (auto client : clients)
+	{
+		if (client.id == id)
+		{
+			client.state = state;
+			std::string message;
+			SendAllClient(message);
+		}
+	}
+}
+
 int Client::ReceiveClient(std::string message)
 {
 	return receiver.RecvClient(MyInfo, message);
