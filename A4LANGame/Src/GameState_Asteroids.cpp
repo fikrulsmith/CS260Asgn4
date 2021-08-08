@@ -41,6 +41,11 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 			GameOver_NoShips = true;
 			onValueChange = true;
 		}
+
+		if (AEInputCheckCurr(AEVK_R))
+		{
+			RestartGameInit();
+		}
 	}
 
 
@@ -70,31 +75,39 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		PlayerShoot(myShip->shipComp.sShipID);
 	}
 
-	if (AEInputCheckCurr(AEVK_W))
+	for (size_t i = 0; i < client->GetNumberOfClients(); ++i)
 	{
-		PlayerMoveForward(ShipID::PLAYER2);
+		auto search = StateToInput_.find(client->GetClient(i)->state);
+
+		if (search != StateToInput_.end())
+			StateToInput_[client->GetClient(i)->state](client->GetClient(i)->id);
 	}
 
-	if (AEInputCheckCurr(AEVK_S))
-	{
-		PlayerMoveBackwards(ShipID::PLAYER2);
-	}
+	//if (AEInputCheckCurr(AEVK_W))
+	//{
+	//	PlayerMoveForward(ShipID::PLAYER2);
+	//}
 
-	if (AEInputCheckCurr(AEVK_A))
-	{
-		PlayerRotateLeft(ShipID::PLAYER2);
-	}
+	//if (AEInputCheckCurr(AEVK_S))
+	//{
+	//	PlayerMoveBackwards(ShipID::PLAYER2);
+	//}
 
-	if (AEInputCheckCurr(AEVK_D))
-	{
-		PlayerRotateRight(ShipID::PLAYER2);
-	}
+	//if (AEInputCheckCurr(AEVK_A))
+	//{
+	//	PlayerRotateLeft(ShipID::PLAYER2);
+	//}
 
-	// Shoot a bullet if space is triggered (Create a new object instance)
-	if (AEInputCheckTriggered(AEVK_E))
-	{
-		PlayerShoot(ShipID::PLAYER2);
-	}
+	//if (AEInputCheckCurr(AEVK_D))
+	//{
+	//	PlayerRotateRight(ShipID::PLAYER2);
+	//}
+
+	//// Shoot a bullet if space is triggered (Create a new object instance)
+	//if (AEInputCheckTriggered(AEVK_E))
+	//{
+	//	PlayerShoot(ShipID::PLAYER2);
+	//}
 
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 	{
@@ -255,7 +268,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 
 						// Update Score
 						IDToPlayerShip_[_pInst->BulletSource]->shipComp.sShipScore += 100;
-						sScore += 100;
+						/*sScore += 100;*/
 
 						// Increment Special Trigger by 1
 						IDToPlayerShip_[_pInst->BulletSource]->shipComp.SPECIAL_TRIGGER += 1;
@@ -461,7 +474,16 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 		spawnAsteroid();
 	}
 
-	sShipLives = SHIP_INITIAL_NUM;
+	StateToInput_[ShipState::MOVINGFORWARD] = std::bind(&AsteroidsGameState::PlayerMoveForward, this, 
+		std::placeholders::_1);
+	StateToInput_[ShipState::MOVINGBACKWARDS] = std::bind(&AsteroidsGameState::PlayerMoveBackwards, this,
+		std::placeholders::_1);
+	StateToInput_[ShipState::ROTATINGLEFT] = std::bind(&AsteroidsGameState::PlayerRotateLeft, this,
+		std::placeholders::_1);
+	StateToInput_[ShipState::ROTATINGRIGHT] = std::bind(&AsteroidsGameState::PlayerRotateRight, this,
+		std::placeholders::_1);
+	StateToInput_[ShipState::SHOOTING] = std::bind(&AsteroidsGameState::PlayerShoot, this,
+		std::placeholders::_1);
 }
 
 void AsteroidsGameState::GameStateAsteroidsDraw(void)
@@ -568,6 +590,7 @@ void AsteroidsGameState::GameStateAsteroidsFree(void)
 	}
 
 	IDToPlayerShip_.clear();
+	StateToInput_.clear();
 }
 
 void AsteroidsGameState::GameStateAsteroidsUnload(void)
