@@ -80,8 +80,6 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
-		u_long enable = 1;
-		ioctlsocket(clients[index].socket, FIONBIO, &enable);
 		ConnectToClient(clients[index]);
 	}
 
@@ -363,7 +361,8 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	client.addr = serverInfo;
 	client.socket = serverSocket;
-	
+	u_long enable = 1;
+	ioctlsocket(client.socket, FIONBIO, &enable);
 	std::cout << "CLIENT: " << std::endl;
 	std::cout << client.name << std::endl;
 	std::cout << client.port << std::endl;
@@ -473,6 +472,9 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 
 void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
+	if (message.empty())
+		return;
+
 	std::vector<std::string> params;
 	std::string header;
 	params = Parser::GetHeader(message, header);
