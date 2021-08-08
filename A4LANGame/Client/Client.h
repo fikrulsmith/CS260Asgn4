@@ -9,7 +9,6 @@ class Client
 	ClientSender sender;
 	ClientReceiver receiver;
 	ClientInfo MyInfo;
-
 	LockStep lockStepManager;
 
 	int InitWSA();
@@ -44,8 +43,8 @@ public:
 	int SendClient(int index, std::string message);
 	int SendAllClient(std::string message);
 
-	int ReceiveClient(SOCKET socket,std::string message);
-	int ReceiveAllClient(std::string& message);
+	int ReceiveClient(SOCKET socket,std::string& message);
+	int ReceiveAllClient();
 	void UpdateState(ShipID id, ShipState state);
 
 	std::string GetOwnPort()

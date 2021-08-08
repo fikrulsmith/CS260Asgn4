@@ -165,14 +165,14 @@ void Client::UpdateState(ShipID id, ShipState state)
 	}
 }
 
-int Client::ReceiveClient(SOCKET socket,std::string message)
+int Client::ReceiveClient(SOCKET socket,std::string& message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
 
 	return receiver.RecvClient(*GetClient(index), message);
 }
-int Client::ReceiveAllClient(std::string& message)
+int Client::ReceiveAllClient()
 {
 	for (auto client : clients)
 	{

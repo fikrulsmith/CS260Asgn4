@@ -34,7 +34,7 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 		client->SendAllClient("[READY]");
 		while (!client->GetClientReadyCheck())
 		{
-			client->ReceiveAllClient(std::string{});
+			client->ReceiveAllClient();
 		}
 
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
