@@ -16,6 +16,12 @@ class Client
 	int InitWSA();
 	int ConnectToClient(ClientInfo& client);
 
+	void UpdateHash();
+	bool CheckAllHash();
+	bool AllHashUpdated();
+	bool AllLocked();
+	void ResetHash();
+
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
@@ -39,7 +45,7 @@ public:
 	bool GetClientReadyCheck();
 
 	bool CreatePlayer(SOCKET socket);
-	size_t GetClientByGamePtr(GameObjInst* entity);
+	size_t GetClientByID(ShipID entity);
 	size_t GetNumberOfClients();
 
 	int SendClient(SOCKET socket, std::string message);
@@ -48,7 +54,8 @@ public:
 
 	int ReceiveClient(SOCKET socket,std::string& message);
 	int ReceiveAllClient();
-	void UpdateState(ShipID id, ShipState state);
+	void UpdateState(ShipState state);
+	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);

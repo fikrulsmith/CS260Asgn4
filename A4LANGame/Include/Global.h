@@ -112,6 +112,9 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
+	std::string hashString;
+	std::string lockedState;
+
 	bool readyCheck;
 
 	ShipID id;

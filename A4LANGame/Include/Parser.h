@@ -11,6 +11,7 @@ public:
 	static std::string CreateHeader(std::string headerCommand, std::vector<std::string> params);
 
 	static std::vector<std::string> GetHeader(std::string input, std::string& headerCommand);
+	static std::string GetPacket(std::string input, std::string& headerCommand);
 
 private:
 	static bool ParseInput(std::string ip, std::string& hostname, std::string& port);
