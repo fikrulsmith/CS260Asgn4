@@ -50,12 +50,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
 
-	while (!client.GetClientReadyCheck())
-	{
-		client.ReceiveAllClient(std::string{});
-	}
-
-
 	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{
 		// reset the system modules
