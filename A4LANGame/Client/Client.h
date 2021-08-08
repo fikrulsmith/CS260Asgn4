@@ -42,10 +42,7 @@ public:
 	int SendClient(SOCKET socket, std::string message);
 	int SendClient(int index, std::string message);
 
-	int ReceiveClient()
-	{
-		
-	}
+	int ReceiveClient(std::string message);
 
 	std::string GetOwnPort()
 	{
