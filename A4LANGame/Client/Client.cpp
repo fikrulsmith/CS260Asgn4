@@ -165,9 +165,23 @@ void Client::UpdateState(ShipID id, ShipState state)
 	}
 }
 
-int Client::ReceiveClient(std::string message)
+int Client::ReceiveClient(SOCKET socket,std::string message)
 {
-	return receiver.RecvClient(MyInfo, message);
+	size_t index = CheckClientExist(socket);
+	if (index == DOES_NOT_EXIST) return -1;
+
+	return receiver.RecvClient(*GetClient(index), message);
+}
+int Client::ReceiveAllClient(std::string& message)
+{
+	for (auto client : clients)
+	{
+		std::string input;
+		ReceiveClient(client.socket, input);
+		HandleRecvMessage(client.socket, input);
+	}
+
+	return 1;
 }
 size_t Client::RegisterClient(std::string name, std::string port)
 {
@@ -291,7 +305,7 @@ int Client::ConnectToClient(ClientInfo& client)
 	return 200;
 }
 
-void Client::HandleRecvMessage(std::string message)
+void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
 	std::vector<std::string> params;
 	std::string header;
@@ -316,8 +330,13 @@ void Client::HandleRecvMessage(std::string message)
 
 
 	}
-	else if (header == "[INITIALIZING]")
+	else if (header == "[READY]")
 	{
+		size_t index = CheckClientExist(client);
+		if (index == DOES_NOT_EXIST) return;
+
+		ClientInfo* info = GetClient(index);
+		info->readyCheck = true;
 
 	}
 }

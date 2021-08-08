@@ -44,8 +44,8 @@ public:
 	int SendClient(int index, std::string message);
 	int SendAllClient(std::string message);
 
-	int ReceiveClient(std::string message);
-
+	int ReceiveClient(SOCKET socket,std::string message);
+	int ReceiveAllClient(std::string& message);
 	void UpdateState(ShipID id, ShipState state);
 
 	std::string GetOwnPort()
@@ -53,5 +53,5 @@ public:
 		return MyInfo.port;
 	}
 	
-	void HandleRecvMessage(std::string message);
+	void HandleRecvMessage(SOCKET client,std::string message);
 };

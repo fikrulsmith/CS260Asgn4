@@ -31,6 +31,7 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 {
 	if (AEInputCheckTriggered(AEVK_RETURN))
 	{
+
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
 	}
 }

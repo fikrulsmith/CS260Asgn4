@@ -39,6 +39,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
 	Client client;
+
 	client.InitialiseClient(vec);
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
@@ -47,6 +48,12 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
+
+	while (!client.GetClientReadyCheck())
+	{
+		client.ReceiveAllClient(std::string{});
+	}
+
 
 	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{
