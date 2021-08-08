@@ -9,6 +9,7 @@ class DeadReckoning
 	AEVec2 LastKnownPosition{ 0,0 };
 	AEVec2 LastKnownVelocity{ 0,0 };
 	AEVec2 LastKnownAcceleration{ 0,0 };
+	AEVec2 InstantVelocityBetweenDRpositions{0,0};
 
 	float TimeOfUpdate{ 0 };
 	float TimeelapsedsinceUpdate{ 0 };
