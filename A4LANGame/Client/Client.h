@@ -40,7 +40,7 @@ public:
 	
 
 	int SendClient(SOCKET socket, std::string message);
-	int SendClient(size_t index, std::string message);
+	int SendClient(int index, std::string message);
 
 	int ReceiveClient()
 	{
