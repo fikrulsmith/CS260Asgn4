@@ -73,4 +73,5 @@ struct ClientInfo
 	std::string port;
 
 	GameObjInst* playerEntity = nullptr;
+	std::string hashInput;
 };
