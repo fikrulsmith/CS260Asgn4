@@ -43,6 +43,7 @@ public:
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
 	bool GetClientReadyCheck();
+	ClientInfo* GetOwnInfo();
 
 	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByID(ShipID entity);

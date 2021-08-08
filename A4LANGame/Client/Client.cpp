@@ -134,6 +134,11 @@ bool Client::GetClientReadyCheck()
 	return true;
 }
 
+ClientInfo* Client::GetOwnInfo()
+{
+	return &MyInfo;
+}
+
 /*****************************************************************
 
 					NEEDS TO BE DONE!!!!
