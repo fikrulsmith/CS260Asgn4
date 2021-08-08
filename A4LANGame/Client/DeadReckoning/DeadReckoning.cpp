@@ -79,7 +79,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction)
 {
 	if (!extrapolating)
-		Predict(UpdatePosition, UpdateVelocity);
+		Predict(UpdatePosition, UpdateVelocity,direction);
 	else
-		Correction(UpdatePosition, UpdateVelocity);
+		Correction(UpdatePosition, UpdateVelocity,direction);
 }

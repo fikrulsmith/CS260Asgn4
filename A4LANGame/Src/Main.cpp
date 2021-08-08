@@ -28,19 +28,22 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	#endif
 	
 	//// Initialize the system
-	//AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
+    AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
 	//// Changing the window title
-	//AESysSetWindowTitle("CS260 Asteroids");
+	AESysSetWindowTitle("CS260 Asteroids");
 
 	////set background color
-	//AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
+	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
 	std::vector<std::pair<std::string, std::string>> vec; 
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
 	Client client;
 	client.InitialiseClient(vec);
-
+	while (true)
+	{
+		std::cout << rand() << std::endl;
+	}
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else
