@@ -434,6 +434,39 @@ void Client::SendUpdatePacket(ShipID id)
 
 	SendAllClient(Parser::CreateHeader("[UPDATE]", params));
 }
+void Client::createDeadReckoning(ShipID id)
+{
+	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
+}
+
+void Client::UpdateAllDeadReckoningDT(float dt)
+{
+	for (auto client : clients)
+	{
+		IdtoDeadReckoning[client.id].UpdateTime(dt);
+	}
+}
+
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
+{
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
+}
+
+void Client::AllDeadReckoningCorrection(float dt)
+{
+	for (auto client : clients)
+	{
+		AEVec2 position;
+		AEVec2 velocity;
+		float direction;
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction,dt);
+		//pass back to fikrul here
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
+	
+	}
+}
 
 void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
@@ -455,9 +488,8 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
 		// add your stuff here nico
-
 
 	}
 	else if (header == "[READY]")
