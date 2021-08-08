@@ -111,5 +111,6 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
-	GameObjInst* playerEntity = nullptr;
+	ShipID id;
+	ShipState state;
 };
