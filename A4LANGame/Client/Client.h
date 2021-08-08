@@ -2,18 +2,20 @@
 #include "ClientSender/ClientSender.h"
 #include "ClientReceiver/ClientReceiver.h"
 #include "LockStep/LockStep.h"
-
+#include "DeadReckoning/DeadReckoning.h"
 class Client
 {
 	std::vector<ClientInfo> clients;
+	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
+
 	ClientSender sender;
 	ClientReceiver receiver;
 	ClientInfo MyInfo;
-
 	LockStep lockStepManager;
 
 	int InitWSA();
 	int ConnectToClient(ClientInfo& client);
+
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
@@ -44,14 +46,20 @@ public:
 	int SendClient(int index, std::string message);
 	int SendAllClient(std::string message);
 
-	int ReceiveClient(std::string message);
-
+	int ReceiveClient(SOCKET socket,std::string& message);
+	int ReceiveAllClient();
 	void UpdateState(ShipID id, ShipState state);
+
+	void createDeadReckoning(ShipID id);
+	void UpdateAllDeadReckoningDT(float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime);
+	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;
 	}
 	
-	void HandleRecvMessage(std::string message);
+	void HandleRecvMessage(SOCKET client,std::string message);
+	void SendUpdatePacket(ShipID id);
 };

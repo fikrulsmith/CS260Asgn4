@@ -83,6 +83,38 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		ConnectToClient(clients[index]);
 	}
 
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		int id = static_cast<int>(ShipID::PLAYER1);
+
+		for (size_t j = 0; j < clients.size(); j++)
+		{
+			if (j == i) continue;
+			if (std::stoi(clients[i].port) > std::stoi(clients[j].port))
+				id++;
+		}
+
+		clients[i].id = static_cast<ShipID>(id);
+	}
+
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		MyInfo.id = static_cast<ShipID>(i);
+		if (std::stoi(MyInfo.port) < std::stoi(clients[i].port))
+		{
+			for (size_t j = i; j < clients.size(); j++)
+			{
+				clients[j].id = static_cast<ShipID>(static_cast<int>(clients[j].id) + 1);
+			}
+			break;
+		}
+	}
+
+	for (size_t k = 0; k < clients.size(); k++)
+	{
+		createDeadReckoning(clients[k].id);
+	}
+
 	return 1;
 }
 
@@ -165,9 +197,23 @@ void Client::UpdateState(ShipID id, ShipState state)
 	}
 }
 
-int Client::ReceiveClient(std::string message)
+int Client::ReceiveClient(SOCKET socket,std::string& message)
 {
-	return receiver.RecvClient(MyInfo, message);
+	size_t index = CheckClientExist(socket);
+	if (index == DOES_NOT_EXIST) return -1;
+
+	return receiver.RecvClient(*GetClient(index), message);
+}
+int Client::ReceiveAllClient()
+{
+	for (auto client : clients)
+	{
+		std::string input;
+		ReceiveClient(client.socket, input);
+		HandleRecvMessage(client.socket, input);
+	}
+
+	return 1;
 }
 size_t Client::RegisterClient(std::string name, std::string port)
 {
@@ -176,6 +222,7 @@ size_t Client::RegisterClient(std::string name, std::string port)
 	client.port = port;
 
 	clients.push_back(client);
+
 	return clients.size() - 1;
 }
 
@@ -290,8 +337,57 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	return 200;
 }
+void Client::createDeadReckoning(ShipID id)
+{
+	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
+}
 
-void Client::HandleRecvMessage(std::string message)
+void Client::UpdateAllDeadReckoningDT(float dt)
+{
+	for (auto client : clients)
+	{
+		IdtoDeadReckoning[client.id].UpdateTime(dt);
+	}
+}
+
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
+{
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
+}
+
+void Client::AllDeadReckoningCorrection(float dt)
+{
+	for (auto client : clients)
+	{
+		AEVec2 position;
+		AEVec2 velocity;
+		float direction;
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction,dt);
+		//pass back to fikrul here
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
+		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
+	
+	}
+}
+
+void Client::SendUpdatePacket(ShipID id)
+{
+	
+	std::vector<std::string> params;
+	params.push_back(std::to_string(static_cast<int>(id)));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.y));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.x));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.y));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(40.0f));
+	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
+
+	SendAllClient(Parser::CreateHeader("[UPDATE]", params));
+}
+
+void Client::HandleRecvMessage(SOCKET client,std::string message)
 {
 	std::vector<std::string> params;
 	std::string header;
@@ -311,13 +407,17 @@ void Client::HandleRecvMessage(std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		//players[playerID].deadreckoning.ReceivedPacket(Position, Velocity, Acceleration);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
 		// add your stuff here nico
 
-
 	}
-	else if (header == "[INITIALIZING]")
+	else if (header == "[READY]")
 	{
+		size_t index = CheckClientExist(client);
+		if (index == DOES_NOT_EXIST) return;
+
+		ClientInfo* info = GetClient(index);
+		info->readyCheck = true;
 
 	}
 }
