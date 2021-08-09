@@ -6,7 +6,7 @@
 class Client
 {
 	std::vector<ClientInfo> clients;
-	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
+
 
 	ClientSender sender;
 	ClientReceiver receiver;
@@ -25,7 +25,7 @@ class Client
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
-
+	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
 
 	// Initialise Client

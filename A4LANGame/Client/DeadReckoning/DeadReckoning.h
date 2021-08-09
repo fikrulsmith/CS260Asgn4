@@ -12,7 +12,7 @@ class DeadReckoning
 	AEVec2 InstantVelocityBetweenDRpositions{0,0};
 
 	float TimeelapsedsinceUpdate{ 0 };
-	float Ttriangle{0.2};
+	float Ttriangle{0.2f};
 	float Mydirection{0};
 	float Tarrow{ 0 };
 
