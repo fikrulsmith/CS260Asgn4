@@ -665,12 +665,10 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 		AEVec2 added;
 		AEVec2Set(&added, cosf(IDToPlayerShip_[PlayerID]->dirCurr),
 			sinf(IDToPlayerShip_[PlayerID]->dirCurr));
-		AEVec2Add(&IDToPlayerShip_[PlayerID]->posCurr,
-			&IDToPlayerShip_[PlayerID]->posCurr, &added);
 
-		// Find the velocity according to the acceleration
-		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 40;
-		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 40;
+			// Find the velocity according to the acceleration
+		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 80;
+		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 80;
 		// Limit your speed over here
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));
@@ -686,12 +684,10 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 		AEVec2 added;
 		AEVec2Set(&added, -cosf(IDToPlayerShip_[PlayerID]->dirCurr),
 			-sinf(IDToPlayerShip_[PlayerID]->dirCurr));
-		AEVec2Add(&IDToPlayerShip_[PlayerID]->posCurr,
-			&IDToPlayerShip_[PlayerID]->posCurr, &added);
 
-		// Find the velocity according to the decceleration
-		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 40;
-		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 40;
+			// Find the velocity according to the decceleration
+		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 80;
+		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 80;
 		// Limit your speed over hereLa
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));
