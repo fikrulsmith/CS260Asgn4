@@ -27,13 +27,14 @@ void DeadReckoning::UpdateTime(float dt)
 	TimeelapsedsinceUpdate += dt;
 }
 
-void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,double apptime)
+void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,float dt)
 {
 	OldPosition = CurrentPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
-	LastKnownVelocity = LKVelocity;
+	LastKnownVelocity.x = LKVelocity.x / dt;
+	LastKnownVelocity.y = LKVelocity.y / dt;
 	LastKnownAcceleration = LKAcceleration;
 	Mydirection = direction;
 	if (isInit)
@@ -80,6 +81,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	UpdatePosition = FinalPosition;
 	CurrentPosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
+	OldVelocity = VelocityBlend;
 	CurrentVelocity = VelocityBlend;
 	direction = Mydirection;
 }

@@ -299,6 +299,12 @@ void Client::UpdateState(ShipState state)
 
 			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
 		}
 	}
 	else
@@ -518,9 +524,9 @@ void Client::ResetHash()
 	}
 }
 
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, double apptime)
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, apptime);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction,dt);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -535,12 +541,6 @@ void Client::AllDeadReckoningCorrection(float dt)
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-		std::cout << "Player: " << static_cast<int>(client.id) << std::endl;
-		std::cout << "PositionX: " << position.x << std::endl;
-		std::cout << "PositionY: " << position.y << std::endl;
-		std::cout << "VelocityX: " << velocity.x << std::endl;
-		std::cout << "VelocityY: " << velocity.y << std::endl;
-		std::cout << "direction: " << direction << std::endl;
 	}
 }
 
@@ -659,6 +659,12 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 
 			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
 		}
 		else
 			std::cout << "HAX" << std::endl;

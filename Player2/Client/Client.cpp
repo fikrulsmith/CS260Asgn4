@@ -142,7 +142,7 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	}
 
 	/*clients.push_back(MyInfo);
-	std::sort(clients.begin(), clients.end(), 
+	std::sort(clients.begin(), clients.end(),
 		[](const ClientInfo& a, const ClientInfo& b) -> bool
 		{
 			return std::stoi(a.port) < std::stoi(b.port);
@@ -230,7 +230,7 @@ int Client::SendClient(SOCKET socket, std::string message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
-	
+
 	return sender.SendClient(*GetClient(index), message);
 }
 
@@ -299,6 +299,12 @@ void Client::UpdateState(ShipState state)
 
 			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
 		}
 	}
 	else
@@ -318,11 +324,11 @@ std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
-	
+
 	return params;
 }
 
-int Client::ReceiveClient(SOCKET socket,std::string& message)
+int Client::ReceiveClient(SOCKET socket, std::string& message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
@@ -465,14 +471,14 @@ int Client::ConnectToClient(ClientInfo& client)
 }
 void Client::UpdateHash()
 {
-	while(!AllHashUpdated())
+	while (!AllHashUpdated())
 	{
 		ReceiveAllClient();
 	}
 }
 bool Client::CheckAllHash()
 {
-	while(!AllLocked())
+	while (!AllLocked())
 		ReceiveAllClient();
 
 	for (auto client : clients)
@@ -518,9 +524,9 @@ void Client::ResetHash()
 	}
 }
 
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, dt);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -535,18 +541,12 @@ void Client::AllDeadReckoningCorrection(float dt)
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-		std::cout << "Player: " << static_cast<int>(client.id) << std::endl;
-		std::cout << "PositionX: " << position.x << std::endl;
-		std::cout << "PositionY: " << position.y << std::endl;
-		std::cout << "VelocityX: " << velocity.x << std::endl;
-		std::cout << "VelocityY: " << velocity.y << std::endl;
-		std::cout << "direction: " << direction << std::endl;
 	}
 }
 
 void Client::SendUpdatePacket(ShipID id)
 {
-	
+
 	std::vector<std::string> params;
 	params.push_back(std::to_string(static_cast<int>(id)));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
@@ -572,7 +572,7 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 	}
 }
 
-void Client::HandleRecvMessage(SOCKET client,std::string message)
+void Client::HandleRecvMessage(SOCKET client, std::string message)
 {
 	if (message.empty()) return;
 	std::vector<std::string> params;
@@ -593,7 +593,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		// add your stuff here nico
 
 	}
@@ -659,11 +659,17 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 
 			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
 		}
 		else
 			std::cout << "HAX" << std::endl;
 
-		
+
 	}
 	else if (header == "[HASHED]")
 	{
