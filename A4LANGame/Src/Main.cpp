@@ -88,7 +88,10 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 			// check if forcing the application to quit
 			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+			{
 				GSManager->SetGameStateNextIndex(GS_QUIT);
+				clientManager->SendAllClient("[QUIT]");
+			}
 
 			g_dt = (f32)AEFrameRateControllerGetFrameTime();
 			g_appTime += g_dt;

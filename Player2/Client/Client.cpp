@@ -82,7 +82,11 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
 		u_long enable = 1;
 		ioctlsocket(clients[index].socket, FIONBIO, &enable);
-		ConnectToClient(clients[index]);
+		if (ConnectToClient(clients[index]) != OK)
+		{
+			std::cout << "Client could not connect! Exiting Game!" << std::endl;
+			GSManager->SetGameStateNextIndex(GS_QUIT);
+		}
 	}
 
 	for (size_t i = 0; i < clients.size(); i++)
@@ -718,5 +722,9 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 				return;
 			}
 		}
+	}
+	else if (header == "[QUIT]")
+	{
+		GSManager->SetGameStateNextIndex(GS_QUIT);
 	}
 }
