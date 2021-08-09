@@ -536,7 +536,7 @@ void Client::AllDeadReckoningCorrection(float dt)
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt,client.id);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
