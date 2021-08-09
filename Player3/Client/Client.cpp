@@ -82,13 +82,10 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
 		u_long enable = 1;
 		ioctlsocket(clients[index].socket, FIONBIO, &enable);
-		/*if (ConnectToClient(clients[index]) != OK)
+		if (ConnectToClient(clients[index]) != OK)
 		{
 			std::cout << "Client could not connect! Exiting Game!" << std::endl;
 			GSManager->SetGameStateNextIndex(GS_QUIT);
-		}*/
-		while (ConnectToClient(clients[index]) != OK)
-		{
 		}
 	}
 
@@ -306,12 +303,6 @@ void Client::UpdateState(ShipState state)
 
 			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
-			std::cout << "PositionX: " << Position.x << std::endl;
-			std::cout << "PositionY: " << Position.y << std::endl;
-			std::cout << "VelocityX: " << Velocity.x << std::endl;
-			std::cout << "VelocityY: " << Velocity.y << std::endl;
-			std::cout << "direction: " << direction << std::endl;
 		}
 	}
 	else
@@ -439,13 +430,16 @@ int Client::ConnectToClient(ClientInfo& client)
 		return 1;
 	}
 
+	char enables = 1;
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enables, sizeof(int)) < 0)
+		std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
+
 	errorCode = bind(
 		serverSocket,
 		info->ai_addr,
 		static_cast<int>(info->ai_addrlen));
 	if (errorCode != NO_ERROR)
 	{
-		std::cout << WSAGetLastError() << std::endl;
 		std::cerr << "bind() failed." << std::endl;
 		closesocket(serverSocket);
 		freeaddrinfo(info);
@@ -667,12 +661,6 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 
 			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
-			std::cout << "PositionX: " << Position.x << std::endl;
-			std::cout << "PositionY: " << Position.y << std::endl;
-			std::cout << "VelocityX: " << Velocity.x << std::endl;
-			std::cout << "VelocityY: " << Velocity.y << std::endl;
-			std::cout << "direction: " << direction << std::endl;
 		}
 		else
 			std::cout << "HAX" << std::endl;

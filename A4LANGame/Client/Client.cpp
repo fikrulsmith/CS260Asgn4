@@ -430,6 +430,10 @@ int Client::ConnectToClient(ClientInfo& client)
 		return 1;
 	}
 
+	char enables = 1;
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enables, sizeof(int)) < 0)
+		std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
+
 	errorCode = bind(
 		serverSocket,
 		info->ai_addr,
@@ -524,7 +528,7 @@ void Client::ResetHash()
 
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction,dt);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, dt);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -534,7 +538,7 @@ void Client::AllDeadReckoningCorrection(float dt)
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt,client.id);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt, client.id);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
