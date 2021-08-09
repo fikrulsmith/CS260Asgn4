@@ -74,6 +74,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			AESysFrameStart();
 			if (GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
 				clientManager->UpdateAllDeadReckoningDT(g_dt);
+
 			clientManager->ReceiveAllClient();
 
 			if(GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)

@@ -535,7 +535,12 @@ void Client::AllDeadReckoningCorrection(float dt)
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-
+		std::cout << "Player: " << static_cast<int>(client.id) << std::endl;
+		std::cout << "PositionX: " << position.x << std::endl;
+		std::cout << "PositionY: " << position.y << std::endl;
+		std::cout << "VelocityX: " << velocity.x << std::endl;
+		std::cout << "VelocityY: " << velocity.y << std::endl;
+		std::cout << "direction: " << direction << std::endl;
 	}
 }
 
