@@ -451,7 +451,7 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 {
 	for (size_t i = 0; i < clientManager->GetNumberOfClients() + 1; ++i)
 	{
-		AEVec2 pos;
+		AEVec2 pos{ 0,0 };
 		float dir = 0.0f;
 		int index = 0;
 
@@ -462,26 +462,26 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 
 		switch (index)
 		{
-		case 0:
-			pos.x = -20.f;
-			pos.y = 20.f;
-			dir = 180.f;
-			break;
-		case 1:
-			pos.x = 20.f;
-			pos.y = 20.f;
-			dir = 0.0f;
-			break;
-		case 2:
-			pos.x = -20.f;
-			pos.y = 0.f;
-			dir = 180.0f;
-			break;
-		case 3:
-			pos.x = 20.f;
-			pos.y = 0.f;
-			dir = 0.0f;
-			break;
+			case 0:
+				pos.x = -20.f;
+				pos.y = 20.f;
+				dir = 180.f;
+				break;
+			case 1:
+				pos.x = 20.f;
+				pos.y = 20.f;
+				dir = 0.0f;
+				break;
+			case 2:
+				pos.x = -20.f;
+				pos.y = 0.f;
+				dir = 180.0f;
+				break;
+			case 3:
+				pos.x = 20.f;
+				pos.y = 0.f;
+				dir = 0.0f;
+				break;
 		}
 
 		GameObjInst* temp = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(dir));
