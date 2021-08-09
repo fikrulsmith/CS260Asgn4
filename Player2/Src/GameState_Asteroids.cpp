@@ -126,11 +126,12 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 
 	for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
 	{
+		if (clientManager->GetClient(i)->state != ShipState::SHOOTING) break;
 		IDToPlayerShip_[clientManager->GetClient(i)->id]->shipComp.sShipState = clientManager->GetClient(i)->state;
-		/*auto search = StateToInput_.find(clientManager->GetClient(i)->state);
+		auto search = StateToInput_.find(clientManager->GetClient(i)->state);
 
 		if (search != StateToInput_.end())
-			StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);*/
+			StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);
 	}
 
 	//if (AEInputCheckCurr(AEVK_W))
@@ -666,7 +667,7 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 		AEVec2Set(&added, cosf(IDToPlayerShip_[PlayerID]->dirCurr),
 			sinf(IDToPlayerShip_[PlayerID]->dirCurr));
 
-			// Find the velocity according to the acceleration
+		// Find the velocity according to the acceleration
 		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 80;
 		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 80;
 		// Limit your speed over here
@@ -685,7 +686,7 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 		AEVec2Set(&added, -cosf(IDToPlayerShip_[PlayerID]->dirCurr),
 			-sinf(IDToPlayerShip_[PlayerID]->dirCurr));
 
-			// Find the velocity according to the decceleration
+		// Find the velocity according to the decceleration
 		IDToPlayerShip_[PlayerID]->velCurr.x = added.x * 80;
 		IDToPlayerShip_[PlayerID]->velCurr.y = added.y * 80;
 		// Limit your speed over hereLa

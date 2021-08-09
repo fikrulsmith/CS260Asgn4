@@ -121,16 +121,17 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	if (AEInputCheckTriggered(AEVK_SPACE))
 	{
 		PlayerShoot(myShip->shipComp.sShipID);
-		clientManager->UpdateState(myShip->shipComp.sShipState);
+ 		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
 	{
+		if (clientManager->GetClient(i)->state != ShipState::SHOOTING) break;
 		IDToPlayerShip_[clientManager->GetClient(i)->id]->shipComp.sShipState = clientManager->GetClient(i)->state;
-		/*auto search = StateToInput_.find(clientManager->GetClient(i)->state);
+		auto search = StateToInput_.find(clientManager->GetClient(i)->state);
 
 		if (search != StateToInput_.end())
-			StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);*/
+			StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);
 	}
 
 	//if (AEInputCheckCurr(AEVK_W))
