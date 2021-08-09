@@ -80,7 +80,6 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 	UpdatePosition = FinalPosition;
 	CurrentPosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
-	OldVelocity = VelocityBlend;
 	CurrentVelocity = VelocityBlend;
 	direction = Mydirection;
 }

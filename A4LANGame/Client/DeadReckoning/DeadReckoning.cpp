@@ -9,7 +9,7 @@ void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, 
 	Mydirection = direction;
 	isInit = true;
 }
-void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction,float dt)
+void DeadReckoning::Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt)
 {
 	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));
 	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt));
@@ -27,7 +27,7 @@ void DeadReckoning::UpdateTime(float dt)
 	TimeelapsedsinceUpdate += dt;
 }
 
-void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,float dt)
+void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction, float dt)
 {
 	OldPosition = CurrentPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
@@ -40,7 +40,7 @@ void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 
 		extrapolating = true;
 }
 
-void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction)
+void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction)
 {
 	OldPosition = LastKnownPosition;
 	OldVelocity = LastKnownVelocity;
@@ -49,7 +49,7 @@ void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& d
 	direction = Mydirection;
 }
 
-void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction,float dt)
+void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt)
 {
 	AEVec2 VelocityBlend;
 	AEVec2 Pt;
@@ -67,7 +67,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	{
 		FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate));
 		FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate));
-	}					
+	}
 	else
 	{
 		FinalPosition.x = static_cast<float>(Pt.x + ((PtPrime.x - Pt.x) * Tarrow));
@@ -80,18 +80,17 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	UpdatePosition = FinalPosition;
 	CurrentPosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
-	OldVelocity = VelocityBlend;
 	CurrentVelocity = VelocityBlend;
 	direction = Mydirection;
 }
 
-void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction,float dt)
+void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt)
 {
 	if (!isInit)
 		return;
 
 	if (!extrapolating)
-		Predict(UpdatePosition, UpdateVelocity,direction,dt);
+		Predict(UpdatePosition, UpdateVelocity, direction, dt);
 	else
-		Correction(UpdatePosition, UpdateVelocity,direction,dt);
+		Correction(UpdatePosition, UpdateVelocity, direction, dt);
 }
