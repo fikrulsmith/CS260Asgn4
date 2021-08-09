@@ -635,19 +635,20 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		std::cout << "Comparing input" << std::endl;
 		if (lockStepManager.CompareInput(_message, payload))
 		{
+			std::vector<std::string> _params = Parser::GetPayload(_message);
 			std::cout << "NO HAX" << std::endl;
-			int playerID = std::stoi(params[0]);
+			int playerID = std::stoi(_params[0]);
 			AEVec2 Position;
 			AEVec2 Velocity;
 			AEVec2 Acceleration;
 			float direction;
-			Position.x = std::stof(params[1]);
-			Position.y = std::stof(params[2]);
-			Velocity.x = std::stof(params[3]);
-			Velocity.y = std::stof(params[4]);
-			Acceleration.x = std::stof(params[5]);
-			Acceleration.y = std::stof(params[6]);
-			direction = std::stof(params[7]);
+			Position.x = std::stof(_params[1]);
+			Position.y = std::stof(_params[2]);
+			Velocity.x = std::stof(_params[3]);
+			Velocity.y = std::stof(_params[4]);
+			Acceleration.x = std::stof(_params[5]);
+			Acceleration.y = std::stof(_params[6]);
+			direction = std::stof(_params[7]);
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 		else
