@@ -6,6 +6,7 @@ void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float&
 	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt) + (0.5 * LastKnownAcceleration.x * dt * dt));
 	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt) + (0.5 * LastKnownAcceleration.y * dt * dt));
 	UpdateVelocity = OldVelocity;
+	CurrentPosition = UpdatePosition;
 	direction = Mydirection;
 }
 
@@ -16,9 +17,8 @@ void DeadReckoning::UpdateTime(float dt)
 
 void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,double apptime)
 {
-	OldPosition = LastKnownPosition;
+	OldPosition = CurrentPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
-	OldAcceleration = LastKnownAcceleration;
 	TimeOfUpdate = static_cast<float>(apptime);
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
@@ -38,7 +38,6 @@ void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& d
 {
 	OldPosition = LastKnownPosition;
 	OldVelocity = LastKnownVelocity;
-	OldAcceleration = LastKnownAcceleration;
 	UpdatePosition = OldPosition;
 	UpdateVelocity = OldVelocity;
 	direction = Mydirection;
@@ -73,6 +72,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	InstantVelocityBetweenDRpositions.y = (FinalPosition.y - UpdatePosition.y) / dt;
 
 	UpdatePosition = FinalPosition;
+	CurrentPosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
 	direction = Mydirection;
 }
