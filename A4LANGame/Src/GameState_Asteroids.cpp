@@ -469,6 +469,9 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 		IDToPlayerShip_[static_cast<ShipID>(index)]->shipComp.sShipScore = 0;
 		IDToPlayerShip_[static_cast<ShipID>(index)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
 
+		if (i != clientManager->GetNumberOfClients())
+			clientManager->IdtoDeadReckoning[static_cast<ShipID>(index)].Init(pos, AEVec2{ 0,0 }, AEVec2{ 40,40 }, dir);
+
 		if (i == clientManager->GetNumberOfClients())
 			myShip = temp;
 
@@ -491,6 +494,8 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 		std::placeholders::_1);
 	StateToInput_[ShipState::SHOOTING] = std::bind(&AsteroidsGameState::PlayerShoot, this,
 		std::placeholders::_1);
+
+
 }
 
 void AsteroidsGameState::GameStateAsteroidsDraw(void)

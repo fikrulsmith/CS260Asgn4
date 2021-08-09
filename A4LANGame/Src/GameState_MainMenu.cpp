@@ -34,6 +34,7 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 		ClientInfo* info = clientManager->GetOwnInfo();
 		info->readyCheck = true;
 		clientManager->SendAllClient("[READY]");
+
 	}
 
 	if (clientManager->GetClientReadyCheck())

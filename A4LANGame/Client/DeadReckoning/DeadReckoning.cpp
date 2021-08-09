@@ -1,37 +1,43 @@
 #include "pch.h"
 #include "DeadReckoning.h"
 #include "Global.h"
+void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+{
+	LastKnownPosition = Position;
+	LastKnownVelocity = Velocity;
+	LastKnownAcceleration = Acceleration;
+	Mydirection = direction;
+	isInit = true;
+}
 void DeadReckoning::Predict(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,float& direction,float dt)
 {
-	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt) + (0.5 * LastKnownAcceleration.x * dt * dt));
-	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt) + (0.5 * LastKnownAcceleration.y * dt * dt));
-	UpdateVelocity = OldVelocity;
+	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));
+	UpdatePosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt));
+	UpdateVelocity = LastKnownVelocity;
 	CurrentPosition = UpdatePosition;
+	CurrentVelocity = UpdateVelocity;
 	direction = Mydirection;
 }
 
 void DeadReckoning::UpdateTime(float dt)
 {
+	if (!isInit)
+		return;
+
 	TimeelapsedsinceUpdate += dt;
 }
 
 void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration,float direction,double apptime)
 {
 	OldPosition = CurrentPosition;
-	OldVelocity = InstantVelocityBetweenDRpositions;
-	TimeOfUpdate = static_cast<float>(apptime);
+	OldVelocity = CurrentVelocity;
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
 	LastKnownVelocity = LKVelocity;
 	LastKnownAcceleration = LKAcceleration;
 	Mydirection = direction;
-	
-	if (secondUpdate)
-	{
+	if (isInit)
 		extrapolating = true;
-	}
-	else
-		secondUpdate = true;
 }
 
 void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction)
@@ -52,15 +58,15 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	Tarrow = TimeelapsedsinceUpdate / Ttriangle;
 	VelocityBlend.x = static_cast<float>(OldVelocity.x + (LastKnownVelocity.x - OldVelocity.x) * Tarrow);
 	VelocityBlend.y = static_cast<float>(OldVelocity.y + (LastKnownVelocity.y - OldVelocity.y) * Tarrow);
-	Pt.x = static_cast<float>(OldPosition.x + (VelocityBlend.x * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.x * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
-	Pt.y = static_cast<float>(OldPosition.y + (VelocityBlend.y * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.y * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
-	PtPrime.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.x * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
-	PtPrime.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.y * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
+	Pt.x = static_cast<float>(OldPosition.x + (VelocityBlend.x * TimeelapsedsinceUpdate));
+	Pt.y = static_cast<float>(OldPosition.y + (VelocityBlend.y * TimeelapsedsinceUpdate));
+	PtPrime.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate));
+	PtPrime.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate));
 
 	if (TimeelapsedsinceUpdate > Ttriangle)
 	{
-		FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.x * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
-		FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate) + (0.5 * LastKnownAcceleration.y * TimeelapsedsinceUpdate * TimeelapsedsinceUpdate));
+		FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate));
+		FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate));
 	}					
 	else
 	{
@@ -74,11 +80,15 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition,AEVec2& UpdateVelocity,flo
 	UpdatePosition = FinalPosition;
 	CurrentPosition = FinalPosition;
 	UpdateVelocity = VelocityBlend;
+	CurrentVelocity = VelocityBlend;
 	direction = Mydirection;
 }
 
 void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity,float& direction,float dt)
 {
+	if (!isInit)
+		return;
+
 	if (!extrapolating)
 		Predict(UpdatePosition, UpdateVelocity,direction,dt);
 	else
