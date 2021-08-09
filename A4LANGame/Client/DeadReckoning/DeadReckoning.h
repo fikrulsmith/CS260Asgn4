@@ -4,9 +4,9 @@ class DeadReckoning
 {
 	AEVec2 OldVelocity{ 0,0 };
 	AEVec2 OldPosition{ 0,0 };
-	AEVec2 OldAcceleration{ 0,0 };
 	AEVec2 LastKnownPosition{ 0,0 };
 	AEVec2 LastKnownVelocity{ 0,0 };
+	AEVec2 CurrentPosition{ 0,0 };
 	AEVec2 LastKnownAcceleration{ 0,0 };
 	AEVec2 InstantVelocityBetweenDRpositions{0,0};
 
