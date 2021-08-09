@@ -23,7 +23,7 @@ class Client
 	void ResetHash();
 
 public:
-	const size_t DOES_NOT_EXIST = -1;
+	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
 	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
@@ -38,7 +38,7 @@ public:
 
 	// run this first
 	// check against DOES_NOT_EXIST before trying to get client
-	size_t CheckClientExist(SOCKET clientSocket);
+	size_t CheckClientExist(SOCKET clientSocket); 
 
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
@@ -53,21 +53,21 @@ public:
 	int SendClient(int index, std::string message);
 	int SendAllClient(std::string message);
 
-	int ReceiveClient(SOCKET socket, std::string& message);
+	int ReceiveClient(SOCKET socket,std::string& message);
 	int ReceiveAllClient();
 	void UpdateState(ShipState state);
 	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
 	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;
 	}
-
-	void HandleRecvMessage(SOCKET client, std::string message);
+	
+	void HandleRecvMessage(SOCKET client,std::string message);
 	void SendUpdatePacket(ShipID id);
 };

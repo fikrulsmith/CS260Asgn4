@@ -6,7 +6,7 @@
 class Client
 {
 	std::vector<ClientInfo> clients;
-	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
+
 
 	ClientSender sender;
 	ClientReceiver receiver;
@@ -25,7 +25,7 @@ class Client
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
-
+	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
 
 	// Initialise Client
@@ -43,6 +43,7 @@ public:
 	// gets the client info
 	ClientInfo* GetClient(size_t index);
 	bool GetClientReadyCheck();
+	ClientInfo* GetOwnInfo();
 
 	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByID(ShipID entity);
@@ -59,7 +60,7 @@ public:
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
 	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()

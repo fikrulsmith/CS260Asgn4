@@ -24,39 +24,37 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	UNREFERENCED_PARAMETER(command_line);
 
 	// Enable run-time memory check for debug builds.
-	#if defined(DEBUG) | defined(_DEBUG)
-		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	#endif
-	
-	// Initialize the system
-	AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
-	// Changing the window title
-	AESysSetWindowTitle("CS260 Asteroids");
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
+	// Initialize the system
+	AESysInit(instanceH, show, 800, 600, 1, 60, false, NULL);
+	// Changing the window title
+	//AESysSetWindowTitle("CS260 Asteroids");
+	AESysSetWindowTitle("1");
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
-	std::vector<std::pair<std::string, std::string>> vec; 
+	std::vector<std::pair<std::string, std::string>> vec;
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
 	clientManager = std::make_unique<Client>();
-
+	GSManager = std::make_unique<GameStateManager>();
 	clientManager->InitialiseClient(vec);
 	/*if (client.GetOwnPort() == "2048")
 		client.SendClient();
 	else
 		client.ReceiveClient();*/
 
-	GSManager = std::make_unique<GameStateManager>();
 	GSManager->Init(GS_MAINMENU);
-
-	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
+	while (GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{
 		// reset the system modules
 		AESysReset();
 
 		// If not restarting, load the gamestate
-		if(GSManager->GetGameStateCurrIndex() != GS_RESTART)
+		if (GSManager->GetGameStateCurrIndex() != GS_RESTART)
 		{
 			GSManager->GameSystemUpdate();
 			GSManager->GameStateLoad();
@@ -70,13 +68,17 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 		// Initialize the gamestate
 		GSManager->GameStateInit();
 
-		while(GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
+		while (GSManager->GetGameStateCurrIndex() == GSManager->GetGameStateNextIndex())
 		{
-			clientManager->ReceiveAllClient();
 			AESysFrameStart();
-			clientManager->UpdateAllDeadReckoningDT(g_dt);
-			//checking of recv
-			clientManager->AllDeadReckoningCorrection(g_dt);
+			if (GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
+				clientManager->UpdateAllDeadReckoningDT(g_dt);
+
+			clientManager->ReceiveAllClient();
+
+			if (GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
+				clientManager->AllDeadReckoningCorrection(g_dt);
+
 
 			AEInputUpdate();
 			GSManager->GameStateUpdate();
@@ -85,12 +87,21 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 			// check if forcing the application to quit
 			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
+			{
 				GSManager->SetGameStateNextIndex(GS_QUIT);
+				clientManager->SendAllClient("[QUIT]");
+			}
 
 			g_dt = (f32)AEFrameRateControllerGetFrameTime();
 			g_appTime += g_dt;
+
+			if (clientManager->GetOwnInfo()->state == ShipState::SHOOTING)
+			{
+				clientManager->GetOwnInfo()->state = ShipState::NOTHING;
+				clientManager->UpdateState(clientManager->GetOwnInfo()->state);
+			}
 		}
-		
+
 		GSManager->GameStateFree();
 
 		if (GSManager->GetGameStateNextIndex() != GS_RESTART)

@@ -53,7 +53,6 @@ private:
 	void bulletExplosion(ShipID PlayerID);
 	void spawnAsteroid(void);
 	void spawnBulletHell(int i, ShipID PlayerID);
-	void RestartGameInit();
 };
 
 

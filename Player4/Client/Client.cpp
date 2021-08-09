@@ -80,7 +80,16 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
-		ConnectToClient(clients[index]);
+		u_long enable = 1;
+		ioctlsocket(clients[index].socket, FIONBIO, &enable);
+		/*if (ConnectToClient(clients[index]) != OK)
+		{
+			std::cout << "Client could not connect! Exiting Game!" << std::endl;
+			GSManager->SetGameStateNextIndex(GS_QUIT);
+		}*/
+		while (ConnectToClient(clients[index]) != OK)
+		{
+		}
 	}
 
 	for (size_t i = 0; i < clients.size(); i++)
@@ -97,18 +106,73 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		clients[i].id = static_cast<ShipID>(id);
 	}
 
-	for (size_t i = 0; i < clients.size(); i++)
-	{
-		MyInfo.id = static_cast<ShipID>(i);
-		if (std::stoi(MyInfo.port) < std::stoi(clients[i].port))
+	std::vector<ClientInfo> oldClient = clients;
+	std::vector<ClientInfo> newClient = clients;
+	clients.clear();
+
+	newClient.push_back(MyInfo);
+	std::sort(newClient.begin(), newClient.end(),
+		[](const ClientInfo& a, const ClientInfo& b) -> bool
 		{
-			for (size_t j = i; j < clients.size(); j++)
+			return std::stoi(a.port) < std::stoi(b.port);
+		}
+	);
+
+	for (size_t i = 0; i < newClient.size(); i++)
+	{
+		ShipID ID = static_cast<ShipID>(i);
+
+		if (MyInfo.port == newClient[i].port)
+			MyInfo.id = ID;
+
+		newClient[i].id = ID;
+	}
+
+	newClient.erase(std::remove_if(newClient.begin(), newClient.end(),
+		[this](const ClientInfo& a)
+		{
+			return a.port == MyInfo.port;
+		}),
+		newClient.end()
+			);
+
+	for (size_t i = 0; i < oldClient.size(); i++)
+	{
+		for (size_t j = 0; j < newClient.size(); j++)
+		{
+			if (oldClient[i].port == newClient[j].port)
 			{
-				clients[j].id = static_cast<ShipID>(static_cast<int>(clients[j].id) + 1);
+				clients.push_back(newClient[j]);
+				break;
 			}
-			break;
 		}
 	}
+
+	/*clients.push_back(MyInfo);
+	std::sort(clients.begin(), clients.end(),
+		[](const ClientInfo& a, const ClientInfo& b) -> bool
+		{
+			return std::stoi(a.port) < std::stoi(b.port);
+		}
+	);
+
+	for (size_t i = 0; i < clients.size(); i++)
+	{
+		ShipID ID = static_cast<ShipID>(i);
+
+		if (MyInfo.port == clients[i].port)
+			MyInfo.id = ID;
+
+		clients[i].id = ID;
+	}
+
+	clients.erase(std::remove_if(clients.begin(), clients.end(),
+		[this](const ClientInfo& a)
+		{
+			return a.port == MyInfo.port;
+		}),
+		clients.end()
+	);*/
 
 	for (size_t k = 0; k < clients.size(); k++)
 	{
@@ -131,7 +195,14 @@ bool Client::GetClientReadyCheck()
 			return false;
 	}
 
+	if (!MyInfo.readyCheck) return false;
+
 	return true;
+}
+
+ClientInfo* Client::GetOwnInfo()
+{
+	return &MyInfo;
 }
 
 /*****************************************************************
@@ -166,7 +237,7 @@ int Client::SendClient(SOCKET socket, std::string message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
-	
+
 	return sender.SendClient(*GetClient(index), message);
 }
 
@@ -201,14 +272,48 @@ void Client::UpdateState(ShipState state)
 
 	std::string hash = lockStepManager.HashInput(message);
 
+	// tell all clients to lock and send a hash input
 	SendAllClient(Parser::CreatePacket("[LOCK]", hash));
 
+	// receive all hash input and save it
 	UpdateHash();
 
-	message = Parser::CreatePacket("[UNLOCK]", message);
+	// send the actual input
+	SendAllClient(message);
+
+	// receive all client inputs
+	ReceiveAllClient();
 
 	if (CheckAllHash())
+	{
 		std::cout << "NO CHEATERS" << std::endl;
+		for (auto& client : clients)
+		{
+			std::vector<std::string> params = Parser::GetPayload(client.lockedState);
+			int playerID = std::stoi(params[0]);
+			std::cout << playerID << std::endl;
+			AEVec2 Position;
+			AEVec2 Velocity;
+			AEVec2 Acceleration;
+			float direction;
+			Position.x = std::stof(params[1]);
+			Position.y = std::stof(params[2]);
+			Velocity.x = std::stof(params[3]);
+			Velocity.y = std::stof(params[4]);
+			Acceleration.x = std::stof(params[5]);
+			Acceleration.y = std::stof(params[6]);
+			direction = std::stof(params[7]);
+
+			client.state = static_cast<ShipState>(std::stoi(params[8]));
+			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
+		}
+	}
 	else
 		std::cout << "CHEATERSSSSS!!!" << std::endl;
 
@@ -226,11 +331,11 @@ std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
-	
+
 	return params;
 }
 
-int Client::ReceiveClient(SOCKET socket,std::string& message)
+int Client::ReceiveClient(SOCKET socket, std::string& message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
@@ -242,7 +347,7 @@ int Client::ReceiveAllClient()
 	for (auto client : clients)
 	{
 		std::string input;
-		ReceiveClient(client.socket, input);
+		if (ReceiveClient(client.socket, input) == 0) return 0;
 		HandleRecvMessage(client.socket, input);
 	}
 
@@ -361,7 +466,8 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	client.addr = serverInfo;
 	client.socket = serverSocket;
-	
+	u_long enable = 1;
+	ioctlsocket(client.socket, FIONBIO, &enable);
 	std::cout << "CLIENT: " << std::endl;
 	std::cout << client.name << std::endl;
 	std::cout << client.port << std::endl;
@@ -372,19 +478,24 @@ int Client::ConnectToClient(ClientInfo& client)
 }
 void Client::UpdateHash()
 {
-	while(!AllHashUpdated())
+	while (!AllHashUpdated())
 	{
 		ReceiveAllClient();
 	}
 }
 bool Client::CheckAllHash()
 {
-	while(!AllLocked())
+	while (!AllLocked())
 		ReceiveAllClient();
 
 	for (auto client : clients)
 	{
-		if (lockStepManager.HashInput(client.lockedState) != client.hashString) return false;
+		if (lockStepManager.HashInput(client.lockedState) != client.hashString)
+		{
+			std::cout << lockStepManager.HashInput(client.lockedState) << std::endl;
+			std::cout << client.hashString << std::endl;
+			return false;
+		}
 	}
 
 	return true;
@@ -420,9 +531,9 @@ void Client::ResetHash()
 	}
 }
 
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, dt);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -432,18 +543,17 @@ void Client::AllDeadReckoningCorrection(float dt)
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt, client.id);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-	
 	}
 }
 
 void Client::SendUpdatePacket(ShipID id)
 {
-	
+
 	std::vector<std::string> params;
 	params.push_back(std::to_string(static_cast<int>(id)));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
@@ -469,8 +579,9 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 	}
 }
 
-void Client::HandleRecvMessage(SOCKET client,std::string message)
+void Client::HandleRecvMessage(SOCKET client, std::string message)
 {
+	if (message.empty()) return;
 	std::vector<std::string> params;
 	std::string header;
 	params = Parser::GetHeader(message, header);
@@ -489,7 +600,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		// add your stuff here nico
 
 	}
@@ -504,27 +615,76 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 	}
 	else if (header == "[LOCK]")
 	{
-		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-		std::vector<std::string> params = PackData(MyInfo.id, it->second);
-		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+		std::string payload = Parser::GetPacket(message, std::string{});
+		size_t index = clientManager->CheckClientExist(client);
+		clientManager->GetClient(index)->hashString = payload;
 
-		std::string hash;
-		for (auto string : params)
+		std::cout << "Retrieved the hash from client" << std::endl;
+
+		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
+		std::vector<std::string> _paramz = PackData(MyInfo.id, it->second);
+		_paramz.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+
+		std::string input;
+		for (auto string : _paramz)
 		{
-			hash += string + "\n";
+			input += string + "\n";
 		}
 
-		hash = lockStepManager.HashInput(hash);
-		std::string _message = Parser::CreatePacket("[HASHED]", hash);
-		SendClient(client, message);
+		std::cout << "Sending hash input back" << std::endl;
+		// send hash input
+		std::string hash = lockStepManager.HashInput(input);
+		hash = Parser::CreatePacket("[HASHED]", hash);
+		SendClient(client, hash);
+
+		// receive actual input from client
+		std::string _message;
+		std::cout << "Retrieving actual input" << std::endl;
+		ReceiveClient(client, _message);
+		std::cout << "Successfully Received\n" << _message << std::endl;
+
+		std::string temp = Parser::CreatePacket("[UNLOCKED]", input);
+		SendClient(client, temp);
+
+		std::cout << "Comparing input" << std::endl;
+		if (lockStepManager.CompareInput(_message, payload))
+		{
+			std::vector<std::string> _params = Parser::GetPayload(_message);
+			std::cout << "NO HAX" << std::endl;
+			int playerID = std::stoi(_params[0]);
+			AEVec2 Position;
+			AEVec2 Velocity;
+			AEVec2 Acceleration;
+			float direction;
+			Position.x = std::stof(_params[1]);
+			Position.y = std::stof(_params[2]);
+			Velocity.x = std::stof(_params[3]);
+			Velocity.y = std::stof(_params[4]);
+			Acceleration.x = std::stof(_params[5]);
+			Acceleration.y = std::stof(_params[6]);
+			direction = std::stof(_params[7]);
+
+			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
+			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
+			std::cout << "PositionX: " << Position.x << std::endl;
+			std::cout << "PositionY: " << Position.y << std::endl;
+			std::cout << "VelocityX: " << Velocity.x << std::endl;
+			std::cout << "VelocityY: " << Velocity.y << std::endl;
+			std::cout << "direction: " << direction << std::endl;
+		}
+		else
+			std::cout << "HAX" << std::endl;
+
+
 	}
 	else if (header == "[HASHED]")
 	{
-		for (auto _client : clients)
+		for (auto& _client : clients)
 		{
 			if (_client.socket == client)
 			{
-				_client.hashString = message;
+				_client.hashString = Parser::GetPacket(message, std::string{});
 				return;
 			}
 		}
@@ -546,7 +706,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 	}
 	else if (header == "[UNLOCKED]")
 	{
-		for (auto _client : clients)
+		for (auto& _client : clients)
 		{
 			if (_client.socket == client)
 			{
@@ -554,5 +714,20 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 				return;
 			}
 		}
+	}
+	else if (header == "[RESTART]")
+	{
+		for (auto& _client : clients)
+		{
+			if (_client.socket == client)
+			{
+				_client.readyCheck = true;
+				return;
+			}
+		}
+	}
+	else if (header == "[QUIT]")
+	{
+		GSManager->SetGameStateNextIndex(GS_QUIT);
 	}
 }

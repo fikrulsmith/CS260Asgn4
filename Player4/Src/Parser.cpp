@@ -66,6 +66,25 @@ std::string Parser::GetPacket(std::string input, std::string& headerCommand)
 	return input;
 }
 
+std::vector<std::string> Parser::GetPayload(std::string input)
+{
+	input += "\n\n";
+	std::vector<std::string> params;
+	while (true)
+	{
+		size_t index = input.find("\n");
+		size_t stopper = input.find("\n\n");
+
+		params.push_back(input.substr(0, index));
+		if (index == stopper)
+			break;
+		else
+			input = input.substr(index + 1);
+	}
+
+	return params;
+}
+
 bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port)
 {
 	std::vector<std::string> tokens = Tokenize(ip, ':');

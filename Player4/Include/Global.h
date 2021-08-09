@@ -115,7 +115,7 @@ struct ClientInfo
 	std::string hashString;
 	std::string lockedState;
 
-	bool readyCheck;
+	bool readyCheck = false;
 
 	ShipID id;
 	ShipState state;

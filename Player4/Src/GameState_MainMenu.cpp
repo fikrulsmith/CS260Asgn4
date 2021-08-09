@@ -31,15 +31,21 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 {
 	if (AEInputCheckTriggered(AEVK_RETURN))
 	{
-		while (!clientManager->GetClientReadyCheck())
-		{
-			std::cout << "waiting for player" << std::endl;
-			clientManager->SendAllClient("[READY]");
-			clientManager->ReceiveAllClient();
-		}
+		ClientInfo* info = clientManager->GetOwnInfo();
+		info->readyCheck = true;
+		clientManager->SendAllClient("[READY]");
 
-		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
 	}
+
+	if (clientManager->GetClientReadyCheck())
+	{
+		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
+		/*std::cout << "waiting for player" << std::endl;
+		
+		clientManager->ReceiveAllClient();*/
+	}
+
+	
 }
 
 void MainMenuGameState::GameStateMainMenuDraw(void)

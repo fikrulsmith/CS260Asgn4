@@ -82,10 +82,13 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
 		u_long enable = 1;
 		ioctlsocket(clients[index].socket, FIONBIO, &enable);
-		if (ConnectToClient(clients[index]) != OK)
+		/*if (ConnectToClient(clients[index]) != OK)
 		{
 			std::cout << "Client could not connect! Exiting Game!" << std::endl;
 			GSManager->SetGameStateNextIndex(GS_QUIT);
+		}*/
+		while (ConnectToClient(clients[index]) != OK)
+		{
 		}
 	}
 
@@ -436,6 +439,7 @@ int Client::ConnectToClient(ClientInfo& client)
 		static_cast<int>(info->ai_addrlen));
 	if (errorCode != NO_ERROR)
 	{
+		std::cout << WSAGetLastError() << std::endl;
 		std::cerr << "bind() failed." << std::endl;
 		closesocket(serverSocket);
 		freeaddrinfo(info);
