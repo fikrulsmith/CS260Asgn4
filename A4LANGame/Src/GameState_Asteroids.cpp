@@ -121,7 +121,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	if (AEInputCheckTriggered(AEVK_SPACE))
 	{
 		PlayerShoot(myShip->shipComp.sShipID);
- 		clientManager->UpdateState(myShip->shipComp.sShipState);
+		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
@@ -487,26 +487,26 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 
 		switch (index)
 		{
-			case 0:
-				pos.x = -20.f;
-				pos.y = 20.f;
-				dir = 180.f;
-				break;
-			case 1:
-				pos.x = 20.f;
-				pos.y = 20.f;
-				dir = 0.0f;
-				break;
-			case 2:
-				pos.x = -20.f;
-				pos.y = 0.f;
-				dir = 180.0f;
-				break;
-			case 3:
-				pos.x = 20.f;
-				pos.y = 0.f;
-				dir = 0.0f;
-				break;
+		case 0:
+			pos.x = -20.f;
+			pos.y = 20.f;
+			dir = 180.f;
+			break;
+		case 1:
+			pos.x = 20.f;
+			pos.y = 20.f;
+			dir = 0.0f;
+			break;
+		case 2:
+			pos.x = -20.f;
+			pos.y = 0.f;
+			dir = 180.0f;
+			break;
+		case 3:
+			pos.x = 20.f;
+			pos.y = 0.f;
+			dir = 0.0f;
+			break;
 		}
 
 		GameObjInst* temp = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(dir));
@@ -835,6 +835,21 @@ void AsteroidsGameState::spawnBulletHell(int i, ShipID PlayerID)
 
 void AsteroidsGameState::RestartGameInit()
 {
+	ClientInfo* info = clientManager->GetOwnInfo();
+	info->readyCheck = true;
+
+	for (size_t i = 0; i < clientManager->GetNumberOfClients(); i++)
+	{
+		ClientInfo* client = clientManager->GetClient(i);
+		client->readyCheck = false;
+	}
+
+	while (!clientManager->GetClientReadyCheck())
+	{
+		clientManager->SendAllClient("[RESTART]");
+		clientManager->ReceiveAllClient();
+	}
+
 	GSManager->SetGameStateCurrIndex(GS_RESTART);
 
 	for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)

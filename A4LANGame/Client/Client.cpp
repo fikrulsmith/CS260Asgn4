@@ -708,4 +708,15 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 			}
 		}
 	}
+	else if (header == "[RESTART]")
+	{
+		for (auto& _client : clients)
+		{
+			if (_client.socket == client)
+			{
+				_client.readyCheck = true;
+				return;
+			}
+		}
+	}
 }

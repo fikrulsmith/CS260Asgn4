@@ -536,7 +536,7 @@ void Client::AllDeadReckoningCorrection(float dt)
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt,client.id);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt, client.id);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
@@ -704,6 +704,17 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 			if (_client.socket == client)
 			{
 				_client.lockedState = Parser::GetPacket(message, std::string{});
+				return;
+			}
+		}
+	}
+	else if (header == "[RESTART]")
+	{
+		for (auto& _client : clients)
+		{
+			if (_client.socket == client)
+			{
+				_client.readyCheck = true;
 				return;
 			}
 		}

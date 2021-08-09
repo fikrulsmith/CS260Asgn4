@@ -835,6 +835,21 @@ void AsteroidsGameState::spawnBulletHell(int i, ShipID PlayerID)
 
 void AsteroidsGameState::RestartGameInit()
 {
+	ClientInfo* info = clientManager->GetOwnInfo();
+	info->readyCheck = true;
+
+	for (size_t i = 0; i < clientManager->GetNumberOfClients(); i++)
+	{
+		ClientInfo* client = clientManager->GetClient(i);
+		client->readyCheck = false;
+	}
+
+	while (!clientManager->GetClientReadyCheck())
+	{
+		clientManager->SendAllClient("[RESTART]");
+		clientManager->ReceiveAllClient();
+	}
+
 	GSManager->SetGameStateCurrIndex(GS_RESTART);
 
 	for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
