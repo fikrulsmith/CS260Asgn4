@@ -475,7 +475,7 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 {
 	for (size_t i = 0; i < clientManager->GetNumberOfClients() + 1; ++i)
 	{
-		AEVec2 pos{ 0,0 };
+		AEVec2 pos{ 0.f,0.f };
 		float dir = 0.0f;
 		int index = 0;
 
@@ -486,26 +486,26 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 
 		switch (index)
 		{
-			case 0:
-				pos.x = -20.f;
-				pos.y = 20.f;
-				dir = 180.f;
-				break;
-			case 1:
-				pos.x = 20.f;
-				pos.y = 20.f;
-				dir = 0.0f;
-				break;
-			case 2:
-				pos.x = -20.f;
-				pos.y = 0.f;
-				dir = 180.0f;
-				break;
-			case 3:
-				pos.x = 20.f;
-				pos.y = 0.f;
-				dir = 0.0f;
-				break;
+		case 0:
+			pos.x = -20.f;
+			pos.y = 20.f;
+			dir = 180.f;
+			break;
+		case 1:
+			pos.x = 20.f;
+			pos.y = 20.f;
+			dir = 0.0f;
+			break;
+		case 2:
+			pos.x = -20.f;
+			pos.y = 0.f;
+			dir = 180.0f;
+			break;
+		case 3:
+			pos.x = 20.f;
+			pos.y = 0.f;
+			dir = 0.0f;
+			break;
 		}
 
 		GameObjInst* temp = GameObjFactory_->gameObjInstCreate(TYPE_SHIP, SHIP_SIZE, &pos, nullptr, AEDegToRad(dir));
@@ -669,8 +669,8 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 			&IDToPlayerShip_[PlayerID]->posCurr, &added);
 
 		// Find the velocity according to the acceleration
-		/*IDToPlayerShip_[PlayerID]->velCurr.x += added.x * SHIP_ACCEL_FORWARD * g_dt;
-		IDToPlayerShip_[PlayerID]->velCurr.y += added.y * SHIP_ACCEL_FORWARD * g_dt;*/
+		/*IDToPlayerShip_[PlayerID]->velCurr.x += added.x * g_dt;
+		IDToPlayerShip_[PlayerID]->velCurr.y += added.y * g_dt;*/
 		// Limit your speed over here
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));
@@ -690,8 +690,8 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 			&IDToPlayerShip_[PlayerID]->posCurr, &added);
 
 		// Find the velocity according to the decceleration
-		/*IDToPlayerShip_[PlayerID]->velCurr.x += g_dt * SHIP_ACCEL_BACKWARD * added.x;
-		IDToPlayerShip_[PlayerID]->velCurr.y += g_dt * SHIP_ACCEL_BACKWARD * added.y;*/
+		/*IDToPlayerShip_[PlayerID]->velCurr.x += g_dt * added.x;
+		IDToPlayerShip_[PlayerID]->velCurr.y += g_dt * added.y;*/
 		// Limit your speed over here
 		AEVec2Scale(&IDToPlayerShip_[PlayerID]->velCurr,
 			&IDToPlayerShip_[PlayerID]->velCurr, static_cast<f32>(0.99));

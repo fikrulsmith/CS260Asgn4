@@ -33,8 +33,7 @@ void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 
 	OldVelocity = InstantVelocityBetweenDRpositions;
 	TimeelapsedsinceUpdate = 0;
 	LastKnownPosition = LKPosition;
-	LastKnownVelocity.x = LKVelocity.x / dt;
-	LastKnownVelocity.y = LKVelocity.y / dt;
+	LastKnownVelocity = LKVelocity;
 	LastKnownAcceleration = LKAcceleration;
 	Mydirection = direction;
 	if (isInit)
