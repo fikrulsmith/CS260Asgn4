@@ -278,7 +278,26 @@ void Client::UpdateState(ShipState state)
 	ReceiveAllClient();
 
 	if (CheckAllHash())
+	{
 		std::cout << "NO CHEATERS" << std::endl;
+		for (auto& client : clients)
+		{
+			std::vector<std::string> params = Parser::GetPayload(client.lockedState);
+			int playerID = std::stoi(params[0]);
+			AEVec2 Position;
+			AEVec2 Velocity;
+			AEVec2 Acceleration;
+			float direction;
+			Position.x = std::stof(params[1]);
+			Position.y = std::stof(params[2]);
+			Velocity.x = std::stof(params[3]);
+			Velocity.y = std::stof(params[4]);
+			Acceleration.x = std::stof(params[5]);
+			Acceleration.y = std::stof(params[6]);
+			direction = std::stof(params[7]);
+			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+		}
+	}
 	else
 		std::cout << "CHEATERSSSSS!!!" << std::endl;
 
@@ -615,9 +634,26 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 
 		std::cout << "Comparing input" << std::endl;
 		if (lockStepManager.CompareInput(_message, payload))
+		{
 			std::cout << "NO HAX" << std::endl;
+			int playerID = std::stoi(params[0]);
+			AEVec2 Position;
+			AEVec2 Velocity;
+			AEVec2 Acceleration;
+			float direction;
+			Position.x = std::stof(params[1]);
+			Position.y = std::stof(params[2]);
+			Velocity.x = std::stof(params[3]);
+			Velocity.y = std::stof(params[4]);
+			Acceleration.x = std::stof(params[5]);
+			Acceleration.y = std::stof(params[6]);
+			direction = std::stof(params[7]);
+			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+		}
 		else
 			std::cout << "HAX" << std::endl;
+
+		
 	}
 	else if (header == "[HASHED]")
 	{
