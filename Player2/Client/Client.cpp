@@ -306,12 +306,6 @@ void Client::UpdateState(ShipState state)
 
 			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
-			std::cout << "PositionX: " << Position.x << std::endl;
-			std::cout << "PositionY: " << Position.y << std::endl;
-			std::cout << "VelocityX: " << Velocity.x << std::endl;
-			std::cout << "VelocityY: " << Velocity.y << std::endl;
-			std::cout << "direction: " << direction << std::endl;
 		}
 	}
 	else
@@ -667,12 +661,6 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 
 			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-			std::cout << "Player: " << static_cast<int>(playerID) << std::endl;
-			std::cout << "PositionX: " << Position.x << std::endl;
-			std::cout << "PositionY: " << Position.y << std::endl;
-			std::cout << "VelocityX: " << Velocity.x << std::endl;
-			std::cout << "VelocityY: " << Velocity.y << std::endl;
-			std::cout << "direction: " << direction << std::endl;
 		}
 		else
 			std::cout << "HAX" << std::endl;
