@@ -127,7 +127,7 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 			return a.port == MyInfo.port;
 		}),
 		newClient.end()
-	);
+			);
 
 	for (size_t i = 0; i < oldClient.size(); i++)
 	{
@@ -230,7 +230,7 @@ int Client::SendClient(SOCKET socket, std::string message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
-	
+
 	return sender.SendClient(*GetClient(index), message);
 }
 
@@ -296,6 +296,8 @@ void Client::UpdateState(ShipState state)
 			Acceleration.x = std::stof(params[5]);
 			Acceleration.y = std::stof(params[6]);
 			direction = std::stof(params[7]);
+
+			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 	}
@@ -316,11 +318,11 @@ std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(40.0f));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
-	
+
 	return params;
 }
 
-int Client::ReceiveClient(SOCKET socket,std::string& message)
+int Client::ReceiveClient(SOCKET socket, std::string& message)
 {
 	size_t index = CheckClientExist(socket);
 	if (index == DOES_NOT_EXIST) return -1;
@@ -329,7 +331,7 @@ int Client::ReceiveClient(SOCKET socket,std::string& message)
 }
 int Client::ReceiveAllClient()
 {
-	for (auto& client : clients)
+	for (auto client : clients)
 	{
 		std::string input;
 		if (ReceiveClient(client.socket, input) == 0) return 0;
@@ -463,21 +465,24 @@ int Client::ConnectToClient(ClientInfo& client)
 }
 void Client::UpdateHash()
 {
-	while(!AllHashUpdated())
+	while (!AllHashUpdated())
 	{
 		ReceiveAllClient();
 	}
 }
 bool Client::CheckAllHash()
 {
-	while(!AllLocked())
+	while (!AllLocked())
 		ReceiveAllClient();
 
 	for (auto client : clients)
 	{
-		std::cout << lockStepManager.HashInput(client.lockedState) << std::endl;
-		std::cout << client.hashString << std::endl;
-		if (lockStepManager.HashInput(client.lockedState) != client.hashString) return false;
+		if (lockStepManager.HashInput(client.lockedState) != client.hashString)
+		{
+			std::cout << lockStepManager.HashInput(client.lockedState) << std::endl;
+			std::cout << client.hashString << std::endl;
+			return false;
+		}
 	}
 
 	return true;
@@ -513,9 +518,9 @@ void Client::ResetHash()
 	}
 }
 
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,double apptime)
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, double apptime)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration,direction,apptime);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, apptime);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -530,13 +535,13 @@ void Client::AllDeadReckoningCorrection(float dt)
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->dirCurr = direction;
-	
+
 	}
 }
 
 void Client::SendUpdatePacket(ShipID id)
 {
-	
+
 	std::vector<std::string> params;
 	params.push_back(std::to_string(static_cast<int>(id)));
 	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
@@ -562,14 +567,11 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 	}
 }
 
-void Client::HandleRecvMessage(SOCKET client,std::string message)
+void Client::HandleRecvMessage(SOCKET client, std::string message)
 {
-	if (message.empty())
-		return;
-
+	if (message.empty()) return;
 	std::vector<std::string> params;
 	std::string header;
-
 	params = Parser::GetHeader(message, header);
 	if (header == "[UPDATE]")
 	{
@@ -586,7 +588,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		Acceleration.x = std::stof(params[5]);
 		Acceleration.y = std::stof(params[6]);
 		direction = std::stof(params[7]);
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction,g_dt);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		// add your stuff here nico
 
 	}
@@ -598,7 +600,6 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		ClientInfo* info = GetClient(index);
 		info->readyCheck = true;
 
-		std::cout << "Set to Ready" << std::endl;
 	}
 	else if (header == "[LOCK]")
 	{
@@ -609,11 +610,11 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		std::cout << "Retrieved the hash from client" << std::endl;
 
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-		std::vector<std::string> params = PackData(MyInfo.id, it->second);
-		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+		std::vector<std::string> _paramz = PackData(MyInfo.id, it->second);
+		_paramz.push_back(std::to_string(static_cast<int>(MyInfo.state)));
 
 		std::string input;
-		for (auto string : params)
+		for (auto string : _paramz)
 		{
 			input += string + "\n";
 		}
@@ -630,7 +631,6 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		ReceiveClient(client, _message);
 		std::cout << "Successfully Received\n" << _message << std::endl;
 
-		// sending actual input
 		std::string temp = Parser::CreatePacket("[UNLOCKED]", input);
 		SendClient(client, temp);
 
@@ -651,10 +651,14 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 			Acceleration.x = std::stof(_params[5]);
 			Acceleration.y = std::stof(_params[6]);
 			direction = std::stof(_params[7]);
+
+			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 		else
 			std::cout << "HAX" << std::endl;
+
+
 	}
 	else if (header == "[HASHED]")
 	{

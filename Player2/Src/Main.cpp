@@ -93,6 +93,12 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 			g_dt = (f32)AEFrameRateControllerGetFrameTime();
 			g_appTime += g_dt;
+
+			if (clientManager->GetOwnInfo()->state == ShipState::SHOOTING)
+			{
+				clientManager->GetOwnInfo()->state = ShipState::NOTHING;
+				clientManager->UpdateState(clientManager->GetOwnInfo()->state);
+			}
 		}
 		
 		GSManager->GameStateFree();

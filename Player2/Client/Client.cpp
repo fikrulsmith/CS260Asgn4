@@ -296,6 +296,8 @@ void Client::UpdateState(ShipState state)
 			Acceleration.x = std::stof(params[5]);
 			Acceleration.y = std::stof(params[6]);
 			direction = std::stof(params[7]);
+
+			client.state = static_cast<ShipState>(std::stoi(params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 	}
@@ -608,11 +610,11 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 		std::cout << "Retrieved the hash from client" << std::endl;
 
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-		std::vector<std::string> params = PackData(MyInfo.id, it->second);
-		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+		std::vector<std::string> _paramz = PackData(MyInfo.id, it->second);
+		_paramz.push_back(std::to_string(static_cast<int>(MyInfo.state)));
 
 		std::string input;
-		for (auto string : params)
+		for (auto string : _paramz)
 		{
 			input += string + "\n";
 		}
@@ -649,6 +651,8 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 			Acceleration.x = std::stof(_params[5]);
 			Acceleration.y = std::stof(_params[6]);
 			direction = std::stof(_params[7]);
+
+			clientManager->GetClient(clientManager->CheckClientExist(client))->state = static_cast<ShipState>(std::stoi(_params[8]));
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 		else

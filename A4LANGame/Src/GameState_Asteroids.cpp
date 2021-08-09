@@ -547,6 +547,8 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 		{
 			printf("----------------------------------------------------------------- \n");
 			printf("%s \n", PLAYERID[i]);
+			printf("%f \n", IDToPlayerShip_[static_cast<ShipID>(i)]->posCurr.x);
+			printf("%f \n", IDToPlayerShip_[static_cast<ShipID>(i)]->posCurr.y);
 			printf("----------------------------------------------------------------- \n");
 
 			if (IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives <= 0)
