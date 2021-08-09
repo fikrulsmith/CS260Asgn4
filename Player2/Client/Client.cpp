@@ -284,6 +284,7 @@ void Client::UpdateState(ShipState state)
 		{
 			std::vector<std::string> params = Parser::GetPayload(client.lockedState);
 			int playerID = std::stoi(params[0]);
+			std::cout << playerID << std::endl;
 			AEVec2 Position;
 			AEVec2 Velocity;
 			AEVec2 Acceleration;
@@ -630,7 +631,6 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 
 		std::string temp = Parser::CreatePacket("[UNLOCKED]", input);
 		SendClient(client, temp);
-		std::cout << temp << std::endl;
 
 		std::cout << "Comparing input" << std::endl;
 		if (lockStepManager.CompareInput(_message, payload))
