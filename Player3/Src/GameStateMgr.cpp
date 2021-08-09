@@ -10,31 +10,31 @@ void GameStateManager::GameSystemUpdate()
 	{
 	case GS_ASTEROIDS:
 		GS_FunctionMap_[GameSystemType::LOAD]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsLoad, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsLoad, std::ref(Asteroids_));
 		GS_FunctionMap_[GameSystemType::INIT]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsInit, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsInit, std::ref(Asteroids_));
 		GS_FunctionMap_[GameSystemType::UPDATE]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsUpdate, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsUpdate, std::ref(Asteroids_));
 		GS_FunctionMap_[GameSystemType::DRAW]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsDraw, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsDraw, std::ref(Asteroids_));
 		GS_FunctionMap_[GameSystemType::FREE]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsFree, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsFree, std::ref(Asteroids_));
 		GS_FunctionMap_[GameSystemType::UNLOAD]
-			= std::bind(&AsteroidsGameState::GameStateAsteroidsUnload, &Asteroids_);
+			= std::bind(&AsteroidsGameState::GameStateAsteroidsUnload, std::ref(Asteroids_));
 		break;
 	case GS_MAINMENU:
 		GS_FunctionMap_[GameSystemType::LOAD]
-			= std::bind(&MainMenuGameState::GameStateMainMenuLoad, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuLoad, std::ref(MainMenu_));
 		GS_FunctionMap_[GameSystemType::INIT]		  
-			= std::bind(&MainMenuGameState::GameStateMainMenuInit, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuInit, std::ref(MainMenu_));
 		GS_FunctionMap_[GameSystemType::UPDATE]		  
-			= std::bind(&MainMenuGameState::GameStateMainMenuUpdate, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuUpdate, std::ref(MainMenu_));
 		GS_FunctionMap_[GameSystemType::DRAW]		  
-			= std::bind(&MainMenuGameState::GameStateMainMenuDraw, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuDraw, std::ref(MainMenu_));
 		GS_FunctionMap_[GameSystemType::FREE]		  
-			= std::bind(&MainMenuGameState::GameStateMainMenuFree, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuFree, std::ref(MainMenu_));
 		GS_FunctionMap_[GameSystemType::UNLOAD]		  
-			= std::bind(&MainMenuGameState::GameStateMainMenuUnload, &MainMenu_);
+			= std::bind(&MainMenuGameState::GameStateMainMenuUnload, std::ref(MainMenu_));
 		break;
 	default:
 		AE_FATAL_ERROR("invalid state!!");

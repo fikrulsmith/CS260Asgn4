@@ -26,13 +26,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 				counter++;
 		}
 	}
-	else
-	{
-		if (AEInputCheckCurr(AEVK_R))
-		{
-			RestartGameInit();
-		}
-	}
 
 	if (counter == IDToPlayerShip_.size())
 	{
@@ -40,11 +33,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		{
 			GameOver_NoShips = true;
 			onValueChange = true;
-		}
-
-		if (AEInputCheckCurr(AEVK_R))
-		{
-			RestartGameInit();
 		}
 	}
 
@@ -54,25 +42,21 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		if (AEInputCheckCurr(AEVK_UP))
 		{
 			PlayerMoveForward(myShip->shipComp.sShipID);
-			//clientManager->UpdateState(myShip->shipComp.sShipState);
 		}
 
 		if (AEInputCheckCurr(AEVK_DOWN))
 		{
 			PlayerMoveBackwards(myShip->shipComp.sShipID);
-			//clientManager->UpdateState(myShip->shipComp.sShipState);
 		}
 
 		if (AEInputCheckCurr(AEVK_LEFT))
 		{
 			PlayerRotateLeft(myShip->shipComp.sShipID);
-			//clientManager->UpdateState(myShip->shipComp.sShipState);
 		}
 
 		if (AEInputCheckCurr(AEVK_RIGHT))
 		{
 			PlayerRotateRight(myShip->shipComp.sShipID);
-			//clientManager->UpdateState(myShip->shipComp.sShipState);
 		}
 
 		if (AEInputCheckTriggered(AEVK_UP))
@@ -135,32 +119,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 			if (search != StateToInput_.end())
 				StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);
 		}
-
-		//if (AEInputCheckCurr(AEVK_W))
-		//{
-		//	PlayerMoveForward(ShipID::PLAYER2);
-		//}
-
-		//if (AEInputCheckCurr(AEVK_S))
-		//{
-		//	PlayerMoveBackwards(ShipID::PLAYER2);
-		//}
-
-		//if (AEInputCheckCurr(AEVK_A))
-		//{
-		//	PlayerRotateLeft(ShipID::PLAYER2);
-		//}
-
-		//if (AEInputCheckCurr(AEVK_D))
-		//{
-		//	PlayerRotateRight(ShipID::PLAYER2);
-		//}
-
-		//// Shoot a bullet if space is triggered (Create a new object instance)
-		//if (AEInputCheckTriggered(AEVK_E))
-		//{
-		//	PlayerShoot(ShipID::PLAYER2);
-		//}
 
 		for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
 		{
@@ -579,7 +537,12 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 		for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
 		{
 			printf("----------------------------------------------------------------- \n");
-			printf("%s \n", PLAYERID[i]);
+
+			if (myShip->shipComp.sShipID == static_cast<ShipID>(i))
+				printf("%s (YOU)\n", PLAYERID[i]);
+			else
+				printf("%s \n", PLAYERID[i]);
+
 			printf("%f \n", IDToPlayerShip_[static_cast<ShipID>(i)]->posCurr.x);
 			printf("%f \n", IDToPlayerShip_[static_cast<ShipID>(i)]->posCurr.y);
 			printf("----------------------------------------------------------------- \n");
@@ -615,7 +578,6 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 		{
 			printf("GAME OVER, ALL SHIPS ARE DESTROYED\n");
 			printf("Press ESC to quit.\n");
-			printf("Press R to restart.\n\n");
 		}
 
 		if (GameOver_MaxScore)
@@ -634,7 +596,6 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 
 			printf("%s wins!!!\n", PLAYERID[WinnerIndex]);
 			printf("Press ESC to quit.\n");
-			printf("Press R to restart.\n\n");
 		}
 
 		onValueChange = false;
@@ -838,37 +799,4 @@ void AsteroidsGameState::spawnBulletHell(int i, ShipID PlayerID)
 	// Get the bullet's direction according to the ship's direction
 	GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 10.0f, &IDToPlayerShip_[PlayerID]->posCurr,
 		&BulletHell, IDToPlayerShip_[PlayerID]->dirCurr);
-}
-
-void AsteroidsGameState::RestartGameInit()
-{
-	ClientInfo* info = clientManager->GetOwnInfo();
-	info->readyCheck = true;
-
-	for (size_t i = 0; i < clientManager->GetNumberOfClients(); i++)
-	{
-		ClientInfo* client = clientManager->GetClient(i);
-		client->readyCheck = false;
-	}
-
-	while (!clientManager->GetClientReadyCheck())
-	{
-		clientManager->SendAllClient("[RESTART]");
-		clientManager->ReceiveAllClient();
-	}
-
-	GSManager->SetGameStateCurrIndex(GS_RESTART);
-
-	for (size_t i = 0; i < IDToPlayerShip_.size(); ++i)
-	{
-		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipScore = 0;
-		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.sShipLives = SHIP_INITIAL_NUM;
-		IDToPlayerShip_[static_cast<ShipID>(i)]->shipComp.SPECIAL_TRIGGER = 0;
-		IDToPlayerShip_[static_cast<ShipID>(i)]->flag = FLAG_ACTIVE;
-	}
-
-	ASTEROID_COUNT = 0;
-	GameOver_MaxScore = false;
-	GameOver_NoShips = false;
-	onValueChange = true;
 }

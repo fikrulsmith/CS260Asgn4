@@ -82,10 +82,13 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
 		u_long enable = 1;
 		ioctlsocket(clients[index].socket, FIONBIO, &enable);
-		if (ConnectToClient(clients[index]) != OK)
+		/*if (ConnectToClient(clients[index]) != OK)
 		{
 			std::cout << "Client could not connect! Exiting Game!" << std::endl;
 			GSManager->SetGameStateNextIndex(GS_QUIT);
+		}*/
+		while (ConnectToClient(clients[index]) != OK)
+		{
 		}
 	}
 
@@ -442,6 +445,7 @@ int Client::ConnectToClient(ClientInfo& client)
 		static_cast<int>(info->ai_addrlen));
 	if (errorCode != NO_ERROR)
 	{
+		std::cout << WSAGetLastError() << std::endl;
 		std::cerr << "bind() failed." << std::endl;
 		closesocket(serverSocket);
 		freeaddrinfo(info);
@@ -530,7 +534,7 @@ void Client::ResetHash()
 
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction,dt);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, dt);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)
@@ -540,7 +544,7 @@ void Client::AllDeadReckoningCorrection(float dt)
 		AEVec2 position;
 		AEVec2 velocity;
 		float direction;
-		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt,client.id);
+		IdtoDeadReckoning[client.id].Run(position, velocity, direction, dt, client.id);
 		//pass back to fikrul here
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->posCurr = position;
 		GSManager->GetAsteroidGameState().IDToPlayerShip_[client.id]->velCurr = velocity;
