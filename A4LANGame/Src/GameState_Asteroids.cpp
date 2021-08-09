@@ -93,6 +93,30 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
+	if (AEInputCheckReleased(AEVK_UP))
+	{
+		myShip->shipComp.sShipState = ShipState::NOTHING;
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckReleased(AEVK_DOWN))
+	{
+		myShip->shipComp.sShipState = ShipState::NOTHING;
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckReleased(AEVK_LEFT))
+	{
+		myShip->shipComp.sShipState = ShipState::NOTHING;
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckReleased(AEVK_RIGHT))
+	{
+		myShip->shipComp.sShipState = ShipState::NOTHING;
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
 	// Shoot a bullet if space is triggered (Create a new object instance)
 	if (AEInputCheckTriggered(AEVK_SPACE))
 	{
