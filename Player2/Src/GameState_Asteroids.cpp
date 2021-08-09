@@ -49,134 +49,137 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	}
 
 
-	if (AEInputCheckCurr(AEVK_UP))
+	if (!GameOver_NoShips && !GameOver_MaxScore)
 	{
-		PlayerMoveForward(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckCurr(AEVK_DOWN))
-	{
-		PlayerMoveBackwards(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckCurr(AEVK_LEFT))
-	{
-		PlayerRotateLeft(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckCurr(AEVK_RIGHT))
-	{
-		PlayerRotateRight(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckTriggered(AEVK_UP))
-	{
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckTriggered(AEVK_DOWN))
-	{
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckTriggered(AEVK_LEFT))
-	{
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckTriggered(AEVK_RIGHT))
-	{
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckReleased(AEVK_UP))
-	{
-		myShip->shipComp.sShipState = ShipState::NOTHING;
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckReleased(AEVK_DOWN))
-	{
-		myShip->shipComp.sShipState = ShipState::NOTHING;
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckReleased(AEVK_LEFT))
-	{
-		myShip->shipComp.sShipState = ShipState::NOTHING;
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	if (AEInputCheckReleased(AEVK_RIGHT))
-	{
-		myShip->shipComp.sShipState = ShipState::NOTHING;
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	// Shoot a bullet if space is triggered (Create a new object instance)
-	if (AEInputCheckTriggered(AEVK_SPACE))
-	{
-		PlayerShoot(myShip->shipComp.sShipID);
-		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
-
-	for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
-	{
-		if (clientManager->GetClient(i)->state != ShipState::SHOOTING) break;
-		IDToPlayerShip_[clientManager->GetClient(i)->id]->shipComp.sShipState = clientManager->GetClient(i)->state;
-		auto search = StateToInput_.find(clientManager->GetClient(i)->state);
-
-		if (search != StateToInput_.end())
-			StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);
-	}
-
-	//if (AEInputCheckCurr(AEVK_W))
-	//{
-	//	PlayerMoveForward(ShipID::PLAYER2);
-	//}
-
-	//if (AEInputCheckCurr(AEVK_S))
-	//{
-	//	PlayerMoveBackwards(ShipID::PLAYER2);
-	//}
-
-	//if (AEInputCheckCurr(AEVK_A))
-	//{
-	//	PlayerRotateLeft(ShipID::PLAYER2);
-	//}
-
-	//if (AEInputCheckCurr(AEVK_D))
-	//{
-	//	PlayerRotateRight(ShipID::PLAYER2);
-	//}
-
-	//// Shoot a bullet if space is triggered (Create a new object instance)
-	//if (AEInputCheckTriggered(AEVK_E))
-	//{
-	//	PlayerShoot(ShipID::PLAYER2);
-	//}
-
-	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
-	{
-		GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
-
-		// If the object is not active, don't do anything
-		if ((pInst->flag & FLAG_ACTIVE) == 0)
+		if (AEInputCheckCurr(AEVK_UP))
 		{
-			continue;
+			PlayerMoveForward(myShip->shipComp.sShipID);
+			//clientManager->UpdateState(myShip->shipComp.sShipState);
 		}
 
-		// Update Positions of the Game Objects
-		pInst->posCurr.x = pInst->posCurr.x + pInst->velCurr.x * g_dt;
-		pInst->posCurr.y = pInst->posCurr.y + pInst->velCurr.y * g_dt;
+		if (AEInputCheckCurr(AEVK_DOWN))
+		{
+			PlayerMoveBackwards(myShip->shipComp.sShipID);
+			//clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
 
-		// Getting bounding rectangles at every active instance
-		AEVec2Set(&pInst->boundingBox.min, -0.5f * pInst->scale + pInst->posCurr.x, -0.5f * pInst->scale + pInst->posCurr.y);
-		AEVec2Set(&pInst->boundingBox.max, 0.5f * pInst->scale + pInst->posCurr.x, 0.5f * pInst->scale + pInst->posCurr.y);
+		if (AEInputCheckCurr(AEVK_LEFT))
+		{
+			PlayerRotateLeft(myShip->shipComp.sShipID);
+			//clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckCurr(AEVK_RIGHT))
+		{
+			PlayerRotateRight(myShip->shipComp.sShipID);
+			//clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckTriggered(AEVK_UP))
+		{
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckTriggered(AEVK_DOWN))
+		{
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckTriggered(AEVK_LEFT))
+		{
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckTriggered(AEVK_RIGHT))
+		{
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckReleased(AEVK_UP))
+		{
+			myShip->shipComp.sShipState = ShipState::NOTHING;
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckReleased(AEVK_DOWN))
+		{
+			myShip->shipComp.sShipState = ShipState::NOTHING;
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckReleased(AEVK_LEFT))
+		{
+			myShip->shipComp.sShipState = ShipState::NOTHING;
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		if (AEInputCheckReleased(AEVK_RIGHT))
+		{
+			myShip->shipComp.sShipState = ShipState::NOTHING;
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		// Shoot a bullet if space is triggered (Create a new object instance)
+		if (AEInputCheckTriggered(AEVK_SPACE))
+		{
+			PlayerShoot(myShip->shipComp.sShipID);
+			clientManager->UpdateState(myShip->shipComp.sShipState);
+		}
+
+		for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
+		{
+			if (clientManager->GetClient(i)->state != ShipState::SHOOTING) break;
+			IDToPlayerShip_[clientManager->GetClient(i)->id]->shipComp.sShipState = clientManager->GetClient(i)->state;
+			auto search = StateToInput_.find(clientManager->GetClient(i)->state);
+
+			if (search != StateToInput_.end())
+				StateToInput_[clientManager->GetClient(i)->state](clientManager->GetClient(i)->id);
+		}
+
+		//if (AEInputCheckCurr(AEVK_W))
+		//{
+		//	PlayerMoveForward(ShipID::PLAYER2);
+		//}
+
+		//if (AEInputCheckCurr(AEVK_S))
+		//{
+		//	PlayerMoveBackwards(ShipID::PLAYER2);
+		//}
+
+		//if (AEInputCheckCurr(AEVK_A))
+		//{
+		//	PlayerRotateLeft(ShipID::PLAYER2);
+		//}
+
+		//if (AEInputCheckCurr(AEVK_D))
+		//{
+		//	PlayerRotateRight(ShipID::PLAYER2);
+		//}
+
+		//// Shoot a bullet if space is triggered (Create a new object instance)
+		//if (AEInputCheckTriggered(AEVK_E))
+		//{
+		//	PlayerShoot(ShipID::PLAYER2);
+		//}
+
+		for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
+		{
+			GameObjInst* pInst = GameObjFactory_->GetGameObjInstData() + i;
+
+			// If the object is not active, don't do anything
+			if ((pInst->flag & FLAG_ACTIVE) == 0)
+			{
+				continue;
+			}
+
+			// Update Positions of the Game Objects
+			pInst->posCurr.x = pInst->posCurr.x + pInst->velCurr.x * g_dt;
+			pInst->posCurr.y = pInst->posCurr.y + pInst->velCurr.y * g_dt;
+
+			// Getting bounding rectangles at every active instance
+			AEVec2Set(&pInst->boundingBox.min, -0.5f * pInst->scale + pInst->posCurr.x, -0.5f * pInst->scale + pInst->posCurr.y);
+			AEVec2Set(&pInst->boundingBox.max, 0.5f * pInst->scale + pInst->posCurr.x, 0.5f * pInst->scale + pInst->posCurr.y);
+		}
 	}
 
 	for (unsigned long i = 0; i < GAME_OBJ_INST_NUM_MAX; i++)
