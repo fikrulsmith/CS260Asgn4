@@ -52,24 +52,44 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	if (AEInputCheckCurr(AEVK_UP))
 	{
 		PlayerMoveForward(myShip->shipComp.sShipID);
-		clientManager->UpdateState(myShip->shipComp.sShipState);
+		//clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_DOWN))
 	{
 		PlayerMoveBackwards(myShip->shipComp.sShipID);
-		clientManager->UpdateState(myShip->shipComp.sShipState);
+		//clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_LEFT))
 	{
 		PlayerRotateLeft(myShip->shipComp.sShipID);
-		clientManager->UpdateState(myShip->shipComp.sShipState);
+		//clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_RIGHT))
 	{
 		PlayerRotateRight(myShip->shipComp.sShipID);
+		//clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckTriggered(AEVK_UP))
+	{
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckTriggered(AEVK_DOWN))
+	{
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckTriggered(AEVK_LEFT))
+	{
+		clientManager->UpdateState(myShip->shipComp.sShipState);
+	}
+
+	if (AEInputCheckTriggered(AEVK_RIGHT))
+	{
 		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
