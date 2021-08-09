@@ -80,6 +80,8 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
+		u_long enable = 1;
+		ioctlsocket(clients[index].socket, FIONBIO, &enable);
 		ConnectToClient(clients[index]);
 	}
 
@@ -263,11 +265,17 @@ void Client::UpdateState(ShipState state)
 
 	std::string hash = lockStepManager.HashInput(message);
 
+	// tell all clients to lock and send a hash input
 	SendAllClient(Parser::CreatePacket("[LOCK]", hash));
 
+	// receive all hash input and save it
 	UpdateHash();
 
-	message = Parser::CreatePacket("[UNLOCK]", message);
+	// send the actual input
+	SendAllClient(message);
+
+	// receive all client inputs
+	ReceiveAllClient();
 
 	if (CheckAllHash())
 		std::cout << "NO CHEATERS" << std::endl;
@@ -447,6 +455,8 @@ bool Client::CheckAllHash()
 
 	for (auto client : clients)
 	{
+		std::cout << lockStepManager.HashInput(client.lockedState) << std::endl;
+		std::cout << client.hashString << std::endl;
 		if (lockStepManager.HashInput(client.lockedState) != client.hashString) return false;
 	}
 
@@ -612,11 +622,11 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 	}
 	else if (header == "[HASHED]")
 	{
-		for (auto _client : clients)
+		for (auto& _client : clients)
 		{
 			if (_client.socket == client)
 			{
-				_client.hashString = message;
+				_client.hashString = Parser::GetPacket(message, std::string{});
 				return;
 			}
 		}
@@ -638,7 +648,7 @@ void Client::HandleRecvMessage(SOCKET client,std::string message)
 	}
 	else if (header == "[UNLOCKED]")
 	{
-		for (auto _client : clients)
+		for (auto& _client : clients)
 		{
 			if (_client.socket == client)
 			{
