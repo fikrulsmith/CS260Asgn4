@@ -281,6 +281,10 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						_pInst->dirCurr = _pInst->shipComp.InitialDirection;
 						// Resets Special Power
 						_pInst->shipComp.SPECIAL_TRIGGER = 0;
+						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].reset();
+						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].Init(_pInst->shipComp.InitialPosition,
+							_pInst->velCurr, AEVec2{ 0,0 }, _pInst->dirCurr);
+
 
 						// Destroy Asteroid
 						GameObjFactory_->gameObjInstDestroy(pInst);

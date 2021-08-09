@@ -49,6 +49,27 @@ void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& 
 	direction = Mydirection;
 }
 
+void DeadReckoning::reset()
+{
+	OldPosition = { 0,0 };
+	OldVelocity = { 0,0 };
+	LastKnownPosition = { 0,0 };
+	LastKnownVelocity = { 0,0 };
+	LastKnownAcceleration = { 0,0 };
+	CurrentPosition = { 0,0 };
+	CurrentVelocity = { 0,0 };
+	InstantVelocityBetweenDRpositions = { 0,0 };
+
+	TimeelapsedsinceUpdate = 0;
+	Mydirection = 0;
+	Tarrow = 0;
+
+	extrapolating = false;
+	isInit = false;
+	goingFront = false;
+	goingBack = false;
+}
+
 void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt,ShipID id)
 {
 	AEVec2 VelocityBlend;

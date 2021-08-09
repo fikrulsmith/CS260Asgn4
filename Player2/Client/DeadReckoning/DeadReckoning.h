@@ -28,4 +28,5 @@ public:
 	void UpdateTime(float dt);
 	void Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id);
 	void Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction);
+	void reset();
 };
