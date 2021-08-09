@@ -52,28 +52,28 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	if (AEInputCheckCurr(AEVK_UP))
 	{
 		PlayerMoveForward(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
+		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_DOWN))
 	{
 		PlayerMoveBackwards(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
+		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_LEFT))
 	{
 		PlayerRotateLeft(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
+		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
 	if (AEInputCheckCurr(AEVK_RIGHT))
 	{
 		PlayerRotateRight(myShip->shipComp.sShipID);
-		//clientManager->UpdateState(myShip->shipComp.sShipState);
+		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
 
-	if (AEInputCheckTriggered(AEVK_UP))
+	/*if (AEInputCheckTriggered(AEVK_UP))
 	{
 		clientManager->UpdateState(myShip->shipComp.sShipState);
 	}
@@ -115,7 +115,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 	{
 		myShip->shipComp.sShipState = ShipState::NOTHING;
 		clientManager->UpdateState(myShip->shipComp.sShipState);
-	}
+	}*/
 
 	// Shoot a bullet if space is triggered (Create a new object instance)
 	if (AEInputCheckTriggered(AEVK_SPACE))
