@@ -255,11 +255,12 @@ int Client::SendAllClient(std::string message)
 
 void Client::UpdateState()
 {
+	if (lock) return;
 	// send lock
 	std::string actual = PackOwnData();
 	std::string hash = lockStepManager.HashInput(actual);
 
-		// tell all clients to lock and send a hash input
+	// tell all clients to lock and send a hash input
 	std::vector<std::string> info;
 	info.push_back(hash);
 	SendAllClient(Parser::CreateHeader("[LOCK]", MyInfo.name, MyInfo.port, info));
@@ -268,9 +269,12 @@ void Client::UpdateState()
 	std::unordered_map<ShipID, std::string> hashStrings;
 	while (hashStrings.size() != clients.size())
 	{
+		std::cout << hashStrings.size() << " " << clients.size() << std::endl;
 		std::string message;
 		if (ReceiveClient(message) <= 0) continue;
-		hashStrings.insert(HandleLockStepMessage(message));
+		std::pair<ShipID, std::string> pair;
+		if (HandleLockStepMessage(pair, message))
+			hashStrings.insert(pair);
 	}
 
 	// send actual
@@ -284,7 +288,9 @@ void Client::UpdateState()
 	{
 		std::string message;
 		if (ReceiveClient(message) <= 0) continue;
-		lockedStrings.insert(HandleLockStepMessage(message));
+		std::pair<ShipID, std::string> pair;
+		if (HandleLockStepMessage(pair, message))
+			lockedStrings.insert(pair);
 	}
 
 	// compare hash
@@ -365,6 +371,8 @@ void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 		info->state = static_cast<ShipState>(std::stoi(params[8]));
 		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 	}
+
+	lock = false;
 }
 
 std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
@@ -609,66 +617,6 @@ void Client::HandleRecvMessage(std::string message)
 	else if (header == "[LOCK]")
 	{
 		RecvUpdateState(info, params[0]);
-		/*info->recvhashString = params[0];
-		std::cout << "Retrieved the hash from client" << std::endl;
-
-		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-		std::vector<std::string> _paramz = PackData(MyInfo.id, it->second);
-		_paramz.push_back(std::to_string(static_cast<int>(MyInfo.state)));
-
-		std::string input;
-		for (auto string : _paramz)
-		{
-			input += string + "\n";
-		}
-
-		std::cout << "Sending hash input back" << std::endl;
-		 send hash input
-		std::string hash = lockStepManager.HashInput(input);
-		std::vector<std::string> ownInfo;
-		ownInfo.push_back(hash);
-		hash = Parser::CreateHeader("[HASHED]", MyInfo.name, MyInfo.port, ownInfo);
-		SendClient(&info->sock, hash);
-
-		 receive actual input from client
-		std::string _message;
-		std::cout << "Retrieving actual input" << std::endl;
-		while (info->recvlockedState.empty())
-		{
-			if (ReceiveClient(_message) > 0)
-				info->recvlockedState = _message;
-		}
-		std::cout << "Successfully Received\n" << _message << std::endl;
-
-		ownInfo.pop_back();
-		ownInfo.push_back(input);
-		std::string temp = Parser::CreateHeader("[UNLOCKED]", MyInfo.name, MyInfo.port, ownInfo);
-		SendClient(&info->sock, temp);
-
-		if (lockStepManager.CompareInput(_message, info->recvhashString))
-		{
-			std::vector<std::string> _params = Parser::GetPayload(_message);
-			std::cout << "NO HAX" << std::endl;
-			int playerID = std::stoi(_params[0]);
-			AEVec2 Position;
-			AEVec2 Velocity;
-			AEVec2 Acceleration;
-			float direction;
-			Position.x = std::stof(_params[1]);
-			Position.y = std::stof(_params[2]);
-			Velocity.x = std::stof(_params[3]);
-			Velocity.y = std::stof(_params[4]);
-			Acceleration.x = std::stof(_params[5]);
-			Acceleration.y = std::stof(_params[6]);
-			direction = std::stof(_params[7]);
-
-			info->state = static_cast<ShipState>(std::stoi(_params[8]));
-			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-		}
-		else
-		{
-			std::cout << "HAX" << std::endl;
-		}*/
 	}
 	else if (header == "[HASHED]")
 	{
@@ -709,7 +657,7 @@ void Client::HandleRecvMessage(std::string message)
 	}
 }
 
-std::pair<ShipID, std::string> Client::HandleLockStepMessage(std::string message)
+bool Client::HandleLockStepMessage(std::pair<ShipID, std::string>& pair, std::string message)
 {
 	std::string header;
 	std::vector<std::string> params = Parser::GetHeader(message, header);
@@ -721,11 +669,15 @@ std::pair<ShipID, std::string> Client::HandleLockStepMessage(std::string message
 	if (header == "[HASHED]")
 	{
 		ShipID id = info->id;
-		return std::make_pair(id, Parser::VectorToString(params));
+		pair = std::make_pair(id, Parser::VectorToString(params));
+		return true;
 	}
 	else if (header == "[ACTUAL]")
 	{
 		ShipID id = static_cast<ShipID>(std::stoi(params[0]));
-		return std::make_pair(id, Parser::VectorToString(params));
+		pair = std::make_pair(id, Parser::VectorToString(params));
+		return true;
 	}
+
+	return false;
 }
