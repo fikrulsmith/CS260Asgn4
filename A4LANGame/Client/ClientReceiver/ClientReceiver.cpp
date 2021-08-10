@@ -1,7 +1,31 @@
+/******************************************************************************/
+/*!
+\file ClientReceiver.cpp
+\author Ong Guan Hin
+\par email: guanhin.ong\@digipen.edu
+\par DigiPen login: guanhin.ong
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation receiving for client
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "Global.h"
 #include "ClientReceiver.h"
 
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+\brief Initialite DR base values
+\param Position
+\param Velocity
+\param Acceleration
+\param direction
+\return bytesReceived
+*/
+/******************************************************************************/
 int ClientReceiver::RecvFromSocket(SOCKET serverSocket, std::string& message)
 {
 	sockaddr clientAddress;

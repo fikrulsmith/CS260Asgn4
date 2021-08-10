@@ -1,6 +1,29 @@
+/******************************************************************************/
+/*!
+\file DeadReckoning.cpp
+\author Ong Guan Hin
+\par email: guanhin.ong\@digipen.edu
+\par DigiPen login: guanhin.ong
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the dead reckoning algorithm
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "DeadReckoning.h"
 #include "Global.h"
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
+\brief Initialite DR base values
+\param Position
+\param Velocity
+\param Acceleration
+\param direction
+*/
+/******************************************************************************/
 void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
 {
 	LastKnownPosition = Position;
@@ -9,6 +32,16 @@ void DeadReckoning::Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, 
 	Mydirection = direction;
 	isInit = true;
 }
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt)
+\brief predict DR for first frame
+\param UpdatePosition
+\param UpdateVelocity
+\param direction
+\param dt
+*/
+/******************************************************************************/
 void DeadReckoning::Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt)
 {
 	UpdatePosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));
@@ -18,7 +51,13 @@ void DeadReckoning::Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, floa
 	CurrentVelocity = UpdateVelocity;
 	direction = Mydirection;
 }
-
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::UpdateTime(float dt)
+\brief Update timeelapsed for DR
+\param dt
+*/
+/******************************************************************************/
 void DeadReckoning::UpdateTime(float dt)
 {
 	if (!isInit)
@@ -26,7 +65,16 @@ void DeadReckoning::UpdateTime(float dt)
 
 	TimeelapsedsinceUpdate += dt;
 }
-
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction)
+\brief update DR after receiving a packet
+\param LKPosition
+\param LKVelocity
+\param LKAcceleration
+\param direction
+*/
+/******************************************************************************/
 void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction)
 {
 	OldPosition = CurrentPosition;
@@ -39,7 +87,15 @@ void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 
 	if (isInit)
 		extrapolating = true;
 }
-
+/******************************************************************************/
+/*!
+\fn DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction)
+\brief snaps in case interpolation doesn't work
+\param UpdatePosition
+\param UpdateVelocity
+\param direction
+*/
+/******************************************************************************/
 void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction)
 {
 	OldPosition = LastKnownPosition;
@@ -48,7 +104,12 @@ void DeadReckoning::Snap(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& 
 	UpdateVelocity = OldVelocity;
 	direction = Mydirection;
 }
-
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::reset()
+\brief resets DR
+*/
+/******************************************************************************/
 void DeadReckoning::reset()
 {
 	OldPosition = { 0,0 };
@@ -71,7 +132,17 @@ void DeadReckoning::reset()
 	RotLeft = false;
 	RotRight = false;
 }
-
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
+\brief does DR correction after 2nd update
+\param UpdatePosition
+\param UpdateVelocity
+\param direction
+\param dt
+\param id
+*/
+/******************************************************************************/
 void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
 {
 	AEVec2 VelocityBlend;
@@ -182,7 +253,17 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 	CurrentVelocity = VelocityBlend;
 	direction = Mydirection;
 }
-
+/******************************************************************************/
+/*!
+\fn void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
+\brief determine predict or correction
+\param UpdatePosition
+\param UpdateVelocity
+\param direction
+\param dt
+\param id
+*/
+/******************************************************************************/
 void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
 {
 	if (!isInit)
