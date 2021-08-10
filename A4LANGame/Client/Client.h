@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*!
+\file Client.h
+\author Wong Swee Jong Nico
+\par email: s.wong\@digipen.edu
+\par DigiPen login: s.wong
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the functionality of a client
+*/
+/******************************************************************************/
+
 #pragma once
 #include "ClientSender/ClientSender.h"
 #include "ClientReceiver/ClientReceiver.h"
@@ -14,16 +28,9 @@ class Client
 	ClientInfo MyInfo;
 	SOCKET MySocket;
 	LockStep lockStepManager;
-	
 
 	int InitWSA();
 	int InitialiseClientMember(ClientInfo& client);
-
-	void UpdateHash();
-	bool CheckAllHash();
-	bool AllHashUpdated();
-	bool AllLocked();
-	void ResetHash();
 
 	std::string PackOwnData();
 public:
@@ -49,7 +56,6 @@ public:
 	bool GetClientReadyCheck();
 	ClientInfo* GetOwnInfo();
 
-	bool CreatePlayer(SOCKET socket);
 	size_t GetClientByID(ShipID entity);
 	size_t GetNumberOfClients();
 
@@ -66,12 +72,6 @@ public:
 	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
 	void AllDeadReckoningCorrection(float dt);
 
-	std::string GetOwnPort()
-	{
-		return MyInfo.port;
-	}
-	
 	void HandleRecvMessage(std::string message);
 	bool HandleLockStepMessage(std::pair<ShipID, std::string>& pair, std::string message);
-	void SendUpdatePacket(ShipID id);
 };

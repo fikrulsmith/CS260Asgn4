@@ -1,12 +1,19 @@
+/******************************************************************************/
+/*!
+\file Client.cpp
+\author Wong Swee Jong Nico
+\par email: s.wong\@digipen.edu
+\par DigiPen login: s.wong
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the functionality of a client
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "Global.h"
 #include "Client.h"
-
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
 
 int Client::InitWSA()
 {
@@ -208,18 +215,6 @@ bool Client::GetClientReadyCheck()
 ClientInfo* Client::GetOwnInfo()
 {
 	return &MyInfo;
-}
-
-/*****************************************************************
-
-					NEEDS TO BE DONE!!!!
-
-******************************************************************/
-bool Client::CreatePlayer(SOCKET socket)
-{
-	// call fik's function to get pointer
-	// playerEntity 
-	return true;
 }
 
 size_t Client::GetClientByID(ShipID entity)
@@ -458,67 +453,6 @@ int Client::InitialiseClientMember(ClientInfo& client)
 
 	return 200;
 }
-void Client::UpdateHash()
-{
-	while (!AllHashUpdated())
-	{
-		std::string message;
-		ReceiveClient(message);
-		HandleRecvMessage(message);
-	}
-}
-bool Client::CheckAllHash()
-{
-	while (!AllLocked())
-	{
-		std::string message;
-		const int bytesReceived = ReceiveClient(message);
-		if (bytesReceived == 0 || bytesReceived == SOCKET_ERROR) continue;
-		HandleRecvMessage(message);
-	}
-
-	for (auto client : clients)
-	{
-		if (lockStepManager.HashInput(client.sendlockedState) != client.sendhashString)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-bool Client::AllHashUpdated()
-{
-	for (auto client : clients)
-	{
-		if (client.sendhashString.empty())
-			return false;
-	}
-
-	return true;
-}
-
-bool Client::AllLocked()
-{
-	for (auto client : clients)
-	{
-		if (client.sendlockedState.empty())
-			return false;
-	}
-
-	return true;
-}
-
-void Client::ResetHash()
-{
-	for (auto& client : clients)
-	{
-		client.recvhashString.clear();
-		client.recvlockedState.clear();
-		client.sendhashString.clear();
-		client.sendlockedState.clear();
-	}
-}
 
 std::string Client::PackOwnData()
 {
@@ -555,21 +489,6 @@ void Client::AllDeadReckoningCorrection(float dt)
 	}
 }
 
-void Client::SendUpdatePacket(ShipID id)
-{
-
-	std::vector<std::string> params;
-	params.push_back(std::to_string(static_cast<int>(id)));
-	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.x));
-	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->posCurr.y));
-	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.x));
-	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->velCurr.y));
-	params.push_back(std::to_string(40.0f));
-	params.push_back(std::to_string(40.0f));
-	params.push_back(std::to_string(GSManager->GetAsteroidGameState().IDToPlayerShip_[id]->dirCurr));
-
-	//SendAllClient(Parser::CreateHeader("[UPDATE]", params));
-}
 void Client::createDeadReckoning(ShipID id)
 {
 	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
