@@ -537,7 +537,7 @@ std::string Client::PackOwnData()
 
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
-	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction, dt);
+	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction);
 }
 
 void Client::AllDeadReckoningCorrection(float dt)

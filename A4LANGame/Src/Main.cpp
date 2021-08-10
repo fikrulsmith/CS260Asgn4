@@ -89,7 +89,8 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			if ((AESysDoesWindowExist() == false) || AEInputCheckTriggered(AEVK_ESCAPE))
 			{
 				GSManager->SetGameStateNextIndex(GS_QUIT);
-				clientManager->SendAllClient("[QUIT]");
+				ClientInfo* info = clientManager->GetOwnInfo();
+				clientManager->SendAllClient(Parser::CreateHeader("[QUIT]", info->name, info->port, std::vector<std::string>{}));
 			}
 
 			g_dt = (f32)AEFrameRateControllerGetFrameTime();
