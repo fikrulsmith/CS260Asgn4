@@ -33,9 +33,7 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 	{
 		ClientInfo* info = clientManager->GetOwnInfo();
 		info->readyCheck = true;
-		std::vector<std::string> ownInfo;
-		ownInfo.push_back(std::to_string(static_cast<int>(info->id)));
-		std::string message = Parser::CreateHeader("[READY]", info->name, info->port, ownInfo);
+		std::string message = Parser::CreateHeader("[READY]", info->name, info->port, std::vector<std::string>{});
 		clientManager->SendAllClient(message);
 	}
 

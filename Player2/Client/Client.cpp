@@ -58,9 +58,9 @@ int Client::InitMyInfo(std::string name, std::string port)
 	}
 
 	MySocket = socket(
-		AF_INET,
-		SOCK_DGRAM,
-		IPPROTO_UDP);
+		hints.ai_family,
+		hints.ai_socktype,
+		hints.ai_protocol);
 	if (MySocket == INVALID_SOCKET)
 	{
 		std::cerr << "socket() failed." << std::endl;
@@ -278,7 +278,7 @@ void Client::UpdateState(ShipState state)
 	UpdateHash();
 
 	// send the actual input
-	SendAllClient(Parser::CreateHeader("[UNLOCK]", MyInfo.name, MyInfo.port, params));
+	SendAllClient(message);
 
 	if (CheckAllHash())
 	{
@@ -287,7 +287,6 @@ void Client::UpdateState(ShipState state)
 		{
 			std::vector<std::string> params = Parser::GetPayload(client.lockedState);
 			int playerID = std::stoi(params[0]);
-			std::cout << playerID << std::endl;
 			AEVec2 Position;
 			AEVec2 Velocity;
 			AEVec2 Acceleration;
@@ -305,8 +304,29 @@ void Client::UpdateState(ShipState state)
 		}
 	}
 	else
+	{
+		for (auto& client : clients)
+		{
+			std::vector<std::string> params = Parser::GetPayload(client.lockedState);
+			int playerID = std::stoi(params[0]);
+			AEVec2 Position;
+			AEVec2 Velocity;
+			AEVec2 Acceleration;
+			float direction;
+			Position.x = std::stof(params[1]);
+			Position.y = std::stof(params[2]);
+			Velocity.x = std::stof(params[3]);
+			Velocity.y = std::stof(params[4]);
+			Acceleration.x = std::stof(params[5]);
+			Acceleration.y = std::stof(params[6]);
+			direction = std::stof(params[7]);
+
+			client.state = static_cast<ShipState>(std::stoi(params[8]));
+			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+		}
 		std::cout << "CHEATERSSSSS!!!" << std::endl;
-	std::cout << "FAIL6" << std::endl;
+	}
+
 	ResetHash();
 }
 
@@ -399,6 +419,7 @@ void Client::UpdateHash()
 {
 	while (!AllHashUpdated())
 	{
+		std::cout << "stuck" << std::endl;
 		std::string message;
 		ReceiveClient(message);
 		HandleRecvMessage(message);
@@ -408,6 +429,7 @@ bool Client::CheckAllHash()
 {
 	while (!AllLocked())
 	{
+		std::cout << "stuck" << std::endl;
 		std::string message;
 		const int bytesReceived = ReceiveClient(message);
 		if (bytesReceived == 0 || bytesReceived == SOCKET_ERROR) continue;
@@ -418,8 +440,6 @@ bool Client::CheckAllHash()
 	{
 		if (lockStepManager.HashInput(client.lockedState) != client.hashString)
 		{
-			std::cout << lockStepManager.HashInput(client.lockedState) << std::endl;
-			std::cout << client.hashString << std::endl;
 			return false;
 		}
 	}
@@ -450,7 +470,7 @@ bool Client::AllLocked()
 
 void Client::ResetHash()
 {
-	for (auto client : clients)
+	for (auto& client : clients)
 	{
 		client.hashString.clear();
 		client.lockedState.clear();
@@ -553,15 +573,15 @@ void Client::HandleRecvMessage(std::string message)
 		std::vector<std::string> ownInfo;
 		ownInfo.push_back(hash);
 		hash = Parser::CreateHeader("[HASHED]", MyInfo.name, MyInfo.port, ownInfo);
-		SendClient(&MyInfo.sock, hash);
+		SendClient(&info->sock, hash);
 
 		// receive actual input from client
 		std::string _message;
 		std::cout << "Retrieving actual input" << std::endl;
 		while (info->lockedState.empty())
 		{
-			ReceiveClient(_message);
-			HandleRecvMessage(_message);
+			if (ReceiveClient(_message) > 0)
+				info->lockedState = _message;
 		}
 		std::cout << "Successfully Received\n" << _message << std::endl;
 
@@ -570,7 +590,6 @@ void Client::HandleRecvMessage(std::string message)
 		std::string temp = Parser::CreateHeader("[UNLOCKED]", MyInfo.name, MyInfo.port, ownInfo);
 		SendClient(&info->sock, temp);
 
-		std::cout << "Comparing input" << std::endl;
 		if (lockStepManager.CompareInput(_message, info->hashString))
 		{
 			std::vector<std::string> _params = Parser::GetPayload(_message);
@@ -592,7 +611,11 @@ void Client::HandleRecvMessage(std::string message)
 			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 		}
 		else
+		{
 			std::cout << "HAX" << std::endl;
+		}
+
+		clientManager->ResetHash();
 	}
 	else if (header == "[HASHED]")
 	{
@@ -615,10 +638,13 @@ void Client::HandleRecvMessage(std::string message)
 	}
 	else if (header == "[UNLOCKED]")
 	{
-		ClientInfo* clientInfo = GetClientByName(params[0], params[1]);
-		if (!clientInfo) return;
+		std::string locked;
+		for (auto string : params)
+		{
+			locked += string + "\n";
+		}
 
-		clientInfo->lockedState = params[2];
+		info->lockedState = locked;
 	}
 	else if (header == "[RESTART]")
 	{
