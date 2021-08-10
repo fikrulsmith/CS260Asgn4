@@ -14,7 +14,12 @@ creation and destruction of game objects.
 /******************************************************************************/
 #include "pch.h"
 #include "main.h"
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameSystemUpdate()
+\brief Update the function pointers for the game state
+*/
+/******************************************************************************/
 void GameStateManager::GameSystemUpdate()
 {
 	if ((gGameStateCurr == GS_RESTART) || (gGameStateCurr == GS_QUIT))
@@ -54,7 +59,13 @@ void GameStateManager::GameSystemUpdate()
 		AE_FATAL_ERROR("invalid state!!");
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::Init(unsigned int gameStateInit)
+\brief Initialite game state
+\param gameStateInit
+*/
+/******************************************************************************/
 void GameStateManager::Init(unsigned int gameStateInit)
 {
 	// set the initial game state
@@ -68,37 +79,72 @@ void GameStateManager::Init(unsigned int gameStateInit)
 	// call the update to set the function pointers
 	GameSystemUpdate();
 }
-
+/******************************************************************************/
+/*!
+\fn GameStateManager::GameStateLoad()
+\brief Load current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateLoad()
 {
 	GS_FunctionMap_[GameSystemType::LOAD]();
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameStateInit()
+\brief Initialize current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateInit()
 {
 	GS_FunctionMap_[GameSystemType::INIT]();
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameStateUpdate()
+\brief Update current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateUpdate()
 {
 	GS_FunctionMap_[GameSystemType::UPDATE]();
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameStateDraw()
+\brief Draw current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateDraw()
 {
 	GS_FunctionMap_[GameSystemType::DRAW]();
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameStateFree()
+\brief Free current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateFree()
 {
 	GS_FunctionMap_[GameSystemType::FREE]();
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::GameStateUnload()
+\brief Unload current game state
+*/
+/******************************************************************************/
 void GameStateManager::GameStateUnload()
 {
 	GS_FunctionMap_[GameSystemType::UNLOAD]();
 }
-
+/******************************************************************************/
+/*!
+\fn unsigned int GameStateManager::GetGameStateInitIndex() const
+\brief Unload current game state
+*/
+/******************************************************************************/
 unsigned int GameStateManager::GetGameStateInitIndex() const
 {
 	return gGameStateInit;
