@@ -68,14 +68,14 @@ void DeadReckoning::reset()
 	isInit = false;
 }
 
-void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
+void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt,ShipID id)
 {
 	AEVec2 VelocityBlend;
 	AEVec2 Pt;
 	AEVec2 PtPrime;
 	AEVec2 FinalPosition;
 
-	AEVec2 Added{ 0,0 };
+	AEVec2 Added{0,0};
 	if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGLEFT)
 	{
 		Mydirection += (2.0f * PI) *
@@ -119,7 +119,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 	direction = Mydirection;
 }
 
-void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
+void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt,ShipID id)
 {
 	if (!isInit)
 		return;
@@ -127,5 +127,5 @@ void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& d
 	if (!extrapolating)
 		Predict(UpdatePosition, UpdateVelocity, direction, dt);
 	else
-		Correction(UpdatePosition, UpdateVelocity, direction, dt, id);
+		Correction(UpdatePosition, UpdateVelocity, direction, dt,id);
 }

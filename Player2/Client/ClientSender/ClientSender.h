@@ -3,9 +3,8 @@
 class ClientSender
 {
 public:
-	int SendClient(ClientInfo& info, std::string message);
-	int RecvClient(ClientInfo& info, std::string& message);
+	int SendClient(SOCKET serverSocket, sockaddr* sock, std::string message);
 
-	int SendCommand(ClientInfo& info, std::string command);
-	int SendPacket(ClientInfo& info, std::string packet);
+	int SendCommand(SOCKET serverSocket, ClientInfo& info, std::string command);
+	int SendPacket(SOCKET serverSocket, ClientInfo& info, std::string packet);
 };

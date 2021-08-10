@@ -4,6 +4,5 @@
 class ClientReceiver
 {
 public:
-	int SendClient(ClientInfo info, std::string message);
-	int RecvClient(ClientInfo info, std::string& message);
+	int RecvFromSocket(SOCKET serverSocket, std::string& message);
 };

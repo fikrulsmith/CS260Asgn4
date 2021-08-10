@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
 	// Changing the window title
 	//AESysSetWindowTitle("CS260 Asteroids");
-	AESysSetWindowTitle("2");
+	AESysSetWindowTitle("1");
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 
@@ -40,14 +40,12 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	Parser::GetAllPairsOfHostnameAndPorts(std::string{ command_line }, vec);
 
 	clientManager = std::make_unique<Client>();
+
 	GSManager = std::make_unique<GameStateManager>();
 	clientManager->InitialiseClient(vec);
-	/*if (client.GetOwnPort() == "2048")
-		client.SendClient();
-	else
-		client.ReceiveClient();*/
 
 	GSManager->Init(GS_MAINMENU);
+
 	while(GSManager->GetGameStateCurrIndex() != GS_QUIT)
 	{
 		// reset the system modules
@@ -74,7 +72,9 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			if (GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
 				clientManager->UpdateAllDeadReckoningDT(g_dt);
 
-			clientManager->ReceiveAllClient();
+			std::string message;
+			clientManager->ReceiveClient(message);
+			clientManager->HandleRecvMessage(message);
 
 			if(GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
 				clientManager->AllDeadReckoningCorrection(g_dt);

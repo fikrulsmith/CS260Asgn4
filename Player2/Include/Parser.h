@@ -8,7 +8,7 @@ public:
 
 // PACKETS
 	static std::string CreatePacket(std::string header, std::string payload);
-	static std::string CreateHeader(std::string headerCommand, std::vector<std::string> params);
+	static std::string CreateHeader(std::string headerCommand, std::string name, std::string port, std::vector<std::string> params);
 
 	static std::vector<std::string> GetHeader(std::string input, std::string& headerCommand);
 	static std::string GetPacket(std::string input, std::string& headerCommand);

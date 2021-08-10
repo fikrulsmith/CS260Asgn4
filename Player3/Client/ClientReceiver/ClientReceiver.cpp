@@ -2,34 +2,17 @@
 #include "Global.h"
 #include "ClientReceiver.h"
 
-int ClientReceiver::SendClient(ClientInfo info, std::string message)
+int ClientReceiver::RecvFromSocket(SOCKET serverSocket, std::string& message)
 {
-	int bytesSend = sendto(info.socket, message.c_str(),
-		static_cast<int>(message.length()), 0, info.addr->ai_addr, sizeof(*info.addr->ai_addr));
+	sockaddr clientAddress;
+	SecureZeroMemory(&clientAddress, sizeof(clientAddress));
 
-	if (bytesSend == SOCKET_ERROR)
-	{
-		size_t errorCode = WSAGetLastError();
-		std::cout << errorCode << std::endl;
-		std::cerr << "send failed" << std::endl;
-		return bytesSend;
-	}
-
-	return bytesSend;
-}
-
-int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
-{
-	const size_t BUFFER_SIZE = 10000;
+	constexpr size_t BUFFER_SIZE = 500;
 	char buffer[BUFFER_SIZE];
 
-	/*int serverAddressSize = sizeof(*info.addr->ai_addr);*/
-	/*const int bytesReceived = recvfrom(info.socket, buffer, BUFFER_SIZE - 1, 0, info.addr->ai_addr, &serverAddressSize);*/
-
-	sockaddr clientAddress{};
-	SecureZeroMemory(&clientAddress, sizeof(clientAddress));
 	int clientAddressSize = sizeof(clientAddress);
-	const int bytesReceived = recvfrom(info.socket,
+
+	const int bytesReceived = recvfrom(serverSocket,
 		buffer,
 		BUFFER_SIZE - 1,
 		0,
@@ -41,15 +24,12 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 		size_t errorCode = WSAGetLastError();
 		if (errorCode == WSAEWOULDBLOCK)
 		{
-			// A non-blocking call returned no data; sleep and try again.
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(0ms);
-			//std::cerr << "trying again..." << std::endl;
-			return -1;
+			return 0;
 		}
 		else
 		{
 			std::cerr << "recv()from failed." << std::endl;
+			return -1;
 		}
 	}
 
@@ -59,11 +39,13 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 		return 0;
 	}
 
-	buffer[bytesReceived] = '\0';
+	if (bytesReceived > BUFFER_SIZE)
+		buffer[BUFFER_SIZE - 1] = '\0';
+	else
+		buffer[bytesReceived] = '\0';
+	
 	message.clear();
 	message.append(buffer, bytesReceived);
-
-	std::cout << "RECV from " << info.port << ": " << message << std::endl;
 
 	return bytesReceived;
 }
