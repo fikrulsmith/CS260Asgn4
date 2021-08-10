@@ -35,12 +35,9 @@ int ClientSender::SendClient(SOCKET serverSocket, sockaddr* sock, std::string me
 	if (bytesSend == SOCKET_ERROR)
 	{
 		size_t errorCode = WSAGetLastError();
-		std::cout << errorCode << std::endl;
 		std::cerr << "send failed" << std::endl;
-		return bytesSend;
+		return errorCode;
 	}
 
-	std::cout << "SENDING: \n" << message << std::endl;
-	std::cout << std::endl;
 	return bytesSend;
 }

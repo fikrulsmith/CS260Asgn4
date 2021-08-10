@@ -416,7 +416,6 @@ void Client::UpdateState()
 		size_t index = GetClientByID(static_cast<ShipID>(i));
 		ClientInfo* info = GetClient(index);
 		info->state = static_cast<ShipState>(std::stoi(params[8]));
-		std::cout << "CHANGING STATE AH: " << static_cast<int>(info->state) << std::endl;
 		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 	}
 }
