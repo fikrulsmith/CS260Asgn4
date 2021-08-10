@@ -298,7 +298,7 @@ size_t Client::GetClientByID(ShipID entity)
 			return i;
 	}
 
-	return -1;
+	return static_cast<size_t>(-1);
 }
 
 /******************************************************************************/
@@ -414,9 +414,9 @@ void Client::UpdateState()
 		direction = std::stof(params[7]);
 
 		size_t index = GetClientByID(static_cast<ShipID>(i));
-		ClientInfo* info = GetClient(index);
-		info->state = static_cast<ShipState>(std::stoi(params[8]));
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+		ClientInfo* info2 = GetClient(index);
+		info2->state = static_cast<ShipState>(std::stoi(params[8]));
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction);
 	}
 }
 
@@ -452,7 +452,8 @@ void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 
 		if (!message.empty())
 		{
-			std::vector<std::string> params = Parser::GetHeader(message, std::string{});
+			std::string temp;
+			std::vector<std::string> params = Parser::GetHeader(message, temp);
 			params.erase(params.begin()); // erase name
 			params.erase(params.begin()); // erase port
 			lockString = Parser::VectorToString(params);
@@ -478,7 +479,7 @@ void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 		direction = std::stof(params[7]);
 
 		info->state = static_cast<ShipState>(std::stoi(params[8]));
-		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction);
 	}
 
 	lock = false;
@@ -490,13 +491,11 @@ void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 
 \param id
 
-\param obj
-
 \return
 	Returns a vector of string of the data
 */
 /******************************************************************************/
-std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
+std::vector<std::string> Client::PackData(ShipID id)
 {
 	std::vector<std::string> params;
 	params.push_back(std::to_string(static_cast<int>(id)));
@@ -637,7 +636,7 @@ int Client::InitialiseClientMember(ClientInfo& client)
 std::string Client::PackOwnData()
 {
 	auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-	std::vector<std::string> param = PackData(MyInfo.id, it->second);
+	std::vector<std::string> param = PackData(MyInfo.id);
 	param.push_back(std::to_string(static_cast<int>(MyInfo.state)));
 
 	std::string actual;
@@ -662,11 +661,9 @@ std::string Client::PackOwnData()
 \param Acceleration
 
 \param direction
-
-\param dt
 */
 /******************************************************************************/
-void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
+void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction)
 {
 	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction);
 }
@@ -746,9 +743,9 @@ void Client::HandleRecvMessage(std::string message)
 		// send back a ready ready command
 		std::vector<std::string> paramsToSend;
 		paramsToSend.push_back(std::to_string(MyInfo.readyCheck));
-		std::string message = Parser::CreateHeader("[READYREADY]", MyInfo.name, MyInfo.port, paramsToSend);
+		std::string packet = Parser::CreateHeader("[READYREADY]", MyInfo.name, MyInfo.port, paramsToSend);
 
-		SendClient(&info->sock, message);
+		SendClient(&info->sock, packet);
 	}
 	else if (header == "[READYREADY]")
 	{
@@ -761,11 +758,11 @@ void Client::HandleRecvMessage(std::string message)
 	else if (header == "[UNLOCK]")
 	{
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
-		std::vector<std::string> params = PackData(MyInfo.id, it->second);
-		params.push_back(std::to_string(static_cast<int>(MyInfo.state)));
+		std::vector<std::string> paramz = PackData(MyInfo.id);
+		paramz.push_back(std::to_string(static_cast<int>(MyInfo.state)));
 
 		std::string _message;
-		for (auto string : params)
+		for (auto string : paramz)
 		{
 			_message += string + "\n";
 		}

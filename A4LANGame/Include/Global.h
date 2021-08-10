@@ -127,6 +127,6 @@ struct ClientInfo
 
 	bool readyCheck = false;
 
-	ShipID id;
+	ShipID id = ShipID::UNASSIGNED;
 	ShipState state = ShipState::NOTHING;
 };

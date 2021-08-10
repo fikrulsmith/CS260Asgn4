@@ -8,7 +8,8 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>127.0.0.1:2051 127.0.0.1:2048</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>127.0.0.1:2050 127.0.0.1:2051 127.0.0.1:2048 127.0.0.1:2049</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand>C:\Users\nico\Desktop\Digipen\CS260Asgn4\Bin\CS260_Asteroids.exe</LocalDebuggerCommand>
   </PropertyGroup>
 </Project>

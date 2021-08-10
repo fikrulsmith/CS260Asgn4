@@ -35,7 +35,7 @@ class Client
 	std::string PackOwnData();
 public:
 	bool lock = false;
-	const size_t DOES_NOT_EXIST = -1; 
+	const size_t DOES_NOT_EXIST = static_cast<size_t>(-1); 
 	const int OK = 200;
 	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
@@ -65,11 +65,11 @@ public:
 	int ReceiveClient(std::string& message);
 	void UpdateState();
 	void RecvUpdateState(ClientInfo* info, std::string hash);
-	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
+	std::vector<std::string> PackData(ShipID id);
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
 	void AllDeadReckoningCorrection(float dt);
 
 	void HandleRecvMessage(std::string message);
