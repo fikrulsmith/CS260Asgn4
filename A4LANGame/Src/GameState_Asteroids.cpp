@@ -115,7 +115,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		if (AEInputCheckTriggered(AEVK_SPACE))
 		{
 			PlayerShoot(myShip->shipComp.sShipID);
-			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->GetOwnInfo()->state = ShipState::SHOOTING;
 			clientManager->UpdateState();
 		}
 

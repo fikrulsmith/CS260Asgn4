@@ -56,7 +56,7 @@ int ClientReceiver::RecvFromSocket(SOCKET serverSocket, std::string& message)
 	}
 
 	std::cout << "RECV: \n" << message << std::endl;
-	std::cout << bytesReceived << std::endl;
+	std::cout << std::endl;
 
 	return bytesReceived;
 }

@@ -12,7 +12,7 @@ static bool			onValueChange = true;
 // object flag definition
 const unsigned long FLAG_ACTIVE = 0x00000001;
 // MAX SCORE
-const unsigned long MAX_SCORE = 300;
+const unsigned long MAX_SCORE = 300000;
 
 enum TYPE
 {
@@ -123,5 +123,5 @@ struct ClientInfo
 	bool readyCheck = false;
 
 	ShipID id;
-	ShipState state;
+	ShipState state = ShipState::NOTHING;
 };

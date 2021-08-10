@@ -269,7 +269,6 @@ void Client::UpdateState()
 	std::unordered_map<ShipID, std::string> hashStrings;
 	while (hashStrings.size() != clients.size())
 	{
-		std::cout << hashStrings.size() << " " << clients.size() << std::endl;
 		std::string message;
 		if (ReceiveClient(message) <= 0) continue;
 		std::pair<ShipID, std::string> pair;
@@ -296,27 +295,26 @@ void Client::UpdateState()
 	// compare hash
 	for (size_t i = 0; i < lockedStrings.size(); i++)
 	{
-		if (lockStepManager.CompareInput(lockedStrings[static_cast<ShipID>(i)], hashStrings[static_cast<ShipID>(i)]))
-		{
-			std::vector<std::string> params = Parser::GetPayload(lockedStrings[static_cast<ShipID>(i)]);
-			int playerID = std::stoi(params[0]);
-			AEVec2 Position;
-			AEVec2 Velocity;
-			AEVec2 Acceleration;
-			float direction;
-			Position.x = std::stof(params[1]);
-			Position.y = std::stof(params[2]);
-			Velocity.x = std::stof(params[3]);
-			Velocity.y = std::stof(params[4]);
-			Acceleration.x = std::stof(params[5]);
-			Acceleration.y = std::stof(params[6]);
-			direction = std::stof(params[7]);
+		std::vector<std::string> params = Parser::GetPayload(lockedStrings[static_cast<ShipID>(i)]);
+		if (params.size() < 9) continue;
+		int playerID = std::stoi(params[0]);
+		AEVec2 Position;
+		AEVec2 Velocity;
+		AEVec2 Acceleration;
+		float direction;
+		Position.x = std::stof(params[1]);
+		Position.y = std::stof(params[2]);
+		Velocity.x = std::stof(params[3]);
+		Velocity.y = std::stof(params[4]);
+		Acceleration.x = std::stof(params[5]);
+		Acceleration.y = std::stof(params[6]);
+		direction = std::stof(params[7]);
 
-			size_t index = GetClientByID(static_cast<ShipID>(i));
-			ClientInfo* info = GetClient(index);
-			info->state = static_cast<ShipState>(std::stoi(params[8]));
-			UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
-		}
+		size_t index = GetClientByID(static_cast<ShipID>(i));
+		ClientInfo* info = GetClient(index);
+		info->state = static_cast<ShipState>(std::stoi(params[8]));
+		std::cout << "CHANGING STATE AH: " << static_cast<int>(info->state) << std::endl;
+		UpdateDeadReckoning(static_cast<ShipID>(playerID), Position, Velocity, Acceleration, direction, g_dt);
 	}
 }
 
@@ -464,7 +462,6 @@ void Client::UpdateHash()
 {
 	while (!AllHashUpdated())
 	{
-		std::cout << "stuck" << std::endl;
 		std::string message;
 		ReceiveClient(message);
 		HandleRecvMessage(message);
@@ -474,7 +471,6 @@ bool Client::CheckAllHash()
 {
 	while (!AllLocked())
 	{
-		std::cout << "stuck" << std::endl;
 		std::string message;
 		const int bytesReceived = ReceiveClient(message);
 		if (bytesReceived == 0 || bytesReceived == SOCKET_ERROR) continue;
