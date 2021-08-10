@@ -16,6 +16,7 @@ int ClientSender::SendClient(SOCKET serverSocket, sockaddr* sock, std::string me
 		return bytesSend;
 	}
 
+	std::cout << bytesSend << std::endl;
 	return bytesSend;
 }
 

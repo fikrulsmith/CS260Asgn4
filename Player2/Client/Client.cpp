@@ -259,7 +259,7 @@ void Client::UpdateState()
 	std::string actual = PackOwnData();
 	std::string hash = lockStepManager.HashInput(actual);
 
-	// tell all clients to lock and send a hash input
+		// tell all clients to lock and send a hash input
 	std::vector<std::string> info;
 	info.push_back(hash);
 	SendAllClient(Parser::CreateHeader("[LOCK]", MyInfo.name, MyInfo.port, info));

@@ -98,7 +98,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			if (clientManager->GetOwnInfo()->state == ShipState::SHOOTING)
 			{
 				clientManager->GetOwnInfo()->state = ShipState::NOTHING;
-				clientManager->UpdateState(clientManager->GetOwnInfo()->state);
+				clientManager->UpdateState();
 			}
 		}
 		

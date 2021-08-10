@@ -37,6 +37,17 @@ std::string Parser::CreateHeader(std::string headerCommand, std::string name, st
 	return header;
 }
 
+std::string Parser::CreatePayload(std::string headerCommand, std::string name, std::string port, std::string payload)
+{
+	std::string header;
+
+	header = headerCommand;
+	header += "\n\n";
+
+	header += name + "\n" + port + "\n" + payload + "\n";
+	return header;
+}
+
 std::vector<std::string> Parser::GetHeader(std::string input, std::string& headerCommand)
 {
 	size_t index = input.find("\n\n");
@@ -85,6 +96,24 @@ std::vector<std::string> Parser::GetPayload(std::string input)
 	}
 
 	return params;
+}
+
+std::string Parser::RemoveHeader(std::string input, std::string& headerCommand)
+{
+	size_t index = input.find("\n\n");
+	headerCommand = input.substr(0, index);
+	return input.substr(index + 2);
+}
+
+std::string Parser::VectorToString(std::vector<std::string> params)
+{
+	std::string combined;
+	for (auto string : params)
+	{
+		combined += string + "\n";
+	}
+
+	return combined;
 }
 
 bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port)

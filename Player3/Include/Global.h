@@ -112,8 +112,13 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
-	std::string hashString;
-	std::string lockedState;
+	// recv
+	std::string recvhashString;
+	std::string recvlockedState;
+
+	// send
+	std::string sendhashString;
+	std::string sendlockedState;
 
 	bool readyCheck = false;
 

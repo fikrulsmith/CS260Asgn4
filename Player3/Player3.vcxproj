@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AC672FD6-A855-4C63-BF2B-DE53121C6369}</ProjectGuid>
+    <ProjectGuid>{7B162746-E956-469E-B26D-6B2EF88DCA44}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CS230_Asteroids</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>

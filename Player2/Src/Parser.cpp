@@ -23,7 +23,7 @@ PARAM_3\n
 std::string Parser::CreateHeader(std::string headerCommand, std::string name, std::string port, std::vector<std::string> params)
 {
 	std::string header;
-
+	
 	header = headerCommand;
 	header += "\n\n";
 
@@ -75,7 +75,7 @@ std::string Parser::GetPacket(std::string input, std::string& headerCommand)
 	size_t index = input.find("\n\n");
 	headerCommand = input.substr(0, index);
 	input = input.substr(index + 2);
-
+	
 	return input;
 }
 
@@ -130,7 +130,7 @@ bool Parser::ParseInput(std::string ip, std::string& hostname, std::string& port
 	return true;
 }
 
-bool Parser::GetAllPairsOfHostnameAndPorts(std::string input,
+bool Parser::GetAllPairsOfHostnameAndPorts(std::string input, 
 	std::vector<std::pair<std::string, std::string>>& vec)
 {
 	RemoveExtraDelim(input, ' ');
@@ -214,15 +214,15 @@ bool Parser::IsValidIP(const std::string& str)
 
 std::vector<std::string> Parser::Tokenize(std::string const& str, const char delim)
 {
-	std::vector<std::string> out;
-	size_t start;
-	size_t end = 0;
+    std::vector<std::string> out;
+    size_t start;
+    size_t end = 0;
 
-	while ((start = str.find_first_not_of(delim, end)) != std::string::npos)
-	{
-		end = str.find(delim, start);
-		out.push_back(str.substr(start, end - start));
-	}
+    while ((start = str.find_first_not_of(delim, end)) != std::string::npos)
+    {
+        end = str.find(delim, start);
+        out.push_back(str.substr(start, end - start));
+    }
 
-	return out;
+    return out;
 }

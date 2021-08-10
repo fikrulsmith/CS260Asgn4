@@ -29,7 +29,7 @@ enum TYPE
 struct GameObj
 {
 	// object type
-	unsigned long type;
+	unsigned long type;		
 	// This will hold the triangles which will form the shape of the object
 	AEGfxVertexList* pMesh;
 };
@@ -41,7 +41,7 @@ enum class ShipState
 	MOVINGBACKWARDS,
 	ROTATINGLEFT,
 	ROTATINGRIGHT,
-	SHOOTING,
+	SHOOTING, 
 	NOTHING
 };
 

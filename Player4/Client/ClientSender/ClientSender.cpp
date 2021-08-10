@@ -4,6 +4,7 @@
 
 int ClientSender::SendClient(SOCKET serverSocket, sockaddr* sock, std::string message)
 {
+	std::cout << "SENDING: \n" << message << std::endl;
 	int bytesSend = sendto(serverSocket, message.c_str(),
 		static_cast<int>(message.length()), 0, sock, sizeof(*sock));
 
@@ -15,6 +16,7 @@ int ClientSender::SendClient(SOCKET serverSocket, sockaddr* sock, std::string me
 		return bytesSend;
 	}
 
+	std::cout << bytesSend << std::endl;
 	return bytesSend;
 }
 

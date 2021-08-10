@@ -250,7 +250,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						_pInst->shipComp.SPECIAL_TRIGGER = 0;
 						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].reset();
 						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].Init(_pInst->shipComp.InitialPosition,
-							_pInst->velCurr, AEVec2{ 0,0 }, _pInst->dirCurr);
+						_pInst->velCurr, AEVec2{ 0,0 }, _pInst->dirCurr);
 
 
 						// Destroy Asteroid

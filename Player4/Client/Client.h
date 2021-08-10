@@ -24,6 +24,7 @@ class Client
 	bool AllLocked();
 	void ResetHash();
 
+	std::string PackOwnData();
 public:
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
@@ -54,7 +55,8 @@ public:
 	int SendAllClient(std::string message);
 
 	int ReceiveClient(std::string& message);
-	void UpdateState(ShipState state);
+	void UpdateState();
+	void RecvUpdateState(ClientInfo* info, std::string hash);
 	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
@@ -68,5 +70,6 @@ public:
 	}
 	
 	void HandleRecvMessage(std::string message);
+	std::pair<ShipID, std::string> HandleLockStepMessage(std::string message);
 	void SendUpdatePacket(ShipID id);
 };
