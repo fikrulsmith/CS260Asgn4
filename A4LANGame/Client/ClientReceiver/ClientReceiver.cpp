@@ -79,9 +79,6 @@ int ClientReceiver::RecvFromSocket(SOCKET serverSocket, std::string& message)
 		clientManager->lock = true;
 	}
 
-	std::cout << "RECV: \n" << message << std::endl;
-	std::cout << std::endl;
-
 	return bytesReceived;
 }
 
