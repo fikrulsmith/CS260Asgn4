@@ -1,11 +1,31 @@
+/******************************************************************************/
+/*!
+\file Collision.cpp
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of AABB collision.
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "main.h"
-/**************************************************************************/
+/******************************************************************************/
 /*!
-	Handles the collision between 2 rectangular bounding boxes based on 
-	their maximum and minimum points.
+\fn bool CollisionIntersection_RectRect(const AABB& aabb1, const AEVec2& vel1,
+    const AABB& aabb2, const AEVec2& vel2)
+\brief Handles the collision between 2 rectangular bounding boxes based on 
+	   their maximum and minimum points.
+\param aabb1
+\param vel1
+\param aabb2
+\param vel1
+\return True if collide, otherwise, false
 */
-/**************************************************************************/
+/******************************************************************************/
 bool CollisionIntersection_RectRect(const AABB& aabb1, const AEVec2& vel1,
     const AABB& aabb2, const AEVec2& vel2)
 {

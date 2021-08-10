@@ -1,14 +1,46 @@
+/******************************************************************************/
+/*!
+\file GameObjectFactory.cpp
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of a factory settings that manages
+creation and destruction of game objects.
+*/
+/******************************************************************************/
 #pragma once
 
 #include "pch.h"
 #include "GameObjectFactory.h"
 #include "AEEngine.h"
-
+/******************************************************************************/
+/*!
+\fn GameObjectFactory::GameObjectFactory()
+\brief GameObjectFactory Default Constructor
+*/
+/******************************************************************************/
 GameObjectFactory::GameObjectFactory() :
 	sGameObjNum{ 0 }, sGameObjInstNum{ 0 }
 {}
-
-GameObjInst* GameObjectFactory::gameObjInstCreate(unsigned long type, float scale, AEVec2* pPos, AEVec2* pVel, float dir)
+/******************************************************************************/
+/*!
+\fn GameObjInst* GameObjectFactory::gameObjInstCreate(unsigned long type,
+	float scale, AEVec2* pPos, AEVec2* pVel, float dir)
+\brief Creation and initialization of Game Objects
+\param type
+\param scale
+\param pPos
+\param pVel
+\param dir
+\return Address of Game Object Instance
+*/
+/******************************************************************************/
+GameObjInst* GameObjectFactory::gameObjInstCreate(unsigned long type, 
+	float scale, AEVec2* pPos, AEVec2* pVel, float dir)
 {
 	AEVec2 zero;
 	AEVec2Zero(&zero);
@@ -45,7 +77,13 @@ GameObjInst* GameObjectFactory::gameObjInstCreate(unsigned long type, float scal
 	// cannot find empty slot => return 0
 	return 0;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameObjectFactory::gameObjInstDestroy(GameObjInst* pInst)
+\brief Destruction of Game Objects
+\param pInst
+*/
+/******************************************************************************/
 void GameObjectFactory::gameObjInstDestroy(GameObjInst* pInst)
 {
 	// if instance is destroyed before, just return
@@ -55,23 +93,47 @@ void GameObjectFactory::gameObjInstDestroy(GameObjInst* pInst)
 	// zero out the flag
 	pInst->flag = 0;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameObjectFactory::gameObjInstDestroy(GameObjInst* pInst)
+\brief Iterates to the next game object pointer in the list
+\return Address of Game Object
+*/
+/******************************************************************************/
 GameObj* GameObjectFactory::GetNextGameObjectPointer()
 {
 	GameObj* temp = sGameObjList + sGameObjNum++;
 	return temp;
 }
-
+/******************************************************************************/
+/*!
+\fn GameObj* GameObjectFactory::GetGameObjData()
+\brief Get the list of Game Objects
+\return Address of Game List
+*/
+/******************************************************************************/
 GameObj* GameObjectFactory::GetGameObjData()
 {
 	return sGameObjList;
 }
-
+/******************************************************************************/
+/*!
+\fn GameObj* GameObjectFactory::GetGameObjData()
+\brief Get the list of Game Objects Instance
+\return Address of Game List
+*/
+/******************************************************************************/
 GameObjInst* GameObjectFactory::GetGameObjInstData()
 {
 	return sGameObjInstList;
 }
-
+/******************************************************************************/
+/*!
+\fn GameObj* GameObjectFactory::GetGameObjData()
+\brief Get the list of Game Objects Instance
+\return Address of Game List
+*/
+/******************************************************************************/
 unsigned long GameObjectFactory::GetGameObjSize() const
 {
 	return sGameObjNum;
