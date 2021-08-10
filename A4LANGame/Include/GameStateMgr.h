@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*!
+\file GameStateMgr.h
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains the declarations for the implementation of a game state 
+manager.
+*/
+/******************************************************************************/
 #pragma once
 
 #include "AEEngine.h"
@@ -9,8 +23,6 @@
 class GameStateManager
 {
 public:
-	time_t RandValue;
-
 	void GameSystemUpdate();
 	void Init(unsigned int gameStateInit);
 
@@ -33,8 +45,6 @@ public:
 	void SetGameStateCurrIndex(unsigned int index);
 	void SetGameStatePrevIndex(unsigned int index);
 	void SetGameStateNextIndex(unsigned int index);
-
-	size_t PlayerCount_{ 2 };
 private:
 	unsigned int gGameStateInit{ 0 };
 	unsigned int gGameStateCurr{ 0 };

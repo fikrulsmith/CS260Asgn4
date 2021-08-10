@@ -1,10 +1,28 @@
+/******************************************************************************/
+/*!
+\file GameState_MainMenu.cpp
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the main system of the Main Menu game
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "GameState_MainMenu.h"
 #include "Main.h"
 
 AEGfxVertexList* MainMenuGameState::pMesh = nullptr;
 AEGfxTexture* MainMenuGameState::pBackground = nullptr;
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuLoad(void)
+\brief Load Main Menu Game State Load Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuLoad(void)
 {
 	AEGfxMeshStart();
@@ -21,26 +39,42 @@ void MainMenuGameState::GameStateMainMenuLoad(void)
 	pMesh = AEGfxMeshEnd();
 	AE_ASSERT_MESG(pMesh, "fail to create object!!");
 }
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuInit(void)
+\brief Load Main Menu Game State Init Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuInit(void)
 {
 	pBackground = AEGfxTextureLoad("Resources\\AsteroidMainMenu.PNG");
 }
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuUpdate(void)
+\brief Load Main Menu Game State Update Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuUpdate(void)
 {
 	if (AEInputCheckTriggered(AEVK_RETURN))
 	{
 		ClientInfo* info = clientManager->GetOwnInfo();
 		info->readyCheck = true;
-		std::string message = Parser::CreateHeader("[READY]", info->name, info->port, std::vector<std::string>{});
+		std::string message = Parser::CreateHeader("[READY]", 
+			info->name, info->port, std::vector<std::string>{});
 		clientManager->SendAllClient(message);
 	}
 
 	if (clientManager->GetClientReadyCheck())
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
 }
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuDraw(void)
+\brief Load Main Menu Game State Draw Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuDraw(void)
 {
 	AEMtx33 trans, scale;
@@ -67,12 +101,22 @@ void MainMenuGameState::GameStateMainMenuDraw(void)
 	// Draw Mesh
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuFree(void)
+\brief Load Main Menu Game State Free Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuFree(void)
 {
 	AEGfxMeshFree(pMesh);
 }
-
+/******************************************************************************/
+/*!
+\fn void MainMenuGameState::GameStateMainMenuUnload(void)
+\brief Load Main Menu Game State Unload Function
+*/
+/******************************************************************************/
 void MainMenuGameState::GameStateMainMenuUnload(void)
 {
 	AEGfxTextureUnload(pBackground);
