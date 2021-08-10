@@ -112,14 +112,6 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
-	// recv
-	std::string recvhashString;
-	std::string recvlockedState;
-
-	// send
-	std::string sendhashString;
-	std::string sendlockedState;
-
 	bool readyCheck = false;
 
 	ShipID id;

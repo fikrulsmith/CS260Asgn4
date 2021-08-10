@@ -15,6 +15,14 @@ This file contains an implementation of the functionality of a client
 #include "Global.h"
 #include "Client.h"
 
+/******************************************************************************/
+/*!
+\brief Inits the network startup
+
+\return
+	Returns the error code
+*/
+/******************************************************************************/
 int Client::InitWSA()
 {
 	WSADATA wsaData{};
@@ -48,6 +56,18 @@ int Client::InitWSA()
 	return OK;
 }
 
+/******************************************************************************/
+/*!
+\brief Inits the own client's info
+
+\param name
+
+\param port
+
+\return
+	Returns the error code
+*/
+/******************************************************************************/
 int Client::InitMyInfo(std::string name, std::string port)
 {
 	std::cout << "Initialising Own Info" << std::endl;
@@ -96,6 +116,11 @@ int Client::InitMyInfo(std::string name, std::string port)
 	return OK;
 }
 
+/******************************************************************************/
+/*!
+\brief Destructor for client
+*/
+/******************************************************************************/
 Client::~Client()
 {
 	if (MyInfo.addr)
@@ -110,6 +135,16 @@ Client::~Client()
 	WSACleanup();
 }
 
+/******************************************************************************/
+/*!
+\brief Initialise the client and gets all the clients' sockaddr
+
+\param allClients
+
+\return
+	Returns the error code
+*/
+/******************************************************************************/
 int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> allClients)
 {
 	if (InitWSA() != OK) return -1;
@@ -191,11 +226,33 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	return 1;
 }
 
+/******************************************************************************/
+/*!
+\brief Get the clients by index
+
+\param index
+
+\return
+	Pointer to client info
+*/
+/******************************************************************************/
 ClientInfo* Client::GetClient(size_t index)
 {
 	return &clients[index];
 }
 
+/******************************************************************************/
+/*!
+\brief Checks if all clients are ready
+
+\param name
+
+\param port
+
+\return
+	Returns the error code
+*/
+/******************************************************************************/
 bool Client::GetClientReadyCheck()
 {
 	for (auto client : clients)
@@ -212,11 +269,27 @@ bool Client::GetClientReadyCheck()
 	return true;
 }
 
+/******************************************************************************/
+/*!
+\brief Getting own info
+
+\return
+	Returns Pointer to own client info
+*/
+/******************************************************************************/
 ClientInfo* Client::GetOwnInfo()
 {
 	return &MyInfo;
 }
 
+/******************************************************************************/
+/*!
+\brief Gets client by id
+
+\return
+	Returns index of client
+*/
+/******************************************************************************/
 size_t Client::GetClientByID(ShipID entity)
 {
 	for (size_t i = 0; i < clients.size(); i++)
@@ -228,16 +301,46 @@ size_t Client::GetClientByID(ShipID entity)
 	return -1;
 }
 
+/******************************************************************************/
+/*!
+\brief Gets the number of clients
+
+\return
+	Returns size of clients
+*/
+/******************************************************************************/
 size_t Client::GetNumberOfClients()
 {
 	return clients.size();
 }
 
+/******************************************************************************/
+/*!
+\brief Sends a client the specified message
+
+\param sock
+
+\param message
+
+\return
+	Returns bytes sent
+*/
+/******************************************************************************/
 int Client::SendClient(sockaddr* sock, std::string message)
 {
 	return sender.SendClient(MySocket, sock, message);
 }
 
+/******************************************************************************/
+/*!
+\brief Sends all client the specified message
+
+\param message
+
+\return
+	Returns if success
+*/
+/******************************************************************************/
 int Client::SendAllClient(std::string message)
 {
 	for (auto client : clients)
@@ -248,6 +351,11 @@ int Client::SendAllClient(std::string message)
 	return 1;
 }
 
+/******************************************************************************/
+/*!
+\brief Updates the sender's lockstep
+*/
+/******************************************************************************/
 void Client::UpdateState()
 {
 	if (lock) return;
@@ -313,6 +421,15 @@ void Client::UpdateState()
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief Updates the Receiver's lockstep
+
+\param info
+
+\param hash
+*/
+/******************************************************************************/
 void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 {
 	// receive lock
@@ -368,6 +485,18 @@ void Client::RecvUpdateState(ClientInfo* info, std::string hash)
 	lock = false;
 }
 
+/******************************************************************************/
+/*!
+\brief Packs the data into a vector
+
+\param id
+
+\param obj
+
+\return
+	Returns a vector of string of the data
+*/
+/******************************************************************************/
 std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
 {
 	std::vector<std::string> params;
@@ -383,6 +512,16 @@ std::vector<std::string> Client::PackData(ShipID id, GameObjInst* obj)
 	return params;
 }
 
+/******************************************************************************/
+/*!
+\brief Receives data from socket
+
+\param message
+
+\return
+	Returns the bytes received
+*/
+/******************************************************************************/
 int Client::ReceiveClient(std::string& message)
 {
 	const int bytesReceived = receiver.RecvFromSocket(MySocket, message);
@@ -390,6 +529,18 @@ int Client::ReceiveClient(std::string& message)
 	return bytesReceived;
 }
 
+/******************************************************************************/
+/*!
+\brief Registers the client by adding it into the vector
+
+\param name
+
+\param port
+
+\return
+	Returns the index of the client in vector
+*/
+/******************************************************************************/
 size_t Client::RegisterClient(std::string name, std::string port)
 {
 	ClientInfo client;
@@ -401,6 +552,18 @@ size_t Client::RegisterClient(std::string name, std::string port)
 	return clients.size() - 1;
 }
 
+/******************************************************************************/
+/*!
+\brief Gets clientInfo by name
+
+\param name
+
+\param port
+
+\return
+	Returns pointer to clientinfo
+*/
+/******************************************************************************/
 ClientInfo* Client::GetClientByName(std::string name, std::string port)
 {
 	ClientInfo* clientInfo = nullptr;
@@ -416,6 +579,16 @@ ClientInfo* Client::GetClientByName(std::string name, std::string port)
 	return clientInfo;
 }
 
+/******************************************************************************/
+/*!
+\brief Initialises the client's sockaddr
+
+\param client
+
+\return
+	Returns the error code
+*/
+/******************************************************************************/
 int Client::InitialiseClientMember(ClientInfo& client)
 {
 	std::cout << "Attempting UDP Connection with Client" << std::endl;
@@ -454,6 +627,14 @@ int Client::InitialiseClientMember(ClientInfo& client)
 	return 200;
 }
 
+/******************************************************************************/
+/*!
+\brief Packs own data into a string
+
+\return
+	Returns the data in a string
+*/
+/******************************************************************************/
 std::string Client::PackOwnData()
 {
 	auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
@@ -469,11 +650,35 @@ std::string Client::PackOwnData()
 	return actual;
 }
 
+/******************************************************************************/
+/*!
+\brief Updates the dead reckoning based on packet
+
+\param id
+
+\param Position
+
+\param Velocity
+
+\param Acceleration
+
+\param direction
+
+\param dt
+*/
+/******************************************************************************/
 void Client::UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt)
 {
 	IdtoDeadReckoning[id].ReceivedPacket(Position, Velocity, Acceleration, direction);
 }
 
+/******************************************************************************/
+/*!
+\brief Correct all the dead reckoning
+
+\param dt
+*/
+/******************************************************************************/
 void Client::AllDeadReckoningCorrection(float dt)
 {
 	for (auto client : clients)
@@ -489,11 +694,25 @@ void Client::AllDeadReckoningCorrection(float dt)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief Create a deadreckoning object for ship id
+
+\param id
+*/
+/******************************************************************************/
 void Client::createDeadReckoning(ShipID id)
 {
 	IdtoDeadReckoning.insert(std::make_pair(id, DeadReckoning{}));
 }
 
+/******************************************************************************/
+/*!
+\brief Update the dt of dead reckoning
+
+\param dt
+*/
+/******************************************************************************/
 void Client::UpdateAllDeadReckoningDT(float dt)
 {
 	for (auto client : clients)
@@ -502,6 +721,13 @@ void Client::UpdateAllDeadReckoningDT(float dt)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief Handles all the input from clients
+
+\param message
+*/
+/******************************************************************************/
 void Client::HandleRecvMessage(std::string message)
 {
 	if (message.empty()) return;
@@ -533,10 +759,6 @@ void Client::HandleRecvMessage(std::string message)
 	{
 		RecvUpdateState(info, params[0]);
 	}
-	else if (header == "[HASHED]")
-	{
-		info->sendhashString = params[0];
-	}
 	else if (header == "[UNLOCK]")
 	{
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
@@ -552,16 +774,6 @@ void Client::HandleRecvMessage(std::string message)
 		_message = Parser::CreatePacket("[UNLOCKED]", _message);
 		SendClient(&info->sock, _message);
 	}
-	else if (header == "[UNLOCKED]")
-	{
-		std::string locked;
-		for (auto string : params)
-		{
-			locked += string + "\n";
-		}
-
-		info->sendlockedState = locked;
-	}
 	else if (header == "[RESTART]")
 	{
 		info->readyCheck = true;
@@ -572,6 +784,18 @@ void Client::HandleRecvMessage(std::string message)
 	}
 }
 
+/******************************************************************************/
+/*!
+\brief Takes the lockstep message and split into a proper package
+
+\param pair
+
+\param message
+
+\return
+	Returns a boolean if the operation was successful
+*/
+/******************************************************************************/
 bool Client::HandleLockStepMessage(std::pair<ShipID, std::string>& pair, std::string message)
 {
 	std::string header;
