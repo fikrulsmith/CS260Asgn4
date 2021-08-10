@@ -1,3 +1,16 @@
+/******************************************************************************/
+/*!
+\file DeadReckoning.h
+\author Ong Guan Hin
+\par email: guanhin.ong\@digipen.edu
+\par DigiPen login: guanhin.ong
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the dead reckoning algorithm
+*/
+/******************************************************************************/
 #pragma once
 #include "AEEngine.h"
 class DeadReckoning
