@@ -29,7 +29,7 @@ enum TYPE
 struct GameObj
 {
 	// object type
-	unsigned long type;		
+	unsigned long type;
 	// This will hold the triangles which will form the shape of the object
 	AEGfxVertexList* pMesh;
 };
@@ -41,7 +41,7 @@ enum class ShipState
 	MOVINGBACKWARDS,
 	ROTATINGLEFT,
 	ROTATINGRIGHT,
-	SHOOTING, 
+	SHOOTING,
 	NOTHING
 };
 
@@ -112,8 +112,13 @@ struct ClientInfo
 	std::string name;
 	std::string port;
 
-	std::string hashString;
-	std::string lockedState;
+	// recv
+	std::string recvhashString;
+	std::string recvlockedState;
+
+	// send
+	std::string sendhashString;
+	std::string sendlockedState;
 
 	bool readyCheck = false;
 

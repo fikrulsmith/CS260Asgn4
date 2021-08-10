@@ -61,53 +61,62 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 
 		if (AEInputCheckTriggered(AEVK_UP))
 		{
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckTriggered(AEVK_DOWN))
 		{
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckTriggered(AEVK_LEFT))
 		{
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckTriggered(AEVK_RIGHT))
 		{
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckReleased(AEVK_UP))
 		{
 			myShip->shipComp.sShipState = ShipState::NOTHING;
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckReleased(AEVK_DOWN))
 		{
 			myShip->shipComp.sShipState = ShipState::NOTHING;
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckReleased(AEVK_LEFT))
 		{
 			myShip->shipComp.sShipState = ShipState::NOTHING;
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		if (AEInputCheckReleased(AEVK_RIGHT))
 		{
 			myShip->shipComp.sShipState = ShipState::NOTHING;
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		// Shoot a bullet if space is triggered (Create a new object instance)
 		if (AEInputCheckTriggered(AEVK_SPACE))
 		{
 			PlayerShoot(myShip->shipComp.sShipID);
-			clientManager->UpdateState(myShip->shipComp.sShipState);
+			clientManager->GetOwnInfo()->state = myShip->shipComp.sShipState;
+			clientManager->UpdateState();
 		}
 
 		for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
@@ -241,7 +250,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 						_pInst->shipComp.SPECIAL_TRIGGER = 0;
 						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].reset();
 						clientManager->IdtoDeadReckoning[_pInst->shipComp.sShipID].Init(_pInst->shipComp.InitialPosition,
-						_pInst->velCurr, AEVec2{ 0,0 }, _pInst->dirCurr);
+							_pInst->velCurr, AEVec2{ 0,0 }, _pInst->dirCurr);
 
 
 						// Destroy Asteroid

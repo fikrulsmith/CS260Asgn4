@@ -24,8 +24,9 @@ class Client
 	bool AllLocked();
 	void ResetHash();
 
+	std::string PackOwnData();
 public:
-	const size_t DOES_NOT_EXIST = -1; 
+	const size_t DOES_NOT_EXIST = -1;
 	const int OK = 200;
 	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
@@ -54,19 +55,21 @@ public:
 	int SendAllClient(std::string message);
 
 	int ReceiveClient(std::string& message);
-	void UpdateState(ShipState state);
+	void UpdateState();
+	void RecvUpdateState(ClientInfo* info, std::string hash);
 	std::vector<std::string> PackData(ShipID id, GameObjInst* obj);
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt);
 	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;
 	}
-	
+
 	void HandleRecvMessage(std::string message);
+	std::pair<ShipID, std::string> HandleLockStepMessage(std::string message);
 	void SendUpdatePacket(ShipID id);
 };
