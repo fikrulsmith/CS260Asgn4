@@ -27,7 +27,7 @@ void DeadReckoning::UpdateTime(float dt)
 	TimeelapsedsinceUpdate += dt;
 }
 
-void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction, float dt)
+void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction)
 {
 	OldPosition = CurrentPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
@@ -156,18 +156,6 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 
 	if (TimeelapsedsinceUpdate > Ttriangle)
 	{
-		std::string caochibaithefkinstateiswhatwehknnbccb;
-		if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGFORWARD)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::MOVINGFORWARD";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGBACKWARDS)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::MOVINGBACKWARDS";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGLEFT)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::ROTATINGLEFT";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGRIGHT)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::ROTATINGRIGHT";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::NOTHING)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::NOTHING";
-
 		if ((RotLeft || RotRight) && (goingFront || goingBack))
 		{
 			FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));

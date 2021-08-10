@@ -27,7 +27,7 @@ void DeadReckoning::UpdateTime(float dt)
 	TimeelapsedsinceUpdate += dt;
 }
 
-void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction, float dt)
+void DeadReckoning::ReceivedPacket(AEVec2 LKPosition, AEVec2 LKVelocity, AEVec2 LKAcceleration, float direction)
 {
 	OldPosition = CurrentPosition;
 	OldVelocity = InstantVelocityBetweenDRpositions;
@@ -156,27 +156,10 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 
 	if (TimeelapsedsinceUpdate > Ttriangle)
 	{
-		std::cout << "RotLeft: " << RotLeft << std::endl;
-		std::cout << "RotRight: " << RotRight << std::endl;
-		std::cout << "GoingForward: " << goingFront << std::endl;
-		std::cout << "GoingBackward: " << goingBack << std::endl;
-		std::string caochibaithefkinstateiswhatwehknnbccb;
-		if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGFORWARD)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::MOVINGFORWARD";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGBACKWARDS)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::MOVINGBACKWARDS";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGLEFT)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::ROTATINGLEFT";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGRIGHT)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::ROTATINGRIGHT";
-		else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::NOTHING)
-			caochibaithefkinstateiswhatwehknnbccb = "ShipState::NOTHING";
-		std::cout << caochibaithefkinstateiswhatwehknnbccb << std::endl;
 		if ((RotLeft || RotRight) && (goingFront || goingBack))
 		{
 			FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));
 			FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt));
-			std::cout << "doing this stupid thing" << std::endl;
 		}
 		else
 		{
