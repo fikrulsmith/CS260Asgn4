@@ -6,6 +6,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>127.0.0.1:2050 127.0.0.1:2049 127.0.0.1:2048</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand>C:\Users\nico\Desktop\Digipen\CS260Asgn4\\Bin\CS260_AsteroidsD.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>127.0.0.1:2051 127.0.0.1:2048</LocalDebuggerCommandArguments>

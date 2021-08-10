@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)D</TargetName>
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\Bin\</OutDir>
+    <OutDir>C:\Users\nico\Desktop\Digipen\CS260Asgn4\\Bin\CS260_AsteroidsD.exe</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
