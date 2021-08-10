@@ -120,7 +120,7 @@ enum class GameSystemType
 
 struct ClientInfo
 {
-	sockaddr sock;
+	sockaddr sock{};
 	addrinfo* addr = nullptr;
 	std::string name;
 	std::string port;
