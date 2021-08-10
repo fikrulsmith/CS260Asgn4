@@ -23,8 +23,18 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 	const size_t BUFFER_SIZE = 10000;
 	char buffer[BUFFER_SIZE];
 
-	int serverAddressSize = sizeof(*info.addr->ai_addr);
-	const int bytesReceived = recvfrom(info.socket, buffer, BUFFER_SIZE - 1, 0, info.addr->ai_addr, &serverAddressSize);
+	/*int serverAddressSize = sizeof(*info.addr->ai_addr);*/
+	/*const int bytesReceived = recvfrom(info.socket, buffer, BUFFER_SIZE - 1, 0, info.addr->ai_addr, &serverAddressSize);*/
+
+	sockaddr clientAddress{};
+	SecureZeroMemory(&clientAddress, sizeof(clientAddress));
+	int clientAddressSize = sizeof(clientAddress);
+	const int bytesReceived = recvfrom(info.socket,
+		buffer,
+		BUFFER_SIZE - 1,
+		0,
+		&clientAddress,
+		&clientAddressSize);
 
 	if (bytesReceived == SOCKET_ERROR)
 	{
@@ -52,6 +62,8 @@ int ClientReceiver::RecvClient(ClientInfo info, std::string& message)
 	buffer[bytesReceived] = '\0';
 	message.clear();
 	message.append(buffer, bytesReceived);
+
+	std::cout << "RECV from " << info.port << ": " << message << std::endl;
 
 	return bytesReceived;
 }

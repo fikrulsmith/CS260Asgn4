@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	AESysInit(instanceH, show, 800, 600, 1, 60, false, NULL);
 	// Changing the window title
 	//AESysSetWindowTitle("CS260 Asteroids");
-	AESysSetWindowTitle("1");
+	AESysSetWindowTitle("3");
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 

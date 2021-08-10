@@ -33,19 +33,14 @@ void MainMenuGameState::GameStateMainMenuUpdate(void)
 	{
 		ClientInfo* info = clientManager->GetOwnInfo();
 		info->readyCheck = true;
-		clientManager->SendAllClient("[READY]");
-
+		std::vector<std::string> ownInfo;
+		ownInfo.push_back(std::to_string(static_cast<int>(clientManager->GetOwnInfo()->id)));
+		std::string message = Parser::CreateHeader("[READY]", ownInfo);
+		clientManager->SendAllClient(message);
 	}
 
 	if (clientManager->GetClientReadyCheck())
-	{
 		GSManager->SetGameStateNextIndex(GS_ASTEROIDS);
-		/*std::cout << "waiting for player" << std::endl;
-		
-		clientManager->ReceiveAllClient();*/
-	}
-
-	
 }
 
 void MainMenuGameState::GameStateMainMenuDraw(void)

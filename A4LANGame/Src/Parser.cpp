@@ -20,12 +20,14 @@ PARAM_2\n
 PARAM_3\n
 \n
 */
-std::string Parser::CreateHeader(std::string headerCommand, std::vector<std::string> params)
+std::string Parser::CreateHeader(std::string headerCommand, std::string name, std::string port, std::vector<std::string> params)
 {
 	std::string header;
 	
 	header = headerCommand;
 	header += "\n\n";
+
+	header += name + "\n" + port + "\n";
 	for (auto& param : params)
 	{
 		header += param;

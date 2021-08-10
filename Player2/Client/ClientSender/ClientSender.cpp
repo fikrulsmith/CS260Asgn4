@@ -4,6 +4,7 @@
 
 int ClientSender::SendClient(ClientInfo& info, std::string message)
 {
+	std::cout << "SEND to " << info.port << ": " << message << std::endl;
 	int bytesSend = sendto(info.socket, message.c_str(),
 		static_cast<int>(message.length()), 0, info.addr->ai_addr, sizeof(*info.addr->ai_addr));
 

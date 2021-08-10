@@ -2,6 +2,12 @@
 #include "Global.h"
 #include "Client.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 int Client::InitWSA()
 {
 	WSADATA wsaData{};
@@ -76,17 +82,16 @@ int Client::InitialiseClient(std::vector<std::pair<std::string, std::string>> al
 	if (InitMyInfo(allClients[0].first, allClients[0].second) != OK) return -1;
 
 	allClients.erase(allClients.begin());
-
 	for (size_t i = 0; i < allClients.size(); i++)
 	{
 		size_t index = RegisterClient(allClients[i].first, allClients[i].second);
-		u_long enable = 1;
-		ioctlsocket(clients[index].socket, FIONBIO, &enable);
+
 		if (ConnectToClient(clients[index]) != OK)
 		{
 			std::cout << "Client could not connect! Exiting Game!" << std::endl;
 			GSManager->SetGameStateNextIndex(GS_QUIT);
 		}
+		std::cout << clients[index].socket << std::endl;
 	}
 
 	for (size_t i = 0; i < clients.size(); i++)
@@ -189,7 +194,10 @@ bool Client::GetClientReadyCheck()
 	for (auto client : clients)
 	{
 		if (!client.readyCheck)
+		{
+			//std::cout << client.port << " RETURNED FALSE." << std::endl;
 			return false;
+		}
 	}
 
 	if (!MyInfo.readyCheck) return false;
@@ -269,18 +277,24 @@ void Client::UpdateState(ShipState state)
 
 	std::string hash = lockStepManager.HashInput(message);
 
+	std::cout << "FAIL1" << std::endl;
 	// tell all clients to lock and send a hash input
-	SendAllClient(Parser::CreatePacket("[LOCK]", hash));
+	std::vector <std::string> ownInfo;
+	ownInfo.push_back(MyInfo.name);
+	ownInfo.push_back(MyInfo.port);
+	ownInfo.push_back(hash);
+	SendAllClient(Parser::CreateHeader("[LOCK]", ownInfo));
 
+	std::cout << "FAIL2" << std::endl;
 	// receive all hash input and save it
 	UpdateHash();
-
+	std::cout << "FAIL3" << std::endl;
 	// send the actual input
 	SendAllClient(message);
-
+	std::cout << "FAIL4" << std::endl;
 	// receive all client inputs
 	ReceiveAllClient();
-
+	std::cout << "FAIL5" << std::endl;
 	if (CheckAllHash())
 	{
 		std::cout << "NO CHEATERS" << std::endl;
@@ -307,7 +321,7 @@ void Client::UpdateState(ShipState state)
 	}
 	else
 		std::cout << "CHEATERSSSSS!!!" << std::endl;
-
+	std::cout << "FAIL6" << std::endl;
 	ResetHash();
 }
 
@@ -338,7 +352,7 @@ int Client::ReceiveAllClient()
 	for (auto client : clients)
 	{
 		std::string input;
-		if (ReceiveClient(client.socket, input) == 0) return 0;
+		if (ReceiveClient(client.socket, input) == 0) continue;
 		HandleRecvMessage(client.socket, input);
 	}
 
@@ -380,6 +394,21 @@ size_t Client::CheckClientExist(SOCKET clientSocket)
 	}
 
 	return DOES_NOT_EXIST;
+}
+
+ClientInfo* Client::GetClientByName(std::string name, std::string port)
+{
+	ClientInfo* clientInfo = nullptr;
+	for (auto& _client : clients)
+	{
+		if (name == _client.name && port == _client.port)
+		{
+			clientInfo = &_client;
+			break;
+		}
+	}
+
+	return clientInfo;
 }
 
 int Client::ConnectToClient(ClientInfo& client)
@@ -446,6 +475,9 @@ int Client::ConnectToClient(ClientInfo& client)
 		return 2;
 	}
 
+	u_long enable = 1;
+	ioctlsocket(serverSocket, FIONBIO, &enable);
+
 	freeaddrinfo(info);
 
 	addrinfo* serverInfo = nullptr;
@@ -461,8 +493,8 @@ int Client::ConnectToClient(ClientInfo& client)
 
 	client.addr = serverInfo;
 	client.socket = serverSocket;
-	u_long enable = 1;
-	ioctlsocket(client.socket, FIONBIO, &enable);
+	u_long enablez = 1;
+	ioctlsocket(client.socket, FIONBIO, &enablez);
 	std::cout << "CLIENT: " << std::endl;
 	std::cout << client.name << std::endl;
 	std::cout << client.port << std::endl;
@@ -475,7 +507,9 @@ void Client::UpdateHash()
 {
 	while (!AllHashUpdated())
 	{
+		std::cout << "STUCK ASF" << std::endl;
 		ReceiveAllClient();
+		Sleep(5000);
 	}
 }
 bool Client::CheckAllHash()
@@ -601,19 +635,35 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 	}
 	else if (header == "[READY]")
 	{
-		size_t index = CheckClientExist(client);
-		if (index == DOES_NOT_EXIST) return;
+		// set the client to true for readycheck
 
-		ClientInfo* info = GetClient(index);
-		info->readyCheck = true;
+		size_t index = GetClientByID(static_cast<ShipID>(std::stoi(params[0])));
+		ClientInfo* clientInfo = GetClient(index);
 
+		std::cout << "READY: " << params[0] << std::endl;
+		clientInfo->readyCheck = true;
+
+		// send back a ready ready command
+		std::vector<std::string> ownInfo;
+		ownInfo.push_back(std::to_string(static_cast<int>(MyInfo.id)));
+		ownInfo.push_back(std::to_string(MyInfo.readyCheck));
+		std::string message = Parser::CreateHeader("[READYREADY]", ownInfo);
+
+		SendClient(client, message);
+	}
+	else if (header == "[READYREADY]")
+	{
+		size_t index = GetClientByID(static_cast<ShipID>(std::stoi(params[0])));
+		ClientInfo* clientInfo = GetClient(index);
+
+		std::cout << "READY: " << params[0] << std::endl;
+		clientInfo->readyCheck = std::stoi(params[1]);
 	}
 	else if (header == "[LOCK]")
 	{
-		std::string payload = Parser::GetPacket(message, std::string{});
-		size_t index = clientManager->CheckClientExist(client);
-		clientManager->GetClient(index)->hashString = payload;
-
+		ClientInfo* clientInfo = GetClientByName(params[0], params[1]);
+		if (!clientInfo) return;
+		clientInfo->hashString = params[2];
 		std::cout << "Retrieved the hash from client" << std::endl;
 
 		auto it = GSManager->GetAsteroidGameState().IDToPlayerShip_.find(MyInfo.id);
@@ -629,7 +679,11 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 		std::cout << "Sending hash input back" << std::endl;
 		// send hash input
 		std::string hash = lockStepManager.HashInput(input);
-		hash = Parser::CreatePacket("[HASHED]", hash);
+		std::vector<std::string> ownInfo;
+		ownInfo.push_back(MyInfo.name);
+		ownInfo.push_back(MyInfo.port);
+		ownInfo.push_back(hash);
+		hash = Parser::CreateHeader("[HASHED]", ownInfo);
 		SendClient(client, hash);
 
 		// receive actual input from client
@@ -638,11 +692,13 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 		ReceiveClient(client, _message);
 		std::cout << "Successfully Received\n" << _message << std::endl;
 
-		std::string temp = Parser::CreatePacket("[UNLOCKED]", input);
+		ownInfo.pop_back();
+		ownInfo.push_back(input);
+		std::string temp = Parser::CreateHeader("[UNLOCKED]", ownInfo);
 		SendClient(client, temp);
 
 		std::cout << "Comparing input" << std::endl;
-		if (lockStepManager.CompareInput(_message, payload))
+		if (lockStepManager.CompareInput(_message, clientInfo->hashString))
 		{
 			std::vector<std::string> _params = Parser::GetPayload(_message);
 			std::cout << "NO HAX" << std::endl;
@@ -664,19 +720,17 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 		}
 		else
 			std::cout << "HAX" << std::endl;
-
-
 	}
 	else if (header == "[HASHED]")
 	{
-		for (auto& _client : clients)
+		ClientInfo* clientInfo = GetClientByName(params[0], params[1]);
+		if (!clientInfo)
 		{
-			if (_client.socket == client)
-			{
-				_client.hashString = Parser::GetPacket(message, std::string{});
-				return;
-			}
+			std::cout << "Cant Find" << std::endl;
+			return;
 		}
+
+		clientInfo->hashString = params[2];
 	}
 	else if (header == "[UNLOCK]")
 	{
@@ -695,14 +749,10 @@ void Client::HandleRecvMessage(SOCKET client, std::string message)
 	}
 	else if (header == "[UNLOCKED]")
 	{
-		for (auto& _client : clients)
-		{
-			if (_client.socket == client)
-			{
-				_client.lockedState = Parser::GetPacket(message, std::string{});
-				return;
-			}
-		}
+		ClientInfo* clientInfo = GetClientByName(params[0], params[1]);
+		if (!clientInfo) return;
+
+		clientInfo->lockedState = params[2];
 	}
 	else if (header == "[RESTART]")
 	{

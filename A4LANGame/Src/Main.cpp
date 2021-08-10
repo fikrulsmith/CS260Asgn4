@@ -43,10 +43,6 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 
 	GSManager = std::make_unique<GameStateManager>();
 	clientManager->InitialiseClient(vec);
-	/*if (client.GetOwnPort() == "2048")
-		client.SendClient();
-	else
-		client.ReceiveClient();*/
 
 	GSManager->Init(GS_MAINMENU);
 
@@ -76,7 +72,9 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 			if (GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
 				clientManager->UpdateAllDeadReckoningDT(g_dt);
 
-			clientManager->ReceiveAllClient();
+			std::string message;
+			clientManager->ReceiveClient(message);
+			clientManager->HandleRecvMessage(message);
 
 			if(GSManager->GetGameStateCurrIndex() == GS_ASTEROIDS)
 				clientManager->AllDeadReckoningCorrection(g_dt);

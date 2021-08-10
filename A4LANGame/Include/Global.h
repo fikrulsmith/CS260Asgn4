@@ -107,7 +107,7 @@ enum class GameSystemType
 
 struct ClientInfo
 {
-	SOCKET socket = INVALID_SOCKET;
+	sockaddr sock;
 	addrinfo* addr = nullptr;
 	std::string name;
 	std::string port;
