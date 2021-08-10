@@ -66,66 +66,27 @@ void DeadReckoning::reset()
 
 	extrapolating = false;
 	isInit = false;
-	goingFront = false;
-	goingBack = false;
 }
 
-void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt,ShipID id)
+void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
 {
 	AEVec2 VelocityBlend;
 	AEVec2 Pt;
 	AEVec2 PtPrime;
 	AEVec2 FinalPosition;
 
-	AEVec2 Added{0,0};
-	if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGFORWARD)
-	{
-		goingFront = true;
-		goingBack = false;
-	}
-	else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::MOVINGBACKWARDS)
-	{
-		goingBack = true;
-		goingFront = false;
-	}
-	else if(clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::NOTHING)
-	{
-		goingBack = false;
-		goingFront = false;
-	}
+	AEVec2 Added{ 0,0 };
 	if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGLEFT)
 	{
 		Mydirection += (2.0f * PI) *
 			(float)(AEFrameRateControllerGetFrameTime());
 		Mydirection = AEWrap(Mydirection, -PI, PI);
-
-		if(goingFront)
-			AEVec2Set(&Added, cosf(Mydirection),sinf(Mydirection));
-		else if(goingBack)
-			AEVec2Set(&Added, -cosf(Mydirection), -sinf(Mydirection));
-
-		if(goingFront || goingBack)
-		{
-			LastKnownVelocity.x = Added.x * 80.0f;
-			LastKnownVelocity.y = Added.y * 80.0f;
-		}
 	}
 	else if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGRIGHT)
 	{
 		Mydirection -= (2.0f * PI) *
 			(float)(AEFrameRateControllerGetFrameTime());
 		Mydirection = AEWrap(Mydirection, -PI, PI);
-
-		if (goingFront)
-			AEVec2Set(&Added, cosf(Mydirection), sinf(Mydirection));
-		else if (goingBack)
-			AEVec2Set(&Added, -cosf(Mydirection), -sinf(Mydirection));
-
-		if (goingFront || goingBack)
-		{
-			LastKnownVelocity.x = Added.x * 80.0f;
-			LastKnownVelocity.y = Added.y * 80.0f;
-		}
 	}
 
 
@@ -139,17 +100,8 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 
 	if (TimeelapsedsinceUpdate > Ttriangle)
 	{
-		if (clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGRIGHT ||
-			clientManager->GetClient(clientManager->GetClientByID(id))->state == ShipState::ROTATINGLEFT)
-		{
-			FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * dt));
-			FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * dt));
-		}
-		else
-		{
-			FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate));
-			FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate));
-		}
+		FinalPosition.x = static_cast<float>(LastKnownPosition.x + (LastKnownVelocity.x * TimeelapsedsinceUpdate));
+		FinalPosition.y = static_cast<float>(LastKnownPosition.y + (LastKnownVelocity.y * TimeelapsedsinceUpdate));
 	}
 	else
 	{
@@ -167,7 +119,7 @@ void DeadReckoning::Correction(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, f
 	direction = Mydirection;
 }
 
-void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt,ShipID id)
+void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt, ShipID id)
 {
 	if (!isInit)
 		return;
@@ -175,5 +127,5 @@ void DeadReckoning::Run(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& d
 	if (!extrapolating)
 		Predict(UpdatePosition, UpdateVelocity, direction, dt);
 	else
-		Correction(UpdatePosition, UpdateVelocity, direction, dt,id);
+		Correction(UpdatePosition, UpdateVelocity, direction, dt, id);
 }
