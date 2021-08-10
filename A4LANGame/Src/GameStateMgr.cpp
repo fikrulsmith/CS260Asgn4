@@ -8,8 +8,7 @@
 \par Assignment #04
 \date 10/08/2021
 \brief
-This file contains an implementation of a factory settings that manages
-creation and destruction of game objects.
+This file contains an implementation of a game state manager.
 */
 /******************************************************************************/
 #include "pch.h"
@@ -142,54 +141,109 @@ void GameStateManager::GameStateUnload()
 /******************************************************************************/
 /*!
 \fn unsigned int GameStateManager::GetGameStateInitIndex() const
-\brief Unload current game state
+\brief Get game state init index
+\return gGameStateInit
 */
 /******************************************************************************/
 unsigned int GameStateManager::GetGameStateInitIndex() const
 {
 	return gGameStateInit;
 }
-
+/******************************************************************************/
+/*!
+\fn unsigned int GameStateManager::GetGameStateCurrIndex() const
+\brief Get game state current index
+\return gGameStateCurr
+*/
+/******************************************************************************/
 unsigned int GameStateManager::GetGameStateCurrIndex() const
 {
 	return gGameStateCurr;
 }
-
+/******************************************************************************/
+/*!
+\fn unsigned int GameStateManager::GetGameStatePrevIndex() const
+\brief Get game state previous index
+\return gGameStatePrev
+*/
+/******************************************************************************/
 unsigned int GameStateManager::GetGameStatePrevIndex() const
 {
 	return gGameStatePrev;
 }
-
+/******************************************************************************/
+/*!
+\fn unsigned int GameStateManager::GetGameStateNextIndex() const
+\brief Get game state next index
+\return gGameStateNext
+*/
+/******************************************************************************/
 unsigned int GameStateManager::GetGameStateNextIndex() const
 {
 	return gGameStateNext;
 }
-
+/******************************************************************************/
+/*!
+\fn MainMenuGameState& GameStateManager::GetMainMenuGameState()
+\brief Get Main Menu GameState instance
+\return MainMenu_
+*/
+/******************************************************************************/
 MainMenuGameState& GameStateManager::GetMainMenuGameState()
 {
 	return MainMenu_;
 }
-
+/******************************************************************************/
+/*!
+\fn AsteroidsGameState& GameStateManager::GetAsteroidGameState()
+\brief Get Asteroids GameState instance
+\return Asteroids_
+*/
+/******************************************************************************/
 AsteroidsGameState& GameStateManager::GetAsteroidGameState()
 {
 	return Asteroids_;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::SetGameStateInitIndex(unsigned int index)
+\brief Set game state init index
+\param index
+*/
+/******************************************************************************/
 void GameStateManager::SetGameStateInitIndex(unsigned int index)
 {
 	gGameStateInit = index;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::SetGameStateCurrIndex(unsigned int index)
+\brief Set game state current index
+\param index
+*/
+/******************************************************************************/
 void GameStateManager::SetGameStateCurrIndex(unsigned int index)
 {
 	gGameStateCurr = index;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::SetGameStatePrevIndex(unsigned int index)
+\brief Set game state previous index
+\param index
+*/
+/******************************************************************************/
 void GameStateManager::SetGameStatePrevIndex(unsigned int index)
 {
 	gGameStatePrev = index;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameStateManager::SetGameStateNextIndex(unsigned int index)
+\brief Set game state next index
+\param index
+*/
+/******************************************************************************/
 void GameStateManager::SetGameStateNextIndex(unsigned int index)
 {
 	gGameStateNext = index;

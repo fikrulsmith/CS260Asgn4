@@ -1,9 +1,22 @@
+/******************************************************************************/
+/*!
+\file GameState_Asteroids.h
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains the declaration of the implementation of the main system of 
+the Asteroids game
+*/
+/******************************************************************************/
 #pragma once
 
 #include "Global.h"
 #include "GameObjectFactory.h"
 
-// ---------------------------------------------------------------------------
 class AsteroidsGameState
 {
 public:
@@ -50,10 +63,6 @@ private:
 	void PlayerRotateLeft(ShipID PlayerID);
 	void PlayerRotateRight(ShipID PlayerID);
 	void PlayerShoot(ShipID PlayerID);
-	void bulletExplosion(ShipID PlayerID);
 	void spawnAsteroid(void);
 	void spawnBulletHell(int i, ShipID PlayerID);
 };
-
-
-

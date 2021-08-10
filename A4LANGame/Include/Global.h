@@ -1,3 +1,16 @@
+/******************************************************************************/
+/*!
+\file Global.h
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains the global enums and constant definitions of the application
+*/
+/******************************************************************************/
 #pragma once
 #include "pch.h"
 

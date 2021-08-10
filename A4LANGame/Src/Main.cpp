@@ -1,20 +1,35 @@
+/******************************************************************************/
+/*!
+\file Main.cpp
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an the main loop of the application
+*/
+/******************************************************************************/
 #include "pch.h"
 #include "main.h"
 
 #include <memory>
 #include "../Client/Client.h"
 
-// ---------------------------------------------------------------------------
-// Globals
 float	 g_dt;
 double	 g_appTime;
 std::unique_ptr<GameStateManager> GSManager;
 std::unique_ptr<Client> clientManager;
-
-
 /******************************************************************************/
 /*!
-	Starting point of the application
+\fn int WINAPI WinMain(_In_ HINSTANCE instanceH,
+	_In_opt_ HINSTANCE prevInstanceH, _In_ LPSTR command_line, _In_ int show)
+\brief Main App Loop
+\param instanceH
+\param prevInstanceH
+\param command_line
+\param show
 */
 /******************************************************************************/
 int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _In_ LPSTR command_line, _In_ int show)
@@ -31,8 +46,7 @@ int WINAPI WinMain(_In_ HINSTANCE instanceH, _In_opt_ HINSTANCE prevInstanceH, _
 	// Initialize the system
 	AESysInit (instanceH, show, 800, 600, 1, 60, false, NULL);
 	// Changing the window title
-	//AESysSetWindowTitle("CS260 Asteroids");
-	AESysSetWindowTitle("1");
+	AESysSetWindowTitle("CS260 Asteroids");
 	//set background color
 	AEGfxSetBackgroundColor(0.0f, 0.1f, 1.0f);
 

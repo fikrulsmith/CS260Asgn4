@@ -1,12 +1,24 @@
-#include "pch.h"
-#include "Main.h"
-
 /******************************************************************************/
 /*!
-	Static Variables & Globals
+\file GameState_Asteroids.cpp
+\author Fikrul Islami Bin Abdullah
+\par email: f.abdullah\@digipen.edu
+\par DigiPen login: f.abdullah
+\par Course: CS260-B
+\par Assignment #04
+\date 10/08/2021
+\brief
+This file contains an implementation of the main system of the Asteroids game
 */
 /******************************************************************************/
-
+#include "pch.h"
+#include "Main.h"
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::GameStateAsteroidsUpdate(void)
+\brief Asteroids Game Main Update
+*/
+/******************************************************************************/
 void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 {
 	size_t counter = 0;
@@ -225,12 +237,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 					if (CollisionIntersection_RectRect(pInst->boundingBox, pInst->velCurr,
 						_pInst->boundingBox, _pInst->velCurr))
 					{
-						// Creates bullet explosion after each death.
-						/*if (_pInst->shipComp.sShipLives > 1)
-						{
-							bulletExplosion(_pInst->shipComp.sShipID);
-						}*/
-
 						// Decrease ship lives by 1
 						_pInst->shipComp.sShipLives -= 1;
 
@@ -365,11 +371,21 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 		AEMtx33Concat(&pInst->transform, &trans, &pInst->transform);
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn AsteroidsGameState::AsteroidsGameState()
+\brief Asteroids Constructor
+*/
+/******************************************************************************/
 AsteroidsGameState::AsteroidsGameState() :
 	GameObjFactory_{ std::make_shared<GameObjectFactory>() }
 {}
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::GameStateAsteroidsLoad(void)
+\brief Asteroids Game Main Load State
+*/
+/******************************************************************************/
 void AsteroidsGameState::GameStateAsteroidsLoad(void)
 {
 	// zero the game object array
@@ -497,7 +513,6 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 		AE_ASSERT(IDToPlayerShip_[static_cast<ShipID>(index)]);
 	}
 
-	// CREATE THE INITIAL ASTEROIDS INSTANCES USING THE "gameObjInstCreate" FUNCTION
 	for (int i = 0; i < 4; i++)
 	{
 		spawnAsteroid();
@@ -506,7 +521,12 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 	StateToInput_[ShipState::SHOOTING] = std::bind(&AsteroidsGameState::PlayerShoot, this,
 		std::placeholders::_1);
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::GameStateAsteroidsDraw(void)
+\brief Asteroids Game Main Draw function
+*/
+/******************************************************************************/
 void AsteroidsGameState::GameStateAsteroidsDraw(void)
 {
 	char strBuffer[1024] = { '\0' };
@@ -599,7 +619,12 @@ void AsteroidsGameState::GameStateAsteroidsDraw(void)
 		onValueChange = false;
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::GameStateAsteroidsFree(void)
+\brief Asteroids Game Main Free function
+*/
+/******************************************************************************/
 void AsteroidsGameState::GameStateAsteroidsFree(void)
 {
 	// kill all object instances in the array using "gameObjInstDestroy"
@@ -612,7 +637,12 @@ void AsteroidsGameState::GameStateAsteroidsFree(void)
 	IDToPlayerShip_.clear();
 	StateToInput_.clear();
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::GameStateAsteroidsUnload(void)
+\brief Asteroids Game Main Unload function
+*/
+/******************************************************************************/
 void AsteroidsGameState::GameStateAsteroidsUnload(void)
 {
 	// free all mesh data (shapes) of each object using "AEGfxTriFree"
@@ -624,7 +654,13 @@ void AsteroidsGameState::GameStateAsteroidsUnload(void)
 		AEGfxMeshFree(pInst->pMesh);
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
+\brief Calculate input when player moves forward
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 {
 	if (IDToPlayerShip_[PlayerID]->flag != 0)
@@ -643,7 +679,13 @@ void AsteroidsGameState::PlayerMoveForward(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::MOVINGFORWARD;
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
+\brief Calculate input when player moves backwards
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 {
 	if (IDToPlayerShip_[PlayerID]->flag != 0)
@@ -662,7 +704,13 @@ void AsteroidsGameState::PlayerMoveBackwards(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::MOVINGBACKWARDS;
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
+\brief Calculate input when player rotates left
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
 {
 	if (IDToPlayerShip_[PlayerID]->flag != 0)
@@ -674,7 +722,13 @@ void AsteroidsGameState::PlayerRotateLeft(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::ROTATINGLEFT;
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
+\brief Calculate input when player rotates right
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
 {
 	if (IDToPlayerShip_[PlayerID]->flag != 0)
@@ -686,7 +740,13 @@ void AsteroidsGameState::PlayerRotateRight(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::ROTATINGRIGHT;
 	}
 }
-
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::PlayerShoot(ShipID PlayerID)
+\brief Calculate input when player shoots
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::PlayerShoot(ShipID PlayerID)
 {
 	if (IDToPlayerShip_[PlayerID]->flag != 0)
@@ -718,35 +778,12 @@ void AsteroidsGameState::PlayerShoot(ShipID PlayerID)
 		IDToPlayerShip_[PlayerID]->shipComp.sShipState = ShipState::SHOOTING;
 	}
 }
-
-// Creates bullet explosion when ship dies
-void AsteroidsGameState::bulletExplosion(ShipID PlayerID)
-{
-	float BEDir = 0.0f;
-	float BERot = 0.2f;
-	AEVec2 BulletExp;
-
-	for (int i = 0; i < 10; ++i)
-	{
-		BEDir = BERot * PI;
-
-		// Get the bullet's direction according to the ship's direction
-		AEVec2Set(&BulletExp, cosf(BEDir), sinf(BEDir));
-
-		// Set the velocity
-		BulletExp.x += BULLET_SPEED * BulletExp.x;
-		BulletExp.y += BULLET_SPEED * BulletExp.y;
-
-		// Create an instance
-		GameObjInst* bullet = GameObjFactory_->gameObjInstCreate(TYPE_BULLET, 20.0f,
-			&IDToPlayerShip_[PlayerID]->posCurr, &BulletExp, BEDir);
-
-		bullet->BulletSource = PlayerID;
-		BERot += 0.2f;
-	}
-}
-
-// Spawns an asteroid
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::spawnAsteroid(void)
+\brief Spawn asteroid instances
+*/
+/******************************************************************************/
 void AsteroidsGameState::spawnAsteroid(void)
 {
 	// Create an array of vectors for the asteroids
@@ -784,8 +821,14 @@ void AsteroidsGameState::spawnAsteroid(void)
 	// Keeps track of the spawned asteroids on screen
 	ASTEROID_COUNT++;
 }
-
-// Creates Bullet Hell Mechanic
+/******************************************************************************/
+/*!
+\fn void AsteroidsGameState::spawnAsteroid(void)
+\brief Creates Bullet Hell Mechanic
+\param i
+\param PlayerID
+*/
+/******************************************************************************/
 void AsteroidsGameState::spawnBulletHell(int i, ShipID PlayerID)
 {
 	AEVec2 BulletHell;
