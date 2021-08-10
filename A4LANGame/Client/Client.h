@@ -14,6 +14,7 @@ class Client
 	ClientInfo MyInfo;
 	SOCKET MySocket;
 	LockStep lockStepManager;
+	
 
 	int InitWSA();
 	int InitialiseClientMember(ClientInfo& client);
@@ -26,6 +27,7 @@ class Client
 
 	std::string PackOwnData();
 public:
+	bool lock = false;
 	const size_t DOES_NOT_EXIST = -1; 
 	const int OK = 200;
 	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
@@ -70,6 +72,6 @@ public:
 	}
 	
 	void HandleRecvMessage(std::string message);
-	std::pair<ShipID, std::string> HandleLockStepMessage(std::string message);
+	bool HandleLockStepMessage(std::pair<ShipID, std::string>& pair, std::string message);
 	void SendUpdatePacket(ShipID id);
 };

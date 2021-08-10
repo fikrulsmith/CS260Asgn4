@@ -15,6 +15,7 @@ class Client
 	SOCKET MySocket;
 	LockStep lockStepManager;
 
+
 	int InitWSA();
 	int InitialiseClientMember(ClientInfo& client);
 
@@ -26,7 +27,8 @@ class Client
 
 	std::string PackOwnData();
 public:
-	const size_t DOES_NOT_EXIST = -1; 
+	bool lock = false;
+	const size_t DOES_NOT_EXIST = -1;
 	const int OK = 200;
 	std::unordered_map<ShipID, DeadReckoning> IdtoDeadReckoning;
 	~Client();
@@ -61,15 +63,15 @@ public:
 
 	void createDeadReckoning(ShipID id);
 	void UpdateAllDeadReckoningDT(float dt);
-	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction,float dt);
+	void UpdateDeadReckoning(ShipID id, AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction, float dt);
 	void AllDeadReckoningCorrection(float dt);
 
 	std::string GetOwnPort()
 	{
 		return MyInfo.port;
 	}
-	
+
 	void HandleRecvMessage(std::string message);
-	std::pair<ShipID, std::string> HandleLockStepMessage(std::string message);
+	bool HandleLockStepMessage(std::pair<ShipID, std::string>& pair, std::string message);
 	void SendUpdatePacket(ShipID id);
 };

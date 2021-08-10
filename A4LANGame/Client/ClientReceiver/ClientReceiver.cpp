@@ -47,8 +47,16 @@ int ClientReceiver::RecvFromSocket(SOCKET serverSocket, std::string& message)
 	message.clear();
 	message.append(buffer, bytesReceived);
 
+	std::string header;
+	Parser::GetPacket(message, header);
+
+	if (header == "[LOCK]")
+	{
+		clientManager->lock = true;
+	}
+
 	std::cout << "RECV: \n" << message << std::endl;
-	std::cout << bytesReceived << std::endl;
+	std::cout << std::endl;
 
 	return bytesReceived;
 }
