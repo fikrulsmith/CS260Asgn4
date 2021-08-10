@@ -118,9 +118,9 @@ GameObj* GameObjectFactory::GetGameObjData()
 }
 /******************************************************************************/
 /*!
-\fn GameObj* GameObjectFactory::GetGameObjData()
+GameObjInst* GameObjectFactory::GetGameObjInstData()
 \brief Get the list of Game Objects Instance
-\return Address of Game List
+\return Address of Game List Instance
 */
 /******************************************************************************/
 GameObjInst* GameObjectFactory::GetGameObjInstData()
@@ -129,26 +129,44 @@ GameObjInst* GameObjectFactory::GetGameObjInstData()
 }
 /******************************************************************************/
 /*!
-\fn GameObj* GameObjectFactory::GetGameObjData()
-\brief Get the list of Game Objects Instance
-\return Address of Game List
+\fn unsigned long GameObjectFactory::GetGameObjSize() const
+\brief Get the numbers of game objects
+\return sGameObjNum
 */
 /******************************************************************************/
 unsigned long GameObjectFactory::GetGameObjSize() const
 {
 	return sGameObjNum;
 }
-
+/******************************************************************************/
+/*!
+\fn unsigned long GameObjectFactory::GetGameObjInstSize() const
+\brief Get the numbers of game objects
+\return sGameObjInstNum
+*/
+/******************************************************************************/
 unsigned long GameObjectFactory::GetGameObjInstSize() const
 {
 	return sGameObjInstNum;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameObjectFactory::SetGameObjSize(unsigned long size)
+\brief Set the numbers of game objects
+\param size
+*/
+/******************************************************************************/
 void GameObjectFactory::SetGameObjSize(unsigned long size)
 {
 	sGameObjNum = size;
 }
-
+/******************************************************************************/
+/*!
+\fn void GameObjectFactory::SetGameObjInstSize(unsigned long size)
+\brief Set the numbers of game object instances
+\param size
+*/
+/******************************************************************************/
 void GameObjectFactory::SetGameObjInstSize(unsigned long size)
 {
 	sGameObjInstNum = size;
