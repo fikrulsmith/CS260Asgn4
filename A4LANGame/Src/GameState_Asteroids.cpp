@@ -136,6 +136,7 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 			// If the object is not active, don't do anything
 			if ((pInst->flag & FLAG_ACTIVE) == 0)
 			{
+				//continue
 				continue;
 			}
 
