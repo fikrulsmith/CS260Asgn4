@@ -18,6 +18,10 @@ class DeadReckoning
 
 	bool extrapolating{ false };
 	bool isInit{ false };
+	bool goingFront{ false };
+	bool goingBack{ false };
+	bool RotLeft{ false };
+	bool RotRight{ false };
 public:
 	void Init(AEVec2 Position, AEVec2 Velocity, AEVec2 Acceleration, float direction);
 	void Predict(AEVec2& UpdatePosition, AEVec2& UpdateVelocity, float& direction, float dt);
