@@ -19,6 +19,8 @@ This file contains an implementation of the functionality of lockstep
 /*!
 \brief Hashes the input
 
+\param input
+
 \return
 	Returns the hash string
 */
@@ -31,6 +33,10 @@ std::string LockStep::HashInput(std::string input)
 /******************************************************************************/
 /*!
 \brief Compares the string with a hash input
+
+\param input
+
+\param hashInput
 
 \return
 	Returns if it is the same

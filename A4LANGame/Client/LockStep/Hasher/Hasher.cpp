@@ -15,6 +15,16 @@ This file contains an implementation of the functionality of hashing
 #include "Global.h"
 #include "Hasher.h"
 
+/******************************************************************************/
+/*!
+\brief Hashes the input
+
+\param input
+
+\return
+	Returns the hash string
+*/
+/******************************************************************************/
 std::string Hasher::HashString(std::string input)
 {
 	std::vector<unsigned char> hash(picosha2::k_digest_size);
