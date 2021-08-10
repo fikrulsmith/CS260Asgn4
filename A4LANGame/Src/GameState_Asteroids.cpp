@@ -121,7 +121,6 @@ void AsteroidsGameState::GameStateAsteroidsUpdate(void)
 
 		for (size_t i = 0; i < clientManager->GetNumberOfClients(); ++i)
 		{
-			if (clientManager->GetClient(i)->state != ShipState::SHOOTING) break;
 			IDToPlayerShip_[clientManager->GetClient(i)->id]->shipComp.sShipState = clientManager->GetClient(i)->state;
 			auto search = StateToInput_.find(clientManager->GetClient(i)->state);
 
@@ -504,18 +503,8 @@ void AsteroidsGameState::GameStateAsteroidsInit(void)
 		spawnAsteroid();
 	}
 
-	StateToInput_[ShipState::MOVINGFORWARD] = std::bind(&AsteroidsGameState::PlayerMoveForward, this,
-		std::placeholders::_1);
-	StateToInput_[ShipState::MOVINGBACKWARDS] = std::bind(&AsteroidsGameState::PlayerMoveBackwards, this,
-		std::placeholders::_1);
-	StateToInput_[ShipState::ROTATINGLEFT] = std::bind(&AsteroidsGameState::PlayerRotateLeft, this,
-		std::placeholders::_1);
-	StateToInput_[ShipState::ROTATINGRIGHT] = std::bind(&AsteroidsGameState::PlayerRotateRight, this,
-		std::placeholders::_1);
 	StateToInput_[ShipState::SHOOTING] = std::bind(&AsteroidsGameState::PlayerShoot, this,
 		std::placeholders::_1);
-
-
 }
 
 void AsteroidsGameState::GameStateAsteroidsDraw(void)
